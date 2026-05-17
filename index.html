@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGRATHA 2K26 - Loading...</title>
+  <meta http-equiv="refresh" content="0;url=AGRATHA-2K26-0417/index.html">
+  <style>
+    body {
+      margin: 0; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: #0a0a0f; color: #f0f0f5;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .loader {
+      text-align: center;
+    }
+    .loader h2 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .loader p { color: #8a8a9a; font-size: 0.9rem; }
+    .spinner {
+      width: 40px; height: 40px; margin: 0 auto 20px;
+      border: 3px solid rgba(255,255,255,0.08);
+      border-top-color: #00d4ff; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <h2>AGRATHA 2K26</h2>
+    <p>Redirecting to portal...</p>
+  </div>
+  <script>
+    // Immediate redirect as backup
+    window.location.href = 'AGRATHA-2K26-0417/index.html';
+  </script>
+</body>
+</html>

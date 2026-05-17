@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="auth-wrapper">
+    <div class="auth-card fade-in-up" style="max-width:520px">
+      <h2>Join AGRATHA 2K26</h2>
+      <p class="subtitle">Create your account and start participating</p>
+      <!-- Auth Error Display -->
+      <div id="auth-error" style="display:none;padding:14px 16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);color:var(--accent-red);font-size:0.85rem;margin-bottom:20px;line-height:1.5"></div>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" class="input-field" placeholder="Your full name" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" class="input-field" placeholder="you@college.edu" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" class="input-field" placeholder="Min 6 characters" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="phone" class="input-field" placeholder="+91 98765 43210">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group">
+            <label>College</label>
+            <input type="text" id="college" class="input-field" placeholder="College name">
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <input type="text" id="department" class="input-field" placeholder="CSE, ECE, etc.">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Create Account</button>
+      </form>
+      <p style="text-align:center;margin-top:24px;color:var(--text-secondary);font-size:0.9rem">
+        Already have an account? <a href="login.html">Sign in</a>
+      </p>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar('register');
+      initParticles('particles-canvas', 30);
+    });
+  </script>
+</body>
+</html>

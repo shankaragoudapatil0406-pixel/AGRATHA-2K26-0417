@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Events - AGRATHA 2K26</title>
+  <meta name="description" content="Admin panel to create, edit, and delete events for AGRATHA 2K26.">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content with-sidebar">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px">
+      <div>
+        <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:4px">Manage Events</h1>
+        <p style="color:var(--text-secondary);font-size:0.9rem">Create, edit, and manage all fest events</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateModal()">
+        <i data-lucide="plus" style="width:18px;height:18px"></i> Create Event
+      </button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid-4" id="event-stats" style="margin-bottom:32px">
+      <div class="stat-card"><div class="stat-value" id="s-total">0</div><div class="stat-label">Total Events</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-upcoming">0</div><div class="stat-label">Upcoming</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-ongoing">0</div><div class="stat-label">Ongoing</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-completed">0</div><div class="stat-label">Completed</div></div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <input type="text" id="admin-search" class="input-field" placeholder="Search events..." style="max-width:300px" oninput="adminFilterEvents()">
+      <select id="admin-category" class="input-field" style="max-width:180px" onchange="adminFilterEvents()">
+        <option value="">All Categories</option>
+        <option value="technical">Technical</option>
+        <option value="cultural">Cultural</option>
+        <option value="workshop">Workshop</option>
+        <option value="sports">Sports</option>
+        <option value="gaming">Gaming</option>
+      </select>
+    </div>
+
+    <!-- Events Table -->
+    <div class="glass-card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="data-table" id="admin-events-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Venue</th>
+              <th>Registrations</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-events-tbody">
+            <tr><td colspan="7"><div class="loading-spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE / EDIT MODAL -->
+  <div class="modal-overlay" id="event-modal">
+    <div class="modal modal-lg">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <h3 id="modal-title">Create Event</h3>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+      <form id="event-form" onsubmit="saveEvent(event)">
+        <input type="hidden" id="edit-id">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Event Title *</label>
+            <input type="text" id="f-title" class="input-field" required placeholder="e.g. Hackathon 2026">
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="f-category" class="input-field" required>
+              <option value="">Select category</option>
+              <option value="technical">💻 Technical</option>
+              <option value="cultural">🎭 Cultural</option>
+              <option value="workshop">🔧 Workshop</option>
+              <option value="sports">⚽ Sports</option>
+              <option value="gaming">🎮 Gaming</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="f-description" class="input-field" rows="4" placeholder="Describe the event..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Event Date *</label>
+            <input type="datetime-local" id="f-date" class="input-field" required>
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="datetime-local" id="f-end-date" class="input-field">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Venue</label>
+            <input type="text" id="f-venue" class="input-field" placeholder="e.g. Main Auditorium">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="f-status" class="input-field">
+              <option value="upcoming">Upcoming</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Max Participants</label>
+            <input type="number" id="f-max" class="input-field" placeholder="e.g. 100" min="1">
+          </div>
+          <div class="form-group">
+            <label>Team Size</label>
+            <input type="number" id="f-team" class="input-field" value="1" min="1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Rules</label>
+          <textarea id="f-rules" class="input-field" rows="3" placeholder="Event rules (one per line)..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Prizes</label>
+          <textarea id="f-prizes" class="input-field" rows="3" placeholder="Prize details..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="url" id="f-image" class="input-field" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px">
+          <button type="submit" class="btn btn-primary" style="flex:1" id="save-btn">Create Event</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal" style="max-width:420px;text-align:center">
+      <div style="font-size:3rem;margin-bottom:16px">⚠️</div>
+      <h3 style="margin-bottom:8px">Delete Event?</h3>
+      <p style="color:var(--text-secondary);margin-bottom:24px;font-size:0.9rem">This action cannot be undone. All registrations for this event will also be deleted.</p>
+      <input type="hidden" id="delete-id">
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-danger" style="flex:1" onclick="confirmDelete()">Delete</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminEvents = [];
+    let adminRegCounts = {};
+    let adminUser = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      adminUser = await requireAuth('admin');
+      if (!adminUser) return;
+      renderNavbar('admin');
+      renderSidebar('admin', 'manage-events');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      await loadAdminEvents();
+    });
+
+    async function loadAdminEvents() {
+      const { data } = await supabase.from('events').select('*').order('created_at', { ascending: false });
+      adminEvents = data || [];
+
+      // Get registration counts
+      const { data: regs } = await supabase.from('registrations').select('event_id');
+      adminRegCounts = {};
+      (regs || []).forEach(r => { adminRegCounts[r.event_id] = (adminRegCounts[r.event_id] || 0) + 1; });
+
+      // Update stats
+      document.getElementById('s-total').textContent = adminEvents.length;
+      document.getElementById('s-upcoming').textContent = adminEvents.filter(e => e.status === 'upcoming').length;
+      document.getElementById('s-ongoing').textContent = adminEvents.filter(e => e.status === 'ongoing').length;
+      document.getElementById('s-completed').textContent = adminEvents.filter(e => e.status === 'completed').length;
+
+      renderAdminTable(adminEvents);
+    }
+
+    function renderAdminTable(events) {
+      const tbody = document.getElementById('admin-events-tbody');
+      if (!events.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px">No events found. Click "Create Event" to add your first event.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = events.map(e => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.3rem">${getCategoryIcon(e.category)}</span>
+              <div>
+                <div style="font-weight:600;margin-bottom:2px">${e.title}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted)">${(e.description || '').substring(0, 50)}${(e.description || '').length > 50 ? '...' : ''}</div>
+              </div>
+            </div>
+          </td>
+          <td>${getCategoryBadge(e.category)}</td>
+          <td style="color:var(--text-secondary);white-space:nowrap">${formatDate(e.event_date)}</td>
+          <td>${getStatusBadge(e.status)}</td>
+          <td style="color:var(--text-secondary)">${e.venue || '—'}</td>
+          <td>
+            <span style="font-family:var(--font-display);color:var(--accent-cyan)">${adminRegCounts[e.id] || 0}</span>
+            <span style="color:var(--text-muted);font-size:0.8rem">/ ${e.max_participants || '∞'}</span>
+          </td>
+          <td>
+            <div class="admin-event-actions" style="justify-content:flex-end">
+              <button class="btn-icon" onclick="openEditModal('${e.id}')" title="Edit">
+                <i data-lucide="pencil" style="width:16px;height:16px"></i>
+              </button>
+              <a class="btn-icon" href="event-detail.html?id=${e.id}" title="View" target="_blank">
+                <i data-lucide="external-link" style="width:16px;height:16px"></i>
+              </a>
+              <button class="btn-icon danger" onclick="openDeleteModal('${e.id}')" title="Delete">
+                <i data-lucide="trash-2" style="width:16px;height:16px"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function adminFilterEvents() {
+      const search = document.getElementById('admin-search').value.toLowerCase();
+      const cat = document.getElementById('admin-category').value;
+      const filtered = adminEvents.filter(e => {
+        const matchSearch = !search || (e.title || '').toLowerCase().includes(search) || (e.description || '').toLowerCase().includes(search);
+        const matchCat = !cat || e.category === cat;
+        return matchSearch && matchCat;
+      });
+      renderAdminTable(filtered);
+    }
+
+    // ===== MODAL OPERATIONS =====
+    function openCreateModal() {
+      document.getElementById('modal-title').textContent = 'Create Event';
+      document.getElementById('save-btn').textContent = 'Create Event';
+      document.getElementById('edit-id').value = '';
+      document.getElementById('event-form').reset();
+      document.getElementById('f-team').value = '1';
+      document.getElementById('f-status').value = 'upcoming';
+      document.getElementById('event-modal').classList.add('active');
+    }
+
+    function openEditModal(eventId) {
+      const event = adminEvents.find(e => e.id === eventId);
+      if (!event) return;
+      document.getElementById('modal-title').textContent = 'Edit Event';
+      document.getElementById('save-btn').textContent = 'Update Event';
+      document.getElementById('edit-id').value = event.id;
+      document.getElementById('f-title').value = event.title || '';
+      document.getElementById('f-category').value = event.category || '';
+      document.getElementById('f-description').value = event.description || '';
+      document.getElementById('f-venue').value = event.venue || '';
+      document.getElementById('f-status').value = event.status || 'upcoming';
+      document.getElementById('f-max').value = event.max_participants || '';
+      document.getElementById('f-team').value = event.team_size || 1;
+      document.getElementById('f-rules').value = event.rules || '';
+      document.getElementById('f-prizes').value = event.prizes || '';
+      document.getElementById('f-image').value = event.image_url || '';
+      // Format dates for datetime-local input
+      if (event.event_date) document.getElementById('f-date').value = new Date(event.event_date).toISOString().slice(0, 16);
+      if (event.end_date) document.getElementById('f-end-date').value = new Date(event.end_date).toISOString().slice(0, 16);
+      document.getElementById('event-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('event-modal').classList.remove('active');
+    }
+
+    async function saveEvent(e) {
+      e.preventDefault();
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      const isEdit = !!document.getElementById('edit-id').value;
+      btn.textContent = isEdit ? 'Updating...' : 'Creating...';
+
+      const payload = {
+        title: document.getElementById('f-title').value,
+        category: document.getElementById('f-category').value,
+        description: document.getElementById('f-description').value,
+        event_date: document.getElementById('f-date').value || null,
+        end_date: document.getElementById('f-end-date').value || null,
+        venue: document.getElementById('f-venue').value,
+        status: document.getElementById('f-status').value,
+        max_participants: parseInt(document.getElementById('f-max').value) || null,
+        team_size: parseInt(document.getElementById('f-team').value) || 1,
+        rules: document.getElementById('f-rules').value,
+        prizes: document.getElementById('f-prizes').value,
+        image_url: document.getElementById('f-image').value || null,
+      };
+
+      try {
+        if (isEdit) {
+          const { error } = await supabase.from('events').update(payload).eq('id', document.getElementById('edit-id').value);
+          if (error) throw error;
+          showToast('Event updated successfully!', 'success');
+        } else {
+          payload.created_by = adminUser.id;
+          const { error } = await supabase.from('events').insert(payload);
+          if (error) throw error;
+          showToast('Event created successfully!', 'success');
+        }
+        closeModal();
+        await loadAdminEvents();
+      } catch (err) {
+        showToast(err.message || 'Failed to save event', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = isEdit ? 'Update Event' : 'Create Event';
+      }
+    }
+
+    // ===== DELETE =====
+    function openDeleteModal(eventId) {
+      document.getElementById('delete-id').value = eventId;
+      document.getElementById('delete-modal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-modal').classList.remove('active');
+    }
+
+    async function confirmDelete() {
+      const id = document.getElementById('delete-id').value;
+      if (!id) return;
+      try {
+        const { error } = await supabase.from('events').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Event deleted successfully', 'success');
+        closeDeleteModal();
+        await loadAdminEvents();
+      } catch (err) {
+        showToast(err.message || 'Failed to delete event', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

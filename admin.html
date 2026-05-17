@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content with-sidebar">
+    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:8px">Admin Dashboard</h1>
+    <p style="color:var(--text-secondary);margin-bottom:32px">Overview of platform activity</p>
+    <div class="grid-4" id="admin-stats">
+      <div class="stat-card"><div class="stat-value" id="a-events">0</div><div class="stat-label">Total Events</div></div>
+      <div class="stat-card"><div class="stat-value" id="a-users">0</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-value" id="a-regs">0</div><div class="stat-label">Registrations</div></div>
+      <div class="stat-card"><div class="stat-value" id="a-teams">0</div><div class="stat-label">Teams</div></div>
+    </div>
+    <div class="grid-2" style="margin-top:32px">
+      <div class="glass-card">
+        <h3 style="font-family:var(--font-heading);margin-bottom:16px">Registrations by Category</h3>
+        <canvas id="regChart" height="250"></canvas>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-family:var(--font-heading);margin-bottom:16px">Post Announcement</h3>
+        <form id="announcement-form">
+          <div class="form-group"><label>Title</label><input type="text" id="ann-title" class="input-field" required placeholder="Announcement title"></div>
+          <div class="form-group"><label>Content</label><textarea id="ann-content" class="input-field" rows="4" required placeholder="Write your announcement..."></textarea></div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="ann-priority" class="input-field">
+              <option value="normal">Normal</option>
+              <option value="important">Important</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Post Announcement</button>
+        </form>
+      </div>
+    </div>
+    <div class="glass-card" style="margin-top:32px">
+      <h3 style="font-family:var(--font-heading);margin-bottom:16px">Recent Events</h3>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="events-table">
+          <thead><tr><th>Event</th><th>Category</th><th>Date</th><th>Status</th><th>Registrations</th></tr></thead>
+          <tbody id="events-tbody"><tr><td colspan="5"><div class="loading-spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await requireAuth('admin');
+      if (!user) return;
+      renderNavbar('admin');
+      renderSidebar('admin', 'dashboard');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+
+      // Stats
+      const { count: ec } = await supabase.from('events').select('id', { count: 'exact', head: true });
+      const { count: uc } = await supabase.from('users').select('id', { count: 'exact', head: true });
+      const { count: rc } = await supabase.from('registrations').select('id', { count: 'exact', head: true });
+      const { count: tc } = await supabase.from('teams').select('id', { count: 'exact', head: true });
+      document.getElementById('a-events').textContent = ec || 0;
+      document.getElementById('a-users').textContent = uc || 0;
+      document.getElementById('a-regs').textContent = rc || 0;
+      document.getElementById('a-teams').textContent = tc || 0;
+
+      // Chart
+      const { data: events } = await supabase.from('events').select('category');
+      const catCounts = {};
+      (events || []).forEach(e => { catCounts[e.category || 'other'] = (catCounts[e.category || 'other'] || 0) + 1; });
+      new Chart(document.getElementById('regChart'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(catCounts),
+          datasets: [{ data: Object.values(catCounts), backgroundColor: ['#00d4ff', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#ef4444'], borderWidth: 0 }]
+        },
+        options: { responsive: true, plugins: { legend: { labels: { color: '#8a8a9a' } } } }
+      });
+
+      // Events table
+      const { data: allEvents } = await supabase.from('events').select('*').order('created_at', { ascending: false }).limit(10);
+      const tbody = document.getElementById('events-tbody');
+      if (!allEvents || !allEvents.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">No events yet</td></tr>';
+      } else {
+        tbody.innerHTML = allEvents.map(e => `
+          <tr>
+            <td style="font-weight:600">${e.title}</td>
+            <td>${getCategoryBadge(e.category)}</td>
+            <td style="color:var(--text-secondary)">${formatDate(e.event_date)}</td>
+            <td>${getStatusBadge(e.status)}</td>
+            <td style="color:var(--text-secondary)">${e.max_participants || '∞'}</td>
+          </tr>
+        `).join('');
+      }
+
+      // Announcement form
+      document.getElementById('announcement-form').onsubmit = async (ev) => {
+        ev.preventDefault();
+        const btn = ev.target.querySelector('button');
+        btn.disabled = true; btn.textContent = 'Posting...';
+        const { error } = await supabase.from('announcements').insert({
+          title: document.getElementById('ann-title').value,
+          content: document.getElementById('ann-content').value,
+          priority: document.getElementById('ann-priority').value,
+          created_by: user.id,
+        });
+        if (error) { showToast(error.message, 'error'); }
+        else { showToast('Announcement posted!', 'success'); ev.target.reset(); }
+        btn.disabled = false; btn.textContent = 'Post Announcement';
+      };
+    });
+  </script>
+</body>
+</html>

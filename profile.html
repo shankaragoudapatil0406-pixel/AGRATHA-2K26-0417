@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content with-sidebar">
+    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:32px">My Profile</h1>
+    <div class="glass-card" style="max-width:600px">
+      <form id="profile-form">
+        <div class="form-group"><label>Full Name</label><input type="text" id="p-name" class="input-field" required></div>
+        <div class="form-group"><label>Email</label><input type="email" id="p-email" class="input-field" disabled></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="p-phone" class="input-field"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>College</label><input type="text" id="p-college" class="input-field"></div>
+          <div class="form-group"><label>Department</label><input type="text" id="p-dept" class="input-field"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Update Profile</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await requireAuth();
+      if (!user) return;
+      renderNavbar('profile');
+      renderSidebar(user.role, 'profile');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('p-name').value = user.full_name || '';
+      document.getElementById('p-email').value = user.email || '';
+      document.getElementById('p-phone').value = user.phone || '';
+      document.getElementById('p-college').value = user.college || '';
+      document.getElementById('p-dept').value = user.department || '';
+      document.getElementById('profile-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.disabled = true; btn.textContent = 'Saving...';
+        const { error } = await supabase.from('users').update({
+          full_name: document.getElementById('p-name').value,
+          phone: document.getElementById('p-phone').value,
+          college: document.getElementById('p-college').value,
+          department: document.getElementById('p-dept').value,
+        }).eq('id', user.id);
+        if (error) showToast(error.message, 'error');
+        else showToast('Profile updated!', 'success');
+        btn.disabled = false; btn.textContent = 'Update Profile';
+      };
+    });
+  </script>
+</body>
+</html>

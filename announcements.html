@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Announcements - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="main-content" style="max-width:800px;margin-left:auto;margin-right:auto">
+    <div class="section-header" style="margin-top:20px">
+      <h2>📢 Announcements</h2>
+      <p>Stay updated with the latest news</p>
+    </div>
+    <div id="announcements-list"><div class="loading-spinner"></div></div>
+  </div>
+  <footer class="footer" id="footer"></footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      renderNavbar('announcements');
+      renderFooter();
+      initParticles('particles-canvas', 30);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      const { data: anns } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
+      const el = document.getElementById('announcements-list');
+      if (!anns || !anns.length) {
+        el.innerHTML = '<div class="empty-state"><h3>No announcements yet</h3><p>Check back later for updates.</p></div>';
+        return;
+      }
+      const priorityColors = { urgent: 'var(--accent-red)', important: 'var(--accent-orange)', normal: 'var(--accent-cyan)' };
+      el.innerHTML = anns.map(a => `
+        <div class="glass-card fade-in-up" style="margin-bottom:16px;border-left:3px solid ${priorityColors[a.priority] || priorityColors.normal}">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+            <h3 style="font-family:var(--font-heading);font-size:1.1rem">${a.title}</h3>
+            <span class="badge ${a.priority === 'urgent' ? 'badge-red' : a.priority === 'important' ? 'badge-orange' : 'badge-cyan'}">${a.priority || 'normal'}</span>
+          </div>
+          <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:12px">${a.content}</p>
+          <div style="font-size:0.75rem;color:var(--text-muted)">${formatDateTime(a.created_at)}</div>
+        </div>
+      `).join('');
+    });
+  </script>
+</body>
+</html>

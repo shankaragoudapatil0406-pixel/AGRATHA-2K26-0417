@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Teams - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content with-sidebar">
+    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:8px">My Teams</h1>
+    <p style="color:var(--text-secondary);margin-bottom:32px">Manage your teams and members</p>
+    <div id="teams-list"><div class="loading-spinner"></div></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await requireAuth('participant');
+      if (!user) return;
+      renderNavbar('teams');
+      renderSidebar('participant', 'teams');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      const { data: memberships } = await supabase.from('team_members').select('*, teams(*, events(title))').eq('user_id', user.id);
+      const el = document.getElementById('teams-list');
+      if (!memberships || !memberships.length) {
+        el.innerHTML = '<div class="empty-state"><h3>No teams yet</h3><p>Register for team events to create or join teams. <a href="events.html">Browse events</a></p></div>';
+        return;
+      }
+      el.innerHTML = '<div class="grid-2">' + memberships.map(m => `
+        <div class="glass-card">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
+            <h3 style="font-family:var(--font-heading)">${m.teams?.name || 'Team'}</h3>
+            <span class="badge badge-cyan">${m.role || 'member'}</span>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">Event: ${m.teams?.events?.title || 'Unknown'}</p>
+          <p style="font-size:0.8rem;color:var(--text-muted)">Invite Code: <code style="background:var(--bg-glass);padding:2px 8px;border-radius:4px">${m.teams?.invite_code || 'N/A'}</code></p>
+        </div>
+      `).join('') + '</div>';
+    });
+  </script>
+</body>
+</html>

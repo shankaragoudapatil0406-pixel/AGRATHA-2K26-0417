@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tickets - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-content with-sidebar">
+    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:8px">My Tickets</h1>
+    <p style="color:var(--text-secondary);margin-bottom:32px">Your digital event passes</p>
+    <div id="tickets-list"><div class="loading-spinner"></div></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await requireAuth('participant');
+      if (!user) return;
+      renderNavbar('tickets');
+      renderSidebar('participant', 'tickets');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      const { data: regs } = await supabase.from('registrations').select('*, events(*)').eq('user_id', user.id);
+      const el = document.getElementById('tickets-list');
+      if (!regs || !regs.length) {
+        el.innerHTML = '<div class="empty-state"><h3>No tickets yet</h3><p>Register for events to get your digital tickets. <a href="events.html">Browse events</a></p></div>';
+        return;
+      }
+      el.innerHTML = '<div class="grid-2">' + regs.map(r => `
+        <div class="ticket-card">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+            <div>
+              <h3 style="font-family:var(--font-heading);margin-bottom:4px">${r.events?.title || 'Event'}</h3>
+              <p style="font-size:0.8rem;color:var(--text-muted)">${formatDate(r.events?.event_date)}</p>
+            </div>
+            ${getStatusBadge(r.status || 'confirmed')}
+          </div>
+          <div style="display:flex;gap:16px;font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px">
+            <span><i data-lucide="map-pin" style="width:14px;height:14px;display:inline"></i> ${r.events?.venue || 'TBD'}</span>
+            <span>${getCategoryBadge(r.events?.category)}</span>
+          </div>
+          <div style="padding:12px;background:var(--bg-glass);border-radius:var(--radius-sm);text-align:center;border:1px dashed var(--border-glass)">
+            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">TICKET ID</div>
+            <div style="font-family:var(--font-display);font-size:0.85rem;color:var(--accent-cyan);letter-spacing:2px">${(r.id || '').substring(0, 8).toUpperCase()}</div>
+          </div>
+        </div>
+      `).join('') + '</div>';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

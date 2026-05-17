@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="main-content" style="max-width:800px;margin-left:auto;margin-right:auto">
+    <div class="section-header" style="margin-top:20px">
+      <h2>🏆 Leaderboard</h2>
+      <p>Top performers across all events</p>
+    </div>
+    <div id="leaderboard-list"><div class="loading-spinner"></div></div>
+  </div>
+  <footer class="footer" id="footer"></footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      renderNavbar('leaderboard');
+      renderFooter();
+      initParticles('particles-canvas', 30);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      const { data: users } = await supabase.from('users').select('full_name, college, points').order('points', { ascending: false }).limit(50);
+      const el = document.getElementById('leaderboard-list');
+      if (!users || !users.length) {
+        el.innerHTML = '<div class="empty-state"><h3>No rankings yet</h3><p>Participate in events to earn points!</p></div>';
+        return;
+      }
+      el.innerHTML = users.map((u, i) => `
+        <div class="leaderboard-row fade-in-up" style="animation-delay:${i * 0.05}s">
+          <div class="rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">#${i + 1}</div>
+          <div class="name">
+            <div style="font-weight:600">${u.full_name || 'Anonymous'}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">${u.college || ''}</div>
+          </div>
+          <div class="score">${u.points || 0} pts</div>
+        </div>
+      `).join('');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Sample Events - AGRATHA 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card" style="max-width:560px;text-align:center">
+      <div style="font-size:3rem;margin-bottom:12px">🚀</div>
+      <h2>Setup AGRATHA Events</h2>
+      <p class="subtitle">Click below to populate your database with 6 sample events</p>
+      <div style="text-align:left;margin-bottom:24px">
+        <div class="glass-card" style="padding:16px">
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--text-secondary)">
+            <div style="display:flex;align-items:center;gap:8px">💻 <strong style="color:var(--text-primary)">Hackathon 2026</strong> — Technical</div>
+            <div style="display:flex;align-items:center;gap:8px">💻 <strong style="color:var(--text-primary)">Coding Challenge</strong> — Technical</div>
+            <div style="display:flex;align-items:center;gap:8px">💻 <strong style="color:var(--text-primary)">Tech Quiz</strong> — Technical</div>
+            <div style="display:flex;align-items:center;gap:8px">🔧 <strong style="color:var(--text-primary)">Robo Race</strong> — Workshop</div>
+            <div style="display:flex;align-items:center;gap:8px">🎭 <strong style="color:var(--text-primary)">Cultural Night</strong> — Cultural</div>
+            <div style="display:flex;align-items:center;gap:8px">🔧 <strong style="color:var(--text-primary)">Workshop on AI</strong> — Workshop</div>
+          </div>
+        </div>
+      </div>
+      <button id="add-btn" class="btn btn-primary btn-lg" style="width:100%;margin-bottom:16px" onclick="addSampleEvents()">
+        <i data-lucide="database" style="width:18px;height:18px"></i> Add Sample Events
+      </button>
+      <div id="status" style="color:var(--text-secondary);font-size:0.9rem"></div>
+      <a href="events.html" style="display:inline-block;margin-top:16px;font-size:0.85rem">← Back to Events</a>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+
+    async function addSampleEvents() {
+      const btn = document.getElementById('add-btn');
+      const status = document.getElementById('status');
+      btn.disabled = true; btn.textContent = '⏳ Adding Events...';
+      status.textContent = 'Inserting events into Supabase...';
+
+      const events = [
+        {
+          title: 'Hackathon 2026',
+          description: '24-hour non-stop hackathon! Build innovative solutions for real-world problems using any tech stack. Collaborate, code, and compete for amazing prizes. Mentors from top tech companies will guide you throughout the event.',
+          category: 'technical',
+          status: 'upcoming',
+          venue: 'Innovation Hub, Block A',
+          event_date: '2026-08-15T09:00:00',
+          end_date: '2026-08-16T09:00:00',
+          max_participants: 200,
+          team_size: 4,
+          rules: '1. Teams of up to 4 members\n2. 24-hour continuous coding\n3. Any programming language or framework allowed\n4. Pre-built templates not allowed\n5. All code must be written during the event\n6. Final demo and pitch required',
+          prizes: '🥇 1st Place: ₹50,000 + Internship Offers\n🥈 2nd Place: ₹25,000\n🥉 3rd Place: ₹10,000\n🏆 Best UI/UX: ₹5,000\n🏆 Most Innovative: ₹5,000',
+          image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop'
+        },
+        {
+          title: 'Coding Challenge',
+          description: 'Test your algorithmic skills in this intense competitive programming contest. Solve complex problems under time pressure and climb the leaderboard. Multiple rounds with increasing difficulty.',
+          category: 'technical',
+          status: 'upcoming',
+          venue: 'CS Lab 1, Block B',
+          event_date: '2026-08-16T10:00:00',
+          end_date: '2026-08-16T14:00:00',
+          max_participants: 150,
+          team_size: 1,
+          rules: '1. Individual participation only\n2. 4-hour duration, 3 rounds\n3. Any programming language allowed\n4. Internet access restricted to documentation only\n5. Plagiarism = instant disqualification',
+          prizes: '🥇 1st: ₹15,000\n🥈 2nd: ₹8,000\n🥉 3rd: ₹4,000\n⭐ Top 10 get certificates of excellence',
+          image_url: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&h=400&fit=crop'
+        },
+        {
+          title: 'Tech Quiz',
+          description: 'A thrilling quiz competition covering topics from Data Structures, Algorithms, Web Technologies, AI/ML, Cybersecurity, and General Tech Knowledge. Quick thinking wins!',
+          category: 'technical',
+          status: 'upcoming',
+          venue: 'Seminar Hall A',
+          event_date: '2026-08-17T10:00:00',
+          end_date: '2026-08-17T13:00:00',
+          max_participants: 100,
+          team_size: 2,
+          rules: '1. Teams of 2 members\n2. 4 rounds: MCQ, Rapid Fire, Visual Round, Buzzer Round\n3. No electronic devices during the quiz\n4. Judges decision is final',
+          prizes: '🥇 1st: ₹8,000\n🥈 2nd: ₹4,000\n🥉 3rd: ₹2,000',
+          image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop'
+        },
+        {
+          title: 'Robo Race',
+          description: 'Design and race your robots through a challenging obstacle course! Navigate sharp turns, ramps, tunnels, and surprise obstacles. Speed and precision matter equally.',
+          category: 'workshop',
+          status: 'upcoming',
+          venue: 'Robotics Lab & Open Ground',
+          event_date: '2026-08-18T09:00:00',
+          end_date: '2026-08-18T17:00:00',
+          max_participants: 60,
+          team_size: 3,
+          rules: '1. Teams of 3 members\n2. Bot dimensions: max 30x30x30 cm\n3. Wired or wireless control allowed\n4. Bot must be self-built (no pre-made kits)\n5. Time-based scoring with penalties for obstacles',
+          prizes: '🥇 1st: ₹20,000\n🥈 2nd: ₹10,000\n🥉 3rd: ₹5,000\n🏆 Best Design: ₹3,000',
+          image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&h=400&fit=crop'
+        },
+        {
+          title: 'Cultural Night',
+          description: 'An electrifying evening of dance, music, drama, and artistic performances! Showcase your talent on the grand stage with professional lighting and sound. Solo and group performances welcome.',
+          category: 'cultural',
+          status: 'upcoming',
+          venue: 'Main Auditorium',
+          event_date: '2026-08-19T18:00:00',
+          end_date: '2026-08-19T23:00:00',
+          max_participants: 120,
+          team_size: 1,
+          rules: '1. Solo and group entries accepted\n2. Performance duration: 5-8 minutes\n3. Pre-register your act type (dance/music/drama/other)\n4. No offensive or inappropriate content\n5. Music tracks must be submitted 24 hours before',
+          prizes: '🥇 Best Performance: ₹15,000\n🥈 Runner Up: ₹8,000\n🏆 Best Solo Act: ₹5,000\n🏆 Best Group Act: ₹5,000\n⭐ Audience Choice: ₹3,000',
+          image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop'
+        },
+        {
+          title: 'Workshop on AI',
+          description: 'Hands-on workshop covering fundamentals of Artificial Intelligence and Machine Learning. Learn to build neural networks, train models, and deploy AI applications. No prior ML experience required!',
+          category: 'workshop',
+          status: 'upcoming',
+          venue: 'Smart Classroom, Block C',
+          event_date: '2026-08-15T14:00:00',
+          end_date: '2026-08-15T18:00:00',
+          max_participants: 80,
+          team_size: 1,
+          rules: '1. Bring your own laptop\n2. Python basics recommended\n3. All materials and datasets provided\n4. Hands-on exercises throughout\n5. Certificate of completion for all attendees',
+          prizes: '📜 Certificates for all participants\n🏆 Best Project: ₹3,000\n⭐ Top 5 get LinkedIn recommendations from industry mentors',
+          image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop'
+        }
+      ];
+
+      try {
+        const { error } = await supabase.from('events').insert(events);
+        if (error) throw error;
+        status.innerHTML = '<span style="color:var(--accent-green)">✅ ' + events.length + ' events added successfully!</span>';
+        btn.textContent = '✓ Done!';
+        btn.style.background = 'var(--accent-green)';
+        setTimeout(() => { window.location.href = 'events.html'; }, 1500);
+      } catch (err) {
+        status.innerHTML = '<span style="color:var(--accent-red)">❌ Error: ' + err.message + '</span>';
+        btn.disabled = false; btn.textContent = '🔄 Try Again';
+      }
+    }
+  </script>
+</body>
+</html>

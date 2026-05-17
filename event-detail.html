@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details - AGRATHA 2K26</title>
+  <meta name="description" content="View event details, register, and track countdown at AGRATHA 2K26.">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <div class="main-content" style="max-width:900px;margin-left:auto;margin-right:auto">
+    <div id="event-content"><div class="loading-spinner"></div></div>
+  </div>
+  <footer class="footer" id="footer"></footer>
+
+  <script>
+    let detailCountdownInterval = null;
+
+    async function loadEventDetail() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      const container = document.getElementById('event-content');
+      if (!id) {
+        container.innerHTML = '<div class="empty-state"><h3>Event not found</h3><p>No event ID provided.</p><a href="events.html" class="btn btn-primary" style="margin-top:16px">← Browse Events</a></div>';
+        return;
+      }
+
+      const { data: event, error } = await supabase.from('events').select('*').eq('id', id).single();
+      if (error || !event) {
+        container.innerHTML = '<div class="empty-state"><h3>Event not found</h3><p>This event may have been removed.</p><a href="events.html" class="btn btn-primary" style="margin-top:16px">← Browse Events</a></div>';
+        return;
+      }
+
+      document.title = event.title + ' - AGRATHA 2K26';
+
+      const user = await getCurrentUser();
+      let isRegistered = false;
+      if (user) {
+        const { data } = await supabase.from('registrations').select('id').eq('event_id', id).eq('user_id', user.id).single();
+        isRegistered = !!data;
+      }
+
+      const { count } = await supabase.from('registrations').select('id', { count: 'exact', head: true }).eq('event_id', id);
+      const regCount = count || 0;
+      const maxP = event.max_participants || 0;
+      const pct = maxP > 0 ? Math.min(100, Math.round((regCount / maxP) * 100)) : 0;
+      const isFull = maxP > 0 && regCount >= maxP;
+      const icon = getCategoryIcon(event.category);
+
+      const bannerHTML = event.image_url
+        ? `<img src="${event.image_url}" alt="${event.title}">`
+        : `<div class="banner-placeholder">${icon}</div>`;
+
+      // Registration button
+      let regButton = '';
+      if (!user) {
+        regButton = '<a href="login.html" class="btn-register" style="max-width:320px;margin:0 auto">Login to Register</a>';
+      } else if (isRegistered) {
+        regButton = '<button class="btn-register registered" style="max-width:320px;margin:0 auto" disabled>✓ Already Registered</button>';
+      } else if (isFull) {
+        regButton = '<button class="btn-register registered" style="max-width:320px;margin:0 auto" disabled>🚫 Event Full</button>';
+      } else {
+        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}')">Register Now →</button>`;
+      }
+
+      container.innerHTML = `
+        <a href="events.html" style="display:inline-flex;align-items:center;gap:8px;margin-bottom:24px;color:var(--text-secondary);font-size:0.9rem;transition:color 0.3s">
+          <i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back to Events
+        </a>
+
+        <!-- Image Banner -->
+        <div class="detail-banner">
+          ${bannerHTML}
+          <div class="banner-overlay"></div>
+        </div>
+
+        <!-- Badges -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          ${getCategoryBadge(event.category)}
+          ${getStatusBadge(event.status)}
+          ${event.team_size > 1 ? '<span class="badge badge-orange">Team of ' + event.team_size + '</span>' : '<span class="badge badge-green">Individual</span>'}
+        </div>
+
+        <!-- Title -->
+        <h1 style="font-family:var(--font-heading);font-size:2.2rem;margin-bottom:16px;line-height:1.3">${event.title}</h1>
+
+        <!-- Meta Info -->
+        <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:24px;color:var(--text-secondary);font-size:0.9rem">
+          <span style="display:flex;align-items:center;gap:6px"><i data-lucide="calendar" style="width:16px;height:16px;color:var(--accent-cyan)"></i> ${formatDate(event.event_date)}${event.event_date ? ' · ' + formatTime(event.event_date) : ''}</span>
+          <span style="display:flex;align-items:center;gap:6px"><i data-lucide="map-pin" style="width:16px;height:16px;color:var(--accent-cyan)"></i> ${event.venue || 'TBD'}</span>
+          <span style="display:flex;align-items:center;gap:6px"><i data-lucide="users" style="width:16px;height:16px;color:var(--accent-cyan)"></i> ${regCount} / ${maxP > 0 ? maxP : '∞'} registered</span>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="glass-card" style="text-align:center;margin-bottom:24px">
+          <h3 style="font-family:var(--font-heading);margin-bottom:16px;font-size:1rem;color:var(--text-secondary)">
+            ${event.status === 'upcoming' ? '⏱️ Event Starts In' : event.status === 'ongoing' ? '🟢 Event is LIVE' : '✅ Event Completed'}
+          </h3>
+          <div class="detail-countdown" id="detail-countdown" data-date="${event.event_date || ''}">
+            <div class="cd-block"><div class="cd-block-value" id="dc-days">—</div><div class="cd-block-label">Days</div></div>
+            <div class="cd-block"><div class="cd-block-value" id="dc-hours">—</div><div class="cd-block-label">Hours</div></div>
+            <div class="cd-block"><div class="cd-block-value" id="dc-mins">—</div><div class="cd-block-label">Minutes</div></div>
+            <div class="cd-block"><div class="cd-block-value" id="dc-secs">—</div><div class="cd-block-label">Seconds</div></div>
+          </div>
+        </div>
+
+        <!-- Registration Progress -->
+        <div class="detail-progress" ${maxP <= 0 ? 'style="display:none"' : ''}>
+          <div class="progress-info">
+            <span>Registration Progress</span>
+            <span><strong>${regCount}</strong> / ${maxP} spots filled</span>
+          </div>
+          <div class="progress-track"><div class="progress-track-fill" style="width:${pct}%"></div></div>
+        </div>
+
+        <!-- Description -->
+        <div class="glass-card" style="margin-bottom:24px">
+          <h3 style="font-family:var(--font-heading);margin-bottom:12px">📋 About This Event</h3>
+          <p style="color:var(--text-secondary);line-height:1.8;white-space:pre-line">${event.description || 'No description available.'}</p>
+        </div>
+
+        <!-- Rules -->
+        ${event.rules ? `
+        <div class="glass-card" style="margin-bottom:24px">
+          <h3 style="font-family:var(--font-heading);margin-bottom:12px">📜 Rules & Guidelines</h3>
+          <p style="color:var(--text-secondary);line-height:1.8;white-space:pre-line">${event.rules}</p>
+        </div>` : ''}
+
+        <!-- Prizes -->
+        ${event.prizes ? `
+        <div class="glass-card" style="margin-bottom:24px">
+          <h3 style="font-family:var(--font-heading);margin-bottom:12px">🏆 Prizes</h3>
+          <p style="color:var(--text-secondary);line-height:1.8;white-space:pre-line">${event.prizes}</p>
+        </div>` : ''}
+
+        <!-- Register Button -->
+        <div style="text-align:center;margin:32px 0 48px">
+          ${regButton}
+        </div>
+      `;
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      startDetailCountdown(event.event_date);
+    }
+
+    function startDetailCountdown(dateStr) {
+      if (detailCountdownInterval) clearInterval(detailCountdownInterval);
+      if (!dateStr) return;
+
+      function tick() {
+        const diff = new Date(dateStr).getTime() - Date.now();
+        if (diff <= 0) {
+          document.getElementById('dc-days').textContent = '0';
+          document.getElementById('dc-hours').textContent = '0';
+          document.getElementById('dc-mins').textContent = '0';
+          document.getElementById('dc-secs').textContent = '0';
+          return;
+        }
+        document.getElementById('dc-days').textContent = Math.floor(diff / 86400000);
+        document.getElementById('dc-hours').textContent = Math.floor((diff % 86400000) / 3600000);
+        document.getElementById('dc-mins').textContent = Math.floor((diff % 3600000) / 60000);
+        document.getElementById('dc-secs').textContent = Math.floor((diff % 60000) / 1000);
+      }
+      tick();
+      detailCountdownInterval = setInterval(tick, 1000);
+    }
+
+    async function registerForEvent(eventId) {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+      const btn = document.getElementById('detail-reg-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
+      try {
+        const { error } = await supabase.from('registrations').insert({ event_id: eventId, user_id: user.id, status: 'confirmed' });
+        if (error) throw error;
+        showToast('🎉 Successfully registered!', 'success');
+        setTimeout(() => loadEventDetail(), 500);
+      } catch (err) {
+        showToast(err.message || 'Registration failed', 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Register Now →'; }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar('events');
+      renderFooter();
+      initParticles('particles-canvas', 30);
+      loadEventDetail();
+    });
+  </script>
+</body>
+</html>

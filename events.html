@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events - AGRATHA 2K26</title>
+  <meta name="description" content="Discover and register for exciting events at AGRATHA 2K26. Technical, Cultural, Workshop, and Sports events await you.">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+
+  <!-- HERO SECTION -->
+  <section class="events-hero">
+    <h1>Discover Events</h1>
+    <p>Explore, register, and compete in the most exciting events of AGRATHA 2K26</p>
+    <div class="events-hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="stat-total">—</div>
+        <div class="hero-stat-label">Total Events</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="stat-upcoming">—</div>
+        <div class="hero-stat-label">Upcoming</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="stat-categories">—</div>
+        <div class="hero-stat-label">Categories</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="stat-registrations">—</div>
+        <div class="hero-stat-label">Registrations</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTER TOOLBAR -->
+  <div style="max-width:1200px;margin:0 auto;padding:0 32px">
+    <div class="filter-toolbar">
+      <div class="search-wrapper">
+        <i data-lucide="search"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search events by name, description, venue..." oninput="filterEvents()">
+      </div>
+      <div class="filter-pills" id="categoryPills">
+        <button class="filter-pill active" data-category="" onclick="setCategory(this, '')">All</button>
+        <button class="filter-pill" data-category="technical" onclick="setCategory(this, 'technical')">💻 Technical</button>
+        <button class="filter-pill" data-category="cultural" onclick="setCategory(this, 'cultural')">🎭 Cultural</button>
+        <button class="filter-pill" data-category="workshop" onclick="setCategory(this, 'workshop')">🔧 Workshop</button>
+        <button class="filter-pill" data-category="sports" onclick="setCategory(this, 'sports')">⚽ Sports</button>
+      </div>
+    </div>
+
+    <!-- LOADING STATE -->
+    <div id="loading-state" style="text-align:center;padding:60px 20px">
+      <div class="loading-spinner"></div>
+      <p style="color:var(--text-muted);margin-top:16px;font-size:0.9rem" id="loading-text">Loading events...</p>
+    </div>
+
+    <!-- EVENTS GRID -->
+    <div id="events-grid" class="events-grid" style="display:none"></div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="empty-state" style="display:none">
+      <div style="font-size:4rem;margin-bottom:16px;opacity:0.3">🔍</div>
+      <h3>No Events Found</h3>
+      <p>Try adjusting your search or filter to find events.</p>
+    </div>
+  </div>
+
+  <footer class="footer" id="footer"></footer>
+
+  <script>
+    let allEvents = [];
+    let regCounts = {};
+    let userRegs = {};
+    let currentCategory = '';
+    let countdownIntervals = [];
+
+    // ===== SAMPLE EVENTS DATA (auto-seed fallback) =====
+    const SAMPLE_EVENTS = [
+      {
+        id: 'local-1',
+        title: 'Hackathon 2026',
+        description: '24-hour non-stop hackathon! Build innovative solutions for real-world problems using any tech stack. Collaborate, code, and compete for amazing prizes. Mentors from top tech companies will guide you throughout the event.',
+        category: 'technical',
+        status: 'upcoming',
+        venue: 'Innovation Hub, Block A',
+        event_date: '2026-08-15T09:00:00',
+        end_date: '2026-08-16T09:00:00',
+        max_participants: 200,
+        team_size: 4,
+        rules: '1. Teams of up to 4 members\n2. 24-hour continuous coding\n3. Any programming language or framework allowed',
+        prizes: '🥇 1st Place: ₹50,000\n🥈 2nd Place: ₹25,000\n🥉 3rd Place: ₹10,000',
+        image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop'
+      },
+      {
+        id: 'local-2',
+        title: 'Coding Challenge',
+        description: 'Test your algorithmic skills in this intense competitive programming contest. Solve complex problems under time pressure and climb the leaderboard. Multiple rounds with increasing difficulty.',
+        category: 'technical',
+        status: 'upcoming',
+        venue: 'CS Lab 1, Block B',
+        event_date: '2026-08-16T10:00:00',
+        end_date: '2026-08-16T14:00:00',
+        max_participants: 150,
+        team_size: 1,
+        rules: '1. Individual participation only\n2. 4-hour duration, 3 rounds\n3. Any programming language allowed',
+        prizes: '🥇 1st: ₹15,000\n🥈 2nd: ₹8,000\n🥉 3rd: ₹4,000',
+        image_url: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&h=400&fit=crop'
+      },
+      {
+        id: 'local-3',
+        title: 'Tech Quiz',
+        description: 'A thrilling quiz competition covering Data Structures, Algorithms, Web Technologies, AI/ML, Cybersecurity, and General Tech Knowledge. Quick thinking wins!',
+        category: 'technical',
+        status: 'upcoming',
+        venue: 'Seminar Hall A',
+        event_date: '2026-08-17T10:00:00',
+        end_date: '2026-08-17T13:00:00',
+        max_participants: 100,
+        team_size: 2,
+        rules: '1. Teams of 2 members\n2. 4 rounds: MCQ, Rapid Fire, Visual Round, Buzzer Round',
+        prizes: '🥇 1st: ₹8,000\n🥈 2nd: ₹4,000\n🥉 3rd: ₹2,000',
+        image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop'
+      },
+      {
+        id: 'local-4',
+        title: 'Robo Race',
+        description: 'Design and race your robots through a challenging obstacle course! Navigate sharp turns, ramps, tunnels, and surprise obstacles. Speed and precision matter equally.',
+        category: 'workshop',
+        status: 'upcoming',
+        venue: 'Robotics Lab & Open Ground',
+        event_date: '2026-08-18T09:00:00',
+        end_date: '2026-08-18T17:00:00',
+        max_participants: 60,
+        team_size: 3,
+        rules: '1. Teams of 3 members\n2. Bot dimensions: max 30x30x30 cm\n3. Wired or wireless control allowed',
+        prizes: '🥇 1st: ₹20,000\n🥈 2nd: ₹10,000\n🥉 3rd: ₹5,000',
+        image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&h=400&fit=crop'
+      },
+      {
+        id: 'local-5',
+        title: 'Cultural Night',
+        description: 'An electrifying evening of dance, music, drama, and artistic performances! Showcase your talent on the grand stage with professional lighting and sound.',
+        category: 'cultural',
+        status: 'upcoming',
+        venue: 'Main Auditorium',
+        event_date: '2026-08-19T18:00:00',
+        end_date: '2026-08-19T23:00:00',
+        max_participants: 120,
+        team_size: 1,
+        rules: '1. Solo and group entries accepted\n2. Performance duration: 5-8 minutes',
+        prizes: '🥇 Best Performance: ₹15,000\n🥈 Runner Up: ₹8,000\n🏆 Best Solo Act: ₹5,000',
+        image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop'
+      },
+      {
+        id: 'local-6',
+        title: 'AI Workshop',
+        description: 'Hands-on workshop covering fundamentals of Artificial Intelligence and Machine Learning. Learn to build neural networks, train models, and deploy AI applications. No prior ML experience required!',
+        category: 'workshop',
+        status: 'upcoming',
+        venue: 'Smart Classroom, Block C',
+        event_date: '2026-08-15T14:00:00',
+        end_date: '2026-08-15T18:00:00',
+        max_participants: 80,
+        team_size: 1,
+        rules: '1. Bring your own laptop\n2. Python basics recommended\n3. All materials and datasets provided',
+        prizes: '📜 Certificates for all participants\n🏆 Best Project: ₹3,000',
+        image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop'
+      }
+    ];
+
+    // ===== MAIN LOAD FUNCTION =====
+    async function loadEvents() {
+      const loadingEl = document.getElementById('loading-state');
+      const loadingText = document.getElementById('loading-text');
+
+      console.log('🔄 Starting event load...');
+
+      // Step 1: Try Supabase
+      let supabaseWorking = false;
+      if (window.supabase) {
+        try {
+          loadingText.textContent = 'Connecting to database...';
+          console.log('📡 Fetching events from Supabase...');
+
+          const { data, error } = await supabase.from('events').select('*').order('event_date', { ascending: true });
+
+          if (error) {
+            console.error('❌ Supabase query error:', error.message, error);
+            throw error;
+          }
+
+          console.log('✅ Supabase returned', (data || []).length, 'events');
+
+          // If table is empty, try auto-seeding
+          if (!data || data.length === 0) {
+            console.log('⚠️ Events table is empty. Attempting auto-seed...');
+            loadingText.textContent = 'Seeding sample events...';
+            const seeded = await autoSeedEvents();
+            if (seeded) {
+              // Re-fetch after seeding
+              const { data: freshData, error: freshErr } = await supabase.from('events').select('*').order('event_date', { ascending: true });
+              if (!freshErr && freshData && freshData.length > 0) {
+                allEvents = freshData;
+                supabaseWorking = true;
+                console.log('✅ Auto-seed successful,', freshData.length, 'events loaded');
+              }
+            }
+          } else {
+            allEvents = data;
+            supabaseWorking = true;
+          }
+
+          // Fetch registration counts
+          if (supabaseWorking) {
+            try {
+              const { data: regs } = await supabase.from('registrations').select('event_id');
+              regCounts = {};
+              (regs || []).forEach(r => {
+                regCounts[r.event_id] = (regCounts[r.event_id] || 0) + 1;
+              });
+              console.log('✅ Registration counts loaded');
+            } catch (regErr) {
+              console.warn('⚠️ Could not load registration counts:', regErr.message);
+            }
+
+            // Check user registrations
+            try {
+              const user = await getCurrentUser();
+              userRegs = {};
+              if (user) {
+                const { data: myRegs } = await supabase.from('registrations').select('event_id').eq('user_id', user.id);
+                (myRegs || []).forEach(r => { userRegs[r.event_id] = true; });
+                console.log('✅ User registration status loaded');
+              }
+            } catch (userErr) {
+              console.warn('⚠️ Could not check user registrations:', userErr.message);
+            }
+          }
+        } catch (err) {
+          console.error('❌ Supabase fetch failed:', err.message || err);
+          supabaseWorking = false;
+        }
+      } else {
+        console.warn('⚠️ Supabase client not available');
+      }
+
+      // Step 2: Fallback to local sample data if Supabase didn't work
+      if (!supabaseWorking || allEvents.length === 0) {
+        console.log('📦 Using local sample events as fallback');
+        loadingText.textContent = 'Loading sample events...';
+        allEvents = SAMPLE_EVENTS;
+        regCounts = {};
+        userRegs = {};
+      }
+
+      // Step 3: Update hero stats
+      document.getElementById('stat-total').textContent = allEvents.length;
+      document.getElementById('stat-upcoming').textContent = allEvents.filter(e => e.status === 'upcoming').length;
+      const cats = new Set(allEvents.map(e => e.category).filter(Boolean));
+      document.getElementById('stat-categories').textContent = cats.size;
+      document.getElementById('stat-registrations').textContent = Object.values(regCounts).reduce((a, b) => a + b, 0);
+
+      // Step 4: Hide loading, render events
+      loadingEl.style.display = 'none';
+      renderEvents(allEvents);
+      console.log('🎉 Events rendered successfully!', allEvents.length, 'events displayed');
+    }
+
+    // ===== AUTO SEED TO SUPABASE =====
+    async function autoSeedEvents() {
+      if (!window.supabase) return false;
+      try {
+        const seedData = SAMPLE_EVENTS.map(e => {
+          const { id, ...rest } = e; // Remove local IDs
+          return rest;
+        });
+        const { error } = await supabase.from('events').insert(seedData);
+        if (error) {
+          console.error('❌ Auto-seed failed:', error.message);
+          return false;
+        }
+        console.log('✅ Auto-seeded', seedData.length, 'events to Supabase');
+        return true;
+      } catch (err) {
+        console.error('❌ Auto-seed error:', err.message);
+        return false;
+      }
+    }
+
+    // ===== RENDER EVENTS =====
+    function renderEvents(events) {
+      // Clear previous countdowns
+      countdownIntervals.forEach(id => clearInterval(id));
+      countdownIntervals = [];
+
+      const grid = document.getElementById('events-grid');
+      const empty = document.getElementById('empty-state');
+
+      if (!events.length) {
+        grid.innerHTML = '';
+        grid.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      grid.style.display = 'grid';
+      empty.style.display = 'none';
+
+      grid.innerHTML = events.map((e, idx) => {
+        const icon = getCategoryIcon(e.category);
+        const catClass = getCategoryClass(e.category);
+        const regCount = regCounts[e.id] || 0;
+        const maxP = e.max_participants || 0;
+        const pct = maxP > 0 ? Math.min(100, Math.round((regCount / maxP) * 100)) : 0;
+        const isRegistered = userRegs[e.id];
+        const isFull = maxP > 0 && regCount >= maxP;
+        const isLocal = String(e.id).startsWith('local-');
+
+        const imageHTML = e.image_url
+          ? `<img src="${e.image_url}" alt="${e.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-placeholder ${catClass}" style="display:none"><span>${icon}</span></div>`
+          : `<div class="img-placeholder ${catClass}"><span>${icon}</span></div>`;
+
+        // For local events, don't show register button (no backend)
+        let actionBtn = '';
+        if (isLocal) {
+          actionBtn = '<span class="btn-register" style="opacity:0.6;cursor:default;font-size:0.8rem">⚡ Demo Mode — Connect Supabase to Register</span>';
+        } else if (isRegistered) {
+          actionBtn = '<button class="btn-register registered" disabled>✓ Registered</button>';
+        } else if (isFull) {
+          actionBtn = '<button class="btn-register registered" disabled>🚫 Full</button>';
+        } else {
+          actionBtn = `<button class="btn-register" onclick="registerEvent('${e.id}', this)">Register Now →</button>`;
+        }
+
+        const detailLink = isLocal
+          ? ''
+          : `<a href="event-detail.html?id=${e.id}" style="display:block;text-align:center;margin-top:10px;font-size:0.8rem;color:var(--text-muted)">View Details →</a>`;
+
+        return `
+          <div class="event-card-v2" id="card-${e.id}">
+            <div class="card-image">
+              ${imageHTML}
+              <div class="img-overlay">
+                ${getCategoryBadge(e.category)}
+                ${getStatusBadge(e.status)}
+              </div>
+            </div>
+            <div class="card-body">
+              <h3>${e.title || 'Untitled Event'}</h3>
+              <p class="card-desc">${e.description || 'No description available.'}</p>
+              <div class="card-meta">
+                <div class="card-meta-item"><i data-lucide="calendar"></i> ${formatDate(e.event_date)}${e.event_date ? ' · ' + formatTime(e.event_date) : ''}</div>
+                <div class="card-meta-item"><i data-lucide="map-pin"></i> ${e.venue || 'TBD'}</div>
+                <div class="card-meta-item"><i data-lucide="users"></i> ${e.team_size === 1 ? 'Individual' : 'Team of ' + e.team_size}</div>
+              </div>
+              <div class="mini-countdown" id="cd-${e.id}" data-date="${e.event_date || ''}">
+                <div class="cd-unit"><span class="cd-value">—</span><span class="cd-label">Days</span></div>
+                <div class="cd-unit"><span class="cd-value">—</span><span class="cd-label">Hours</span></div>
+                <div class="cd-unit"><span class="cd-value">—</span><span class="cd-label">Mins</span></div>
+                <div class="cd-unit"><span class="cd-value">—</span><span class="cd-label">Secs</span></div>
+              </div>
+              <div class="reg-progress">
+                <div class="progress-header">
+                  <span>${regCount} registered</span>
+                  <span>${maxP > 0 ? maxP + ' spots' : 'Unlimited'}</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${maxP > 0 ? pct : 0}%"></div></div>
+              </div>
+              ${actionBtn}
+              ${detailLink}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      startCardCountdowns();
+    }
+
+    // ===== COUNTDOWN TIMERS =====
+    function startCardCountdowns() {
+      document.querySelectorAll('.mini-countdown').forEach(el => {
+        const dateStr = el.dataset.date;
+        if (!dateStr) return;
+        function tick() {
+          const now = Date.now();
+          const target = new Date(dateStr).getTime();
+          const diff = target - now;
+          const spans = el.querySelectorAll('.cd-value');
+          if (diff <= 0) {
+            el.classList.add('expired');
+            spans[0].textContent = '🔴';
+            spans[1].textContent = 'LIVE';
+            spans[2].textContent = '';
+            spans[3].textContent = '';
+            el.querySelectorAll('.cd-label')[0].textContent = '';
+            el.querySelectorAll('.cd-label')[1].textContent = 'NOW';
+            el.querySelectorAll('.cd-label')[2].textContent = '';
+            el.querySelectorAll('.cd-label')[3].textContent = '';
+            return;
+          }
+          const d = Math.floor(diff / 86400000);
+          const h = Math.floor((diff % 86400000) / 3600000);
+          const m = Math.floor((diff % 3600000) / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          spans[0].textContent = d;
+          spans[1].textContent = h;
+          spans[2].textContent = m;
+          spans[3].textContent = s;
+        }
+        tick();
+        const id = setInterval(tick, 1000);
+        countdownIntervals.push(id);
+      });
+    }
+
+    // ===== FILTER CONTROLS =====
+    function setCategory(btn, cat) {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = cat;
+      filterEvents();
+    }
+
+    function filterEvents() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allEvents.filter(e => {
+        const matchSearch = !search || (e.title || '').toLowerCase().includes(search) || (e.description || '').toLowerCase().includes(search) || (e.venue || '').toLowerCase().includes(search);
+        const matchCat = !currentCategory || e.category === currentCategory;
+        return matchSearch && matchCat;
+      });
+      renderEvents(filtered);
+    }
+
+    // ===== REGISTRATION =====
+    async function registerEvent(eventId, btn) {
+      const user = await getCurrentUser();
+      if (!user) {
+        showToast('Please login to register for events', 'info');
+        setTimeout(() => window.location.href = 'login.html', 800);
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Registering...';
+      try {
+        const { error } = await supabase.from('registrations').insert({
+          event_id: eventId,
+          user_id: user.id,
+          status: 'confirmed'
+        });
+        if (error) throw error;
+        showToast('🎉 Successfully registered!', 'success');
+        userRegs[eventId] = true;
+        regCounts[eventId] = (regCounts[eventId] || 0) + 1;
+        btn.className = 'btn-register registered';
+        btn.textContent = '✓ Registered';
+        btn.disabled = true;
+        document.getElementById('stat-registrations').textContent = Object.values(regCounts).reduce((a, b) => a + b, 0);
+      } catch (err) {
+        console.error('❌ Registration failed:', err);
+        showToast(err.message || 'Registration failed', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Register Now →';
+      }
+    }
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Events page initializing...');
+      renderNavbar('events');
+      renderFooter();
+      initParticles('particles-canvas', 30);
+      loadEvents();
+    });
+  </script>
+</body>
+</html>
