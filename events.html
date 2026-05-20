@@ -255,7 +255,8 @@
       if (!supabaseWorking || allEvents.length === 0) {
         console.log('📦 Using local sample events as fallback');
         loadingText.textContent = 'Loading sample events...';
-        allEvents = SAMPLE_EVENTS;
+        const userAddedLocal = JSON.parse(localStorage.getItem('localEvents') || '[]');
+        allEvents = [...userAddedLocal, ...SAMPLE_EVENTS];
         regCounts = {};
         userRegs = {};
       }
@@ -438,7 +439,10 @@
       renderEvents(filtered);
     }
 
-    // ===== REGISTRATION =====
+    // ===== REGISTRATION & PAYMENT =====
+    let currentEventIdForPayment = null;
+    let currentBtnForPayment = null;
+
     async function registerEvent(eventId, btn) {
       const user = await getCurrentUser();
       if (!user) {
@@ -446,20 +450,49 @@
         setTimeout(() => window.location.href = 'login.html', 800);
         return;
       }
+      
+      // Open Payment Modal instead of direct registration
+      currentEventIdForPayment = eventId;
+      currentBtnForPayment = btn;
+      document.getElementById('transaction-id').value = '';
+      document.getElementById('payment-modal').classList.add('active');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('payment-modal').classList.remove('active');
+      currentEventIdForPayment = null;
+      currentBtnForPayment = null;
+    }
+
+    async function confirmPaymentAndRegister() {
+      const txnId = document.getElementById('transaction-id').value.trim();
+      if (!txnId) {
+        showToast('Please enter the transaction ID', 'error');
+        return;
+      }
+      
+      const eventId = currentEventIdForPayment;
+      const btn = currentBtnForPayment;
+      const user = await getCurrentUser();
+      
+      closePaymentModal();
+      
       btn.disabled = true;
       btn.textContent = 'Registering...';
       try {
         const { error } = await supabase.from('registrations').insert({
           event_id: eventId,
           user_id: user.id,
-          status: 'confirmed'
+          transaction_id: txnId,
+          status: 'pending', // Registration pending until payment verified by admin
         });
         if (error) throw error;
-        showToast('🎉 Successfully registered!', 'success');
+        
+        showToast('🎉 Successfully registered! Pending payment verification.', 'success');
         userRegs[eventId] = true;
         regCounts[eventId] = (regCounts[eventId] || 0) + 1;
         btn.className = 'btn-register registered';
-        btn.textContent = '✓ Registered';
+        btn.textContent = '✓ Registered (Pending)';
         btn.disabled = true;
         document.getElementById('stat-registrations').textContent = Object.values(regCounts).reduce((a, b) => a + b, 0);
       } catch (err) {
@@ -479,5 +512,34 @@
       loadEvents();
     });
   </script>
+
+  <!-- PAYMENT MODAL -->
+  <div class="modal-overlay" id="payment-modal">
+    <div class="modal" style="max-width:400px;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="margin:0">Complete Payment</h3>
+        <button onclick="closePaymentModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+      
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px">
+        Scan the QR code below to pay the registration fee. Once paid, enter your transaction ID.
+      </p>
+      
+      <div style="background:#fff;padding:16px;border-radius:12px;display:inline-block;margin-bottom:20px">
+        <img src="qr-payment.jpeg" alt="Payment QR Code" style="width:200px;height:200px;object-fit:cover;border-radius:8px">
+      </div>
+      
+      <div class="form-group" style="text-align:left">
+        <label>Transaction / Reference ID *</label>
+        <input type="text" id="transaction-id" class="input-field" placeholder="e.g. UTR123456789" required>
+      </div>
+      
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="confirmPaymentAndRegister()">
+        Confirm Payment & Register
+      </button>
+    </div>
+  </div>
 </body>
 </html>

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   event_id UUID REFERENCES events(id) ON DELETE CASCADE,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   team_id UUID,
+  transaction_id TEXT,
   status TEXT DEFAULT 'confirmed' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'attended')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(event_id, user_id)

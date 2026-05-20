@@ -9,7 +9,7 @@ echo.
 echo  Starting local server...
 echo.
 
-cd /d "%~dp0AGRATHA-2K26-0417"
+cd /d "%~dp0"
 
 echo  Server root: %cd%
 echo.

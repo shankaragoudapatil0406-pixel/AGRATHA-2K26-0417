@@ -170,15 +170,47 @@
       detailCountdownInterval = setInterval(tick, 1000);
     }
 
+    // ===== REGISTRATION & PAYMENT =====
+    let currentEventIdForPayment = null;
+
     async function registerForEvent(eventId) {
       const user = await getCurrentUser();
       if (!user) { window.location.href = 'login.html'; return; }
+      
+      currentEventIdForPayment = eventId;
+      document.getElementById('transaction-id').value = '';
+      document.getElementById('payment-modal').classList.add('active');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('payment-modal').classList.remove('active');
+      currentEventIdForPayment = null;
+    }
+
+    async function confirmPaymentAndRegister() {
+      const txnId = document.getElementById('transaction-id').value.trim();
+      if (!txnId) {
+        showToast('Please enter the transaction ID', 'error');
+        return;
+      }
+      
+      const eventId = currentEventIdForPayment;
+      const user = await getCurrentUser();
+      
+      closePaymentModal();
+      
       const btn = document.getElementById('detail-reg-btn');
       if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
+      
       try {
-        const { error } = await supabase.from('registrations').insert({ event_id: eventId, user_id: user.id, status: 'confirmed' });
+        const { error } = await supabase.from('registrations').insert({ 
+          event_id: eventId, 
+          user_id: user.id, 
+          transaction_id: txnId,
+          status: 'pending' 
+        });
         if (error) throw error;
-        showToast('🎉 Successfully registered!', 'success');
+        showToast('🎉 Successfully registered! Pending payment verification.', 'success');
         setTimeout(() => loadEventDetail(), 500);
       } catch (err) {
         showToast(err.message || 'Registration failed', 'error');
@@ -193,5 +225,34 @@
       loadEventDetail();
     });
   </script>
+
+  <!-- PAYMENT MODAL -->
+  <div class="modal-overlay" id="payment-modal">
+    <div class="modal" style="max-width:400px;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="margin:0">Complete Payment</h3>
+        <button onclick="closePaymentModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+      
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px">
+        Scan the QR code below to pay the registration fee. Once paid, enter your transaction ID.
+      </p>
+      
+      <div style="background:#fff;padding:16px;border-radius:12px;display:inline-block;margin-bottom:20px">
+        <img src="qr-payment.jpeg" alt="Payment QR Code" style="width:200px;height:200px;object-fit:cover;border-radius:8px">
+      </div>
+      
+      <div class="form-group" style="text-align:left">
+        <label>Transaction / Reference ID *</label>
+        <input type="text" id="transaction-id" class="input-field" placeholder="e.g. UTR123456789" required>
+      </div>
+      
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="confirmPaymentAndRegister()">
+        Confirm Payment & Register
+      </button>
+    </div>
+  </div>
 </body>
 </html>
