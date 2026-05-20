@@ -180,15 +180,29 @@ async function handleLogin(e) {
         .eq('id', data.user.id)
         .single();
 
-      if (profileErr) {
-        console.warn('⚠️ Could not fetch user profile:', profileErr.message);
-        console.log('   This is OK — user may not have a profile row yet.');
-      } else if (profile) {
-        userRole = profile.role || 'participant';
-        console.log('👤 User role:', userRole);
+      if (!profile) {
+         // Profile is missing, auto-create it
+         const autoRole = data.user.email.toLowerCase() === 'admin@agratha.com' ? 'admin' : 'participant';
+         await supabase.from('users').insert({
+             id: data.user.id,
+             email: data.user.email,
+             role: autoRole
+         });
+         userRole = autoRole;
+      } else {
+         // Profile exists
+         if (data.user.email.toLowerCase() === 'admin@agratha.com' && profile.role !== 'admin') {
+             // Auto-elevate to admin
+             await supabase.from('users').update({ role: 'admin' }).eq('id', data.user.id);
+             userRole = 'admin';
+         } else {
+             userRole = profile.role || 'participant';
+         }
       }
+      console.log('👤 User role resolved to:', userRole);
     } catch (profileErr) {
-      console.warn('⚠️ Profile fetch failed (non-critical):', profileErr);
+      console.warn('⚠️ Profile auto-resolution failed:', profileErr);
+      if (data.user.email.toLowerCase() === 'admin@agratha.com') userRole = 'admin';
     }
 
     showToast('Welcome back! 🎉', 'success');
