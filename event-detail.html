@@ -65,7 +65,7 @@
       } else if (isFull) {
         regButton = '<button class="btn-register registered" style="max-width:320px;margin:0 auto" disabled>🚫 Event Full</button>';
       } else {
-        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}')">Register Now →</button>`;
+        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}', ${event.team_size || 1})">Register Now →</button>`;
       }
 
       container.innerHTML = `
@@ -172,12 +172,63 @@
 
     // ===== REGISTRATION & PAYMENT =====
     let currentEventIdForPayment = null;
+    let currentTeamSize = 1;
+    let teamDetailsCache = [];
 
-    async function registerForEvent(eventId) {
+    async function registerForEvent(eventId, teamSize) {
       const user = await getCurrentUser();
       if (!user) { window.location.href = 'login.html'; return; }
       
       currentEventIdForPayment = eventId;
+      currentTeamSize = teamSize;
+      
+      // Generate form for members
+      const container = document.getElementById('team-members-container');
+      container.innerHTML = '';
+      for(let i = 1; i <= teamSize; i++) {
+         const title = i === 1 && teamSize > 1 ? 'Team Leader' : (teamSize === 1 ? 'Participant Details' : `Member ${i}`);
+         container.innerHTML += `
+           <div style="background:rgba(255,255,255,0.02);padding:15px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.05)">
+             <h4 style="margin-bottom:10px;color:var(--text-primary);font-size:1rem">${title}</h4>
+             <div class="form-group" style="margin-bottom:10px">
+               <input type="text" id="member-name-${i}" class="input-field" placeholder="Full Name" required>
+             </div>
+             <div class="form-group" style="margin-bottom:10px">
+               <input type="text" id="member-usn-${i}" class="input-field" placeholder="USN / Roll No" required>
+             </div>
+             <div class="form-group" style="margin-bottom:10px">
+               <input type="text" id="member-college-${i}" class="input-field" placeholder="College Name" required>
+             </div>
+             <div class="form-group" style="margin-bottom:0">
+               <input type="text" id="member-branch-${i}" class="input-field" placeholder="Branch / Department" required>
+             </div>
+           </div>
+         `;
+      }
+      
+      document.getElementById('team-modal').classList.add('active');
+    }
+
+    function closeTeamModal() {
+      document.getElementById('team-modal').classList.remove('active');
+    }
+
+    function proceedToPayment() {
+      teamDetailsCache = [];
+      for(let i = 1; i <= currentTeamSize; i++) {
+         const name = document.getElementById(`member-name-${i}`).value.trim();
+         const usn = document.getElementById(`member-usn-${i}`).value.trim();
+         const college = document.getElementById(`member-college-${i}`).value.trim();
+         const branch = document.getElementById(`member-branch-${i}`).value.trim();
+         
+         if(!name || !usn || !college || !branch) {
+           showToast('Please fill all fields for all members', 'error');
+           return;
+         }
+         teamDetailsCache.push({ name, usn, college, branch });
+      }
+      
+      closeTeamModal();
       document.getElementById('transaction-id').value = '';
       document.getElementById('payment-modal').classList.add('active');
     }
@@ -207,6 +258,7 @@
           event_id: eventId, 
           user_id: user.id, 
           transaction_id: txnId,
+          team_details: teamDetailsCache,
           status: 'pending' 
         });
         if (error) throw error;
@@ -225,6 +277,26 @@
       loadEventDetail();
     });
   </script>
+
+  <!-- TEAM DETAILS MODAL -->
+  <div id="team-modal" class="modal-overlay">
+    <div class="modal fade-in-up" style="max-width:500px; max-height:85vh; overflow-y:auto">
+      <div class="modal-header">
+        <h3>Participant Details</h3>
+        <button class="icon-btn" onclick="closeTeamModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:15px;color:var(--text-secondary);font-size:0.9rem">Please provide the details for all team members before proceeding to payment.</p>
+        <div id="team-members-container" style="display:flex;flex-direction:column;gap:20px;">
+          <!-- Dynamically injected member forms -->
+        </div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;position:sticky;bottom:0;background:var(--surface);padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)">
+        <button class="btn btn-secondary" onclick="closeTeamModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="proceedToPayment()">Next: Payment →</button>
+      </div>
+    </div>
+  </div>
 
   <!-- PAYMENT MODAL -->
   <div class="modal-overlay" id="payment-modal">
