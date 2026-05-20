@@ -197,18 +197,13 @@
     });
 
     async function loadAdminEvents() {
-      if (localStorage.getItem('localAdmin') === 'true') {
-        const localData = JSON.parse(localStorage.getItem('localEvents') || '[]');
-        adminEvents = localData;
-        adminRegCounts = {};
-      } else {
-        const { data } = await supabase.from('events').select('*').order('created_at', { ascending: false });
-        adminEvents = data || [];
-        // Get registration counts
-        const { data: regs } = await supabase.from('registrations').select('event_id');
-        adminRegCounts = {};
-        (regs || []).forEach(r => { adminRegCounts[r.event_id] = (adminRegCounts[r.event_id] || 0) + 1; });
-      }
+      const { data } = await supabase.from('events').select('*').order('created_at', { ascending: false });
+      adminEvents = data || [];
+      
+      // Get registration counts
+      const { data: regs } = await supabase.from('registrations').select('event_id');
+      adminRegCounts = {};
+      (regs || []).forEach(r => { adminRegCounts[r.event_id] = (adminRegCounts[r.event_id] || 0) + 1; });
 
       // Update stats
       document.getElementById('s-total').textContent = adminEvents.length;
@@ -333,34 +328,15 @@
       };
 
       try {
-        if (localStorage.getItem('localAdmin') === 'true') {
-          // Local Storage Mode
-          let localData = JSON.parse(localStorage.getItem('localEvents') || '[]');
-          if (isEdit) {
-            const id = document.getElementById('edit-id').value;
-            const index = localData.findIndex(e => e.id === id);
-            if (index !== -1) {
-              localData[index] = { ...localData[index], ...payload };
-            }
-          } else {
-            payload.id = 'local_' + Date.now();
-            payload.created_at = new Date().toISOString();
-            localData.unshift(payload);
-          }
-          localStorage.setItem('localEvents', JSON.stringify(localData));
-          showToast(isEdit ? 'Event updated successfully!' : 'Event created successfully!', 'success');
+        if (isEdit) {
+          const { error } = await supabase.from('events').update(payload).eq('id', document.getElementById('edit-id').value);
+          if (error) throw error;
+          showToast('Event updated successfully!', 'success');
         } else {
-          // Supabase Mode
-          if (isEdit) {
-            const { error } = await supabase.from('events').update(payload).eq('id', document.getElementById('edit-id').value);
-            if (error) throw error;
-            showToast('Event updated successfully!', 'success');
-          } else {
-            payload.created_by = adminUser.id;
-            const { error } = await supabase.from('events').insert(payload);
-            if (error) throw error;
-            showToast('Event created successfully!', 'success');
-          }
+          payload.created_by = adminUser.id;
+          const { error } = await supabase.from('events').insert(payload);
+          if (error) throw error;
+          showToast('Event created successfully!', 'success');
         }
         closeModal();
         await loadAdminEvents();
@@ -386,16 +362,8 @@
       const id = document.getElementById('delete-id').value;
       if (!id) return;
       try {
-        if (localStorage.getItem('localAdmin') === 'true') {
-          // Local Storage Mode
-          let localData = JSON.parse(localStorage.getItem('localEvents') || '[]');
-          localData = localData.filter(e => e.id !== id);
-          localStorage.setItem('localEvents', JSON.stringify(localData));
-        } else {
-          // Supabase Mode
-          const { error } = await supabase.from('events').delete().eq('id', id);
-          if (error) throw error;
-        }
+        const { error } = await supabase.from('events').delete().eq('id', id);
+        if (error) throw error;
         showToast('Event deleted successfully', 'success');
         closeDeleteModal();
         await loadAdminEvents();

@@ -255,8 +255,7 @@
       if (!supabaseWorking || allEvents.length === 0) {
         console.log('📦 Using local sample events as fallback');
         loadingText.textContent = 'Loading sample events...';
-        const userAddedLocal = JSON.parse(localStorage.getItem('localEvents') || '[]');
-        allEvents = [...userAddedLocal, ...SAMPLE_EVENTS];
+        allEvents = SAMPLE_EVENTS;
         regCounts = {};
         userRegs = {};
       }
