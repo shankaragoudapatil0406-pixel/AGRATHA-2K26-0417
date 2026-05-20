@@ -141,16 +141,6 @@ async function handleLogin(e) {
     return;
   }
 
-  // FIXED ADMIN CREDENTIALS BYPASS
-  if (email.trim().toLowerCase() === 'admin@agratha.com' && password === 'admin123') {
-    console.log('✅ Admin bypass successful!');
-    localStorage.setItem('localAdmin', 'true');
-    showToast('Welcome Admin! 🎉', 'success');
-    setTimeout(() => {
-      window.location.href = 'admin.html';
-    }, 600);
-    return;
-  }
 
   btn.disabled = true;
   btn.textContent = 'Signing in...';
