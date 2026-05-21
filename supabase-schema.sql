@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS events (
   venue TEXT,
   max_participants INTEGER,
   team_size INTEGER DEFAULT 1,
+  registration_fee INTEGER DEFAULT 0,
   rules TEXT,
   prizes TEXT,
   image_url TEXT,

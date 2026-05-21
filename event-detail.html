@@ -65,7 +65,7 @@
       } else if (isFull) {
         regButton = '<button class="btn-register registered" style="max-width:320px;margin:0 auto" disabled>🚫 Event Full</button>';
       } else {
-        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}', ${event.team_size || 1})">Register Now →</button>`;
+        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}', ${event.team_size || 1}, ${event.registration_fee || 0})">Register Now →</button>`;
       }
 
       container.innerHTML = `
@@ -173,14 +173,16 @@
     // ===== REGISTRATION & PAYMENT =====
     let currentEventIdForPayment = null;
     let currentTeamSize = 1;
+    let currentFee = 0;
     let teamDetailsCache = [];
 
-    async function registerForEvent(eventId, teamSize) {
+    async function registerForEvent(eventId, teamSize, fee) {
       const user = await getCurrentUser();
       if (!user) { window.location.href = 'login.html'; return; }
       
       currentEventIdForPayment = eventId;
       currentTeamSize = teamSize;
+      currentFee = fee;
       
       // Generate form for members
       const container = document.getElementById('team-members-container');
@@ -230,6 +232,12 @@
       
       closeTeamModal();
       document.getElementById('transaction-id').value = '';
+      
+      const feeText = currentFee > 0 
+        ? `Scan the QR code below to pay the registration fee of <strong style="color:var(--text-primary);font-size:1.1rem">₹${currentFee}</strong>. Once paid, enter your transaction ID.` 
+        : `This event is free to attend. You can just enter 'FREE' or skip the transaction ID.`;
+      
+      document.getElementById('payment-fee-text').innerHTML = feeText;
       document.getElementById('payment-modal').classList.add('active');
     }
 
@@ -308,7 +316,7 @@
         </button>
       </div>
       
-      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px">
+      <p id="payment-fee-text" style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px">
         Scan the QR code below to pay the registration fee. Once paid, enter your transaction ID.
       </p>
       
