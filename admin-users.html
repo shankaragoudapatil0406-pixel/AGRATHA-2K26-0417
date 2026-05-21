@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Users - AGRATHA 2K26</title>
+  <meta name="description" content="Admin panel to manage user roles and view user details for AGRATHA 2K26.">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content with-sidebar">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px">
+      <div>
+        <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:4px">Manage Users</h1>
+        <p style="color:var(--text-secondary);font-size:0.9rem">View and manage user roles</p>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid-4" id="user-stats" style="margin-bottom:32px">
+      <div class="stat-card"><div class="stat-value" id="s-total-users">0</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-participants">0</div><div class="stat-label">Participants</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-admins">0</div><div class="stat-label">Admins</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-organizers">0</div><div class="stat-label">Organizers</div></div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <input type="text" id="admin-search" class="input-field" placeholder="Search by name or email..." style="max-width:300px" oninput="adminFilterUsers()">
+      <select id="admin-role" class="input-field" style="max-width:180px" onchange="adminFilterUsers()">
+        <option value="">All Roles</option>
+        <option value="participant">Participant</option>
+        <option value="organizer">Organizer</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <!-- Users Table -->
+    <div class="glass-card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="data-table" id="admin-users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>College</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Joined Date</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-tbody">
+            <tr><td colspan="6"><div class="loading-spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT ROLE MODAL -->
+  <div class="modal-overlay" id="edit-role-modal">
+    <div class="modal" style="max-width:400px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <h3 id="modal-title">Edit User Role</h3>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+      <form id="role-form" onsubmit="saveUserRole(event)">
+        <input type="hidden" id="edit-user-id">
+        
+        <p style="margin-bottom:16px;color:var(--text-secondary)" id="edit-user-info"></p>
+
+        <div class="form-group">
+          <label>Assign Role *</label>
+          <select id="f-role" class="input-field" required>
+            <option value="participant">Participant</option>
+            <option value="organizer">Organizer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px">
+          <button type="submit" class="btn btn-primary" style="flex:1" id="save-btn">Update Role</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let adminUsersList = [];
+    let adminUser = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      adminUser = await requireAuth('admin');
+      if (!adminUser) return;
+      renderNavbar('admin');
+      renderSidebar('admin', 'manage-users');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      await loadAdminUsers();
+    });
+
+    async function loadAdminUsers() {
+      const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+      if (error) {
+        showToast('Failed to load users', 'error');
+        return;
+      }
+      adminUsersList = data || [];
+      
+      // Update stats
+      document.getElementById('s-total-users').textContent = adminUsersList.length;
+      document.getElementById('s-participants').textContent = adminUsersList.filter(u => u.role === 'participant' || !u.role).length;
+      document.getElementById('s-admins').textContent = adminUsersList.filter(u => u.role === 'admin').length;
+      document.getElementById('s-organizers').textContent = adminUsersList.filter(u => u.role === 'organizer').length;
+
+      renderAdminTable(adminUsersList);
+    }
+
+    function renderAdminTable(users) {
+      const tbody = document.getElementById('admin-users-tbody');
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px">No users found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => {
+        let roleBadgeClass = 'badge-cyan';
+        if (u.role === 'admin') roleBadgeClass = 'badge-pink';
+        else if (u.role === 'organizer') roleBadgeClass = 'badge-orange';
+        else if (u.role === 'participant') roleBadgeClass = 'badge-green';
+        
+        return `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--bg-glass);display:flex;align-items:center;justify-content:center;color:var(--accent-cyan);font-weight:bold">
+                ${u.full_name ? u.full_name.charAt(0).toUpperCase() : u.email.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div style="font-weight:600;margin-bottom:2px">${u.full_name || 'No Name'}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted)">${u.email}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--text-secondary)">${u.college || '—'}</td>
+          <td style="color:var(--text-secondary)">${u.department || '—'}</td>
+          <td><span class="badge ${roleBadgeClass}">${u.role || 'participant'}</span></td>
+          <td style="color:var(--text-secondary);white-space:nowrap">${formatDate(u.created_at)}</td>
+          <td>
+            <div class="admin-event-actions" style="justify-content:flex-end">
+              <button class="btn-icon" onclick="openEditModal('${u.id}')" title="Edit Role">
+                <i data-lucide="shield" style="width:16px;height:16px"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `}).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function adminFilterUsers() {
+      const search = document.getElementById('admin-search').value.toLowerCase();
+      const role = document.getElementById('admin-role').value;
+      const filtered = adminUsersList.filter(u => {
+        const matchSearch = !search || (u.full_name || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search);
+        const matchRole = !role || u.role === role || (!u.role && role === 'participant');
+        return matchSearch && matchRole;
+      });
+      renderAdminTable(filtered);
+    }
+
+    // ===== MODAL OPERATIONS =====
+    function openEditModal(userId) {
+      const user = adminUsersList.find(u => u.id === userId);
+      if (!user) return;
+      document.getElementById('edit-user-id').value = user.id;
+      document.getElementById('edit-user-info').innerHTML = `Changing role for <strong>${user.full_name || user.email}</strong>`;
+      document.getElementById('f-role').value = user.role || 'participant';
+      document.getElementById('edit-role-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('edit-role-modal').classList.remove('active');
+    }
+
+    async function saveUserRole(e) {
+      e.preventDefault();
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Updating...';
+
+      const userId = document.getElementById('edit-user-id').value;
+      const newRole = document.getElementById('f-role').value;
+
+      try {
+        const { error } = await supabase.from('users').update({ role: newRole }).eq('id', userId);
+        if (error) throw error;
+        
+        showToast('User role updated successfully!', 'success');
+        closeModal();
+        await loadAdminUsers();
+      } catch (err) {
+        showToast(err.message || 'Failed to update user role', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Update Role';
+      }
+    }
+  </script>
+</body>
+</html>
