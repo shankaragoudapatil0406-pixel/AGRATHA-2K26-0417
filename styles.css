@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* ============================================
-   AGRATHA 2K26 - Design System
+   VAIBHAV 2K26 - Design System
    ============================================ */
 
 :root {
@@ -987,11 +987,10 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 10, 15, 0.97);
-  backdrop-filter: blur(20px);
+  background: #0a0a0f; /* Solid color to prevent overlap visibility */
   padding: 32px 24px;
   gap: 4px;
-  z-index: 999;
+  z-index: 1050; /* Ensure it stays above other elements */
   animation: fadeInUp 0.3s ease;
 }
 .mobile-nav.show a,
@@ -1072,4 +1071,44 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   .events-hero-stats { gap: 16px; }
   .events-hero-stats .hero-stat-value { font-size: 1.3rem; }
   .mini-countdown .cd-value { font-size: 0.85rem; }
+  
+  /* Mobile Safety Nets to Prevent Overlap */
+  body, p, h1, h2, h3, h4, h5, h6, .card-body, .modal-body {
+    word-break: break-word; /* Prevent text from overflowing */
+  }
+  
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    top: 70px;
+    align-items: stretch;
+  }
+  .toast {
+    max-width: 100%;
+    width: auto;
+  }
+  
+  .modal {
+    padding: 20px;
+    margin: 10px;
+    max-height: 85vh;
+  }
+  
+  .data-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .leaderboard-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .btn {
+    white-space: normal;
+    height: auto;
+    text-align: center;
+  }
 }
