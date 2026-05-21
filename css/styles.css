@@ -1072,4 +1072,44 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   .events-hero-stats { gap: 16px; }
   .events-hero-stats .hero-stat-value { font-size: 1.3rem; }
   .mini-countdown .cd-value { font-size: 0.85rem; }
+  
+  /* Mobile Safety Nets to Prevent Overlap */
+  body, p, h1, h2, h3, h4, h5, h6, .card-body, .modal-body {
+    word-break: break-word; /* Prevent text from overflowing */
+  }
+  
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    top: 70px;
+    align-items: stretch;
+  }
+  .toast {
+    max-width: 100%;
+    width: auto;
+  }
+  
+  .modal {
+    padding: 20px;
+    margin: 10px;
+    max-height: 85vh;
+  }
+  
+  .data-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .leaderboard-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .btn {
+    white-space: normal;
+    height: auto;
+    text-align: center;
+  }
 }

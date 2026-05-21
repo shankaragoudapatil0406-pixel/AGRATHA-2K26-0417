@@ -200,3 +200,24 @@ function getCategoryClass(category) {
   return map[category] || 'tech';
 }
 
+// ===== REALTIME NOTIFICATIONS =====
+function initRealtimeNotifications() {
+  if (!window.supabase) return;
+  supabase
+    .channel('public:announcements')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, payload => {
+      const announcement = payload.new;
+      let toastType = 'info';
+      if (announcement.priority === 'urgent') toastType = 'error';
+      else if (announcement.priority === 'important') toastType = 'warning';
+      
+      showToast(`📣 ${announcement.title}`, toastType);
+    })
+    .subscribe();
+}
+
+// Initialize realtime notifications on page load
+document.addEventListener('DOMContentLoaded', () => {
+  initRealtimeNotifications();
+});
+
