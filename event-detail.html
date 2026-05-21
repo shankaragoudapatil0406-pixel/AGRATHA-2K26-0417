@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Details - AGRATHA 2K26</title>
-  <meta name="description" content="View event details, register, and track countdown at AGRATHA 2K26.">
+  <title>Event Details - VAIBHAV 2K26</title>
+  <meta name="description" content="View event details, register, and track countdown at VAIBHAV 2K26.">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -36,7 +36,7 @@
         return;
       }
 
-      document.title = event.title + ' - AGRATHA 2K26';
+      document.title = event.title + ' - VAIBHAV 2K26';
 
       const user = await getCurrentUser();
       let isRegistered = false;
@@ -65,7 +65,7 @@
       } else if (isFull) {
         regButton = '<button class="btn-register registered" style="max-width:320px;margin:0 auto" disabled>🚫 Event Full</button>';
       } else {
-        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}')">Register Now →</button>`;
+        regButton = `<button class="btn-register" style="max-width:320px;margin:0 auto" id="detail-reg-btn" onclick="registerForEvent('${event.id}', ${event.team_size || 1}, ${event.registration_fee || 0})">Register Now →</button>`;
       }
 
       container.innerHTML = `
@@ -170,15 +170,107 @@
       detailCountdownInterval = setInterval(tick, 1000);
     }
 
-    async function registerForEvent(eventId) {
+    // ===== REGISTRATION & PAYMENT =====
+    let currentEventIdForPayment = null;
+    let currentTeamSize = 1;
+    let currentFee = 0;
+    let teamDetailsCache = [];
+
+    async function registerForEvent(eventId, teamSize, fee) {
       const user = await getCurrentUser();
       if (!user) { window.location.href = 'login.html'; return; }
+      
+      currentEventIdForPayment = eventId;
+      currentTeamSize = teamSize;
+      currentFee = fee;
+      
+      // Generate form for members
+      const container = document.getElementById('team-members-container');
+      container.innerHTML = '';
+      for(let i = 1; i <= teamSize; i++) {
+         const title = i === 1 && teamSize > 1 ? 'Team Leader' : (teamSize === 1 ? 'Participant Details' : `Member ${i}`);
+         container.innerHTML += `
+           <div style="background:rgba(255,255,255,0.02);padding:15px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.05)">
+             <h4 style="margin-bottom:10px;color:var(--text-primary);font-size:1rem">${title}</h4>
+             <div class="form-group" style="margin-bottom:10px">
+               <input type="text" id="member-name-${i}" class="input-field" placeholder="Full Name" required>
+             </div>
+             <div class="form-group" style="margin-bottom:10px">
+               <input type="text" id="member-usn-${i}" class="input-field" placeholder="USN / Roll No" required>
+             </div>
+             <div class="form-group" style="margin-bottom:10px">
+               <input type="text" id="member-college-${i}" class="input-field" placeholder="College Name" required>
+             </div>
+             <div class="form-group" style="margin-bottom:0">
+               <input type="text" id="member-branch-${i}" class="input-field" placeholder="Branch / Department" required>
+             </div>
+           </div>
+         `;
+      }
+      
+      document.getElementById('team-modal').classList.add('active');
+    }
+
+    function closeTeamModal() {
+      document.getElementById('team-modal').classList.remove('active');
+    }
+
+    function proceedToPayment() {
+      teamDetailsCache = [];
+      for(let i = 1; i <= currentTeamSize; i++) {
+         const name = document.getElementById(`member-name-${i}`).value.trim();
+         const usn = document.getElementById(`member-usn-${i}`).value.trim();
+         const college = document.getElementById(`member-college-${i}`).value.trim();
+         const branch = document.getElementById(`member-branch-${i}`).value.trim();
+         
+         if(!name || !usn || !college || !branch) {
+           showToast('Please fill all fields for all members', 'error');
+           return;
+         }
+         teamDetailsCache.push({ name, usn, college, branch });
+      }
+      
+      closeTeamModal();
+      document.getElementById('transaction-id').value = '';
+      
+      const feeText = currentFee > 0 
+        ? `Scan the QR code below to pay the registration fee of <strong style="color:var(--text-primary);font-size:1.1rem">₹${currentFee}</strong>. Once paid, enter your transaction ID.` 
+        : `This event is free to attend. You can just enter 'FREE' or skip the transaction ID.`;
+      
+      document.getElementById('payment-fee-text').innerHTML = feeText;
+      document.getElementById('payment-modal').classList.add('active');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('payment-modal').classList.remove('active');
+      currentEventIdForPayment = null;
+    }
+
+    async function confirmPaymentAndRegister() {
+      const txnId = document.getElementById('transaction-id').value.trim();
+      if (!txnId) {
+        showToast('Please enter the transaction ID', 'error');
+        return;
+      }
+      
+      const eventId = currentEventIdForPayment;
+      const user = await getCurrentUser();
+      
+      closePaymentModal();
+      
       const btn = document.getElementById('detail-reg-btn');
       if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
+      
       try {
-        const { error } = await supabase.from('registrations').insert({ event_id: eventId, user_id: user.id, status: 'confirmed' });
+        const { error } = await supabase.from('registrations').insert({ 
+          event_id: eventId, 
+          user_id: user.id, 
+          transaction_id: txnId,
+          team_details: teamDetailsCache,
+          status: 'pending' 
+        });
         if (error) throw error;
-        showToast('🎉 Successfully registered!', 'success');
+        showToast('🎉 Successfully registered! Pending payment verification.', 'success');
         setTimeout(() => loadEventDetail(), 500);
       } catch (err) {
         showToast(err.message || 'Registration failed', 'error');
@@ -193,5 +285,54 @@
       loadEventDetail();
     });
   </script>
+
+  <!-- TEAM DETAILS MODAL -->
+  <div id="team-modal" class="modal-overlay">
+    <div class="modal fade-in-up" style="max-width:500px; max-height:85vh; overflow-y:auto">
+      <div class="modal-header">
+        <h3>Participant Details</h3>
+        <button class="icon-btn" onclick="closeTeamModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:15px;color:var(--text-secondary);font-size:0.9rem">Please provide the details for all team members before proceeding to payment.</p>
+        <div id="team-members-container" style="display:flex;flex-direction:column;gap:20px;">
+          <!-- Dynamically injected member forms -->
+        </div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;position:sticky;bottom:0;background:var(--surface);padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)">
+        <button class="btn btn-secondary" onclick="closeTeamModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="proceedToPayment()">Next: Payment →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT MODAL -->
+  <div class="modal-overlay" id="payment-modal">
+    <div class="modal" style="max-width:400px;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="margin:0">Complete Payment</h3>
+        <button onclick="closePaymentModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+      
+      <p id="payment-fee-text" style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px">
+        Scan the QR code below to pay the registration fee. Once paid, enter your transaction ID.
+      </p>
+      
+      <div style="background:#fff;padding:16px;border-radius:12px;display:inline-block;margin-bottom:20px">
+        <img src="qr-payment.jpeg" alt="Payment QR Code" style="width:200px;height:200px;object-fit:cover;border-radius:8px">
+      </div>
+      
+      <div class="form-group" style="text-align:left">
+        <label>Transaction / Reference ID *</label>
+        <input type="text" id="transaction-id" class="input-field" placeholder="e.g. UTR123456789" required>
+      </div>
+      
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="confirmPaymentAndRegister()">
+        Confirm Payment & Register
+      </button>
+    </div>
+  </div>
 </body>
 </html>

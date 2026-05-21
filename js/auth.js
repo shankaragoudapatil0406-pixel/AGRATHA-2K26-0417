@@ -1,5 +1,5 @@
 /**
- * AGRATHA 2K26 - Auth Logic
+ * VAIBHAV 2K26 - Auth Logic
  * Login, Register, Forgot Password handlers
  * With comprehensive error handling and diagnostics
  */
@@ -141,6 +141,7 @@ async function handleLogin(e) {
     return;
   }
 
+
   btn.disabled = true;
   btn.textContent = 'Signing in...';
 
@@ -179,15 +180,29 @@ async function handleLogin(e) {
         .eq('id', data.user.id)
         .single();
 
-      if (profileErr) {
-        console.warn('⚠️ Could not fetch user profile:', profileErr.message);
-        console.log('   This is OK — user may not have a profile row yet.');
-      } else if (profile) {
-        userRole = profile.role || 'participant';
-        console.log('👤 User role:', userRole);
+      if (!profile) {
+         // Profile is missing, auto-create it
+         const autoRole = data.user.email.toLowerCase() === 'admin@vaibhav.com' ? 'admin' : 'participant';
+         await supabase.from('users').insert({
+             id: data.user.id,
+             email: data.user.email,
+             role: autoRole
+         });
+         userRole = autoRole;
+      } else {
+         // Profile exists
+         if (data.user.email.toLowerCase() === 'admin@vaibhav.com' && profile.role !== 'admin') {
+             // Auto-elevate to admin
+             await supabase.from('users').update({ role: 'admin' }).eq('id', data.user.id);
+             userRole = 'admin';
+         } else {
+             userRole = profile.role || 'participant';
+         }
       }
+      console.log('👤 User role resolved to:', userRole);
     } catch (profileErr) {
-      console.warn('⚠️ Profile fetch failed (non-critical):', profileErr);
+      console.warn('⚠️ Profile auto-resolution failed:', profileErr);
+      if (data.user.email.toLowerCase() === 'admin@vaibhav.com') userRole = 'admin';
     }
 
     showToast('Welcome back! 🎉', 'success');
@@ -310,7 +325,7 @@ async function handleRegister(e) {
 
     // Handle based on whether session exists
     if (hasSession) {
-      showToast('Account created! Welcome to AGRATHA 2K26! 🎉', 'success');
+      showToast('Account created! Welcome to VAIBHAV 2K26! 🎉', 'success');
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
     } else {
       // Email confirmation required

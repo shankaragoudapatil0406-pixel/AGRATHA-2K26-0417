@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Registrations - VAIBHAV 2K26</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/particles.js" defer></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <nav class="navbar" id="navbar"></nav>
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content with-sidebar">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px">
+      <div>
+        <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:4px">Manage Registrations</h1>
+        <p style="color:var(--text-secondary);font-size:0.9rem">Review payments and grant team access</p>
+      </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <input type="text" id="filter-search" class="input-field" placeholder="Search by Txn ID or User..." style="max-width:300px" oninput="filterRegs()">
+      <select id="filter-status" class="input-field" style="max-width:180px" onchange="filterRegs()">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending Payment</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <!-- Registrations Table -->
+    <div class="glass-card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="data-table" id="regs-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Event</th>
+              <th>Transaction ID</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="regs-tbody">
+            <tr><td colspan="6"><div class="loading-spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAILS MODAL -->
+  <div class="modal-overlay" id="details-modal">
+    <div class="modal" style="max-width:500px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <h3>Registration Details</h3>
+        <button onclick="closeDetailsModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer">
+          <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+      <div id="details-content" style="color:var(--text-secondary);font-size:0.95rem">
+        <!-- Details injected here -->
+      </div>
+      <div style="margin-top:24px" id="details-actions">
+        <!-- Action buttons injected here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminUser = null;
+    let registrations = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      adminUser = await requireAuth('admin');
+      if (!adminUser) return;
+      renderNavbar('admin');
+      renderSidebar('admin', 'manage-regs');
+      initParticles('particles-canvas', 20);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      await loadRegistrations();
+    });
+
+    async function loadRegistrations() {
+      // Fetch registrations with nested user and event info
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('*, users(full_name, email), events(title, team_size)')
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        showToast('Failed to load registrations', 'error');
+        return;
+      }
+      registrations = data || [];
+      renderTable(registrations);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('regs-tbody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px">No registrations found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(r => {
+        let statusBadge = '';
+        if (r.status === 'confirmed') statusBadge = '<span class="badge badge-green">Confirmed</span>';
+        else if (r.status === 'pending') statusBadge = '<span class="badge badge-orange">Pending</span>';
+        else statusBadge = '<span class="badge badge-red">' + r.status + '</span>';
+
+        return `
+        <tr>
+          <td>
+            <div style="font-weight:600">${r.users?.full_name || 'Unknown User'}</div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">${r.users?.email || ''}</div>
+          </td>
+          <td style="color:var(--text-secondary)">${r.events?.title || 'Unknown Event'}</td>
+          <td><code style="background:var(--bg-glass);padding:2px 6px;border-radius:4px;color:var(--accent-cyan)">${r.transaction_id || 'N/A'}</code></td>
+          <td>${statusBadge}</td>
+          <td style="color:var(--text-secondary);font-size:0.9rem">${formatDate(r.created_at)}</td>
+          <td style="text-align:right">
+            <button class="btn btn-sm btn-secondary" onclick="viewDetails('${r.id}')">Review</button>
+          </td>
+        </tr>
+      `}).join('');
+    }
+
+    function filterRegs() {
+      const search = document.getElementById('filter-search').value.toLowerCase();
+      const status = document.getElementById('filter-status').value;
+
+      const filtered = registrations.filter(r => {
+        const matchSearch = !search || 
+          (r.transaction_id || '').toLowerCase().includes(search) || 
+          (r.users?.full_name || '').toLowerCase().includes(search) ||
+          (r.users?.email || '').toLowerCase().includes(search);
+        const matchStatus = !status || r.status === status;
+        return matchSearch && matchStatus;
+      });
+      renderTable(filtered);
+    }
+
+    function viewDetails(id) {
+      const r = registrations.find(x => x.id === id);
+      if (!r) return;
+
+      let teamHtml = '<p>No team details provided.</p>';
+      if (r.team_details && Array.isArray(r.team_details)) {
+        teamHtml = r.team_details.map((m, i) => `
+          <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;margin-bottom:8px">
+            <strong style="color:#fff">${i === 0 ? 'Leader' : 'Member ' + (i+1)}:</strong> ${m.name} (${m.usn})<br>
+            <span style="font-size:0.85rem">${m.college} - ${m.branch}</span>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('details-content').innerHTML = `
+        <div style="margin-bottom:16px">
+          <strong>Event:</strong> <span style="color:#fff">${r.events?.title}</span><br>
+          <strong>User:</strong> <span style="color:#fff">${r.users?.full_name} (${r.users?.email})</span><br>
+          <strong>Transaction ID:</strong> <span style="color:var(--accent-cyan)">${r.transaction_id || 'N/A'}</span><br>
+          <strong>Status:</strong> ${r.status}
+        </div>
+        <h4 style="margin-bottom:12px;color:#fff">Team Details</h4>
+        ${teamHtml}
+      `;
+
+      const actionsContainer = document.getElementById('details-actions');
+      if (r.status === 'pending') {
+        actionsContainer.innerHTML = `
+          <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="grantRegistration('${r.id}')">Verify Payment & Grant Access</button>
+          <button class="btn btn-danger" style="width:100%" onclick="rejectRegistration('${r.id}')">Reject Registration</button>
+        `;
+      } else {
+        actionsContainer.innerHTML = `<p style="text-align:center">Registration is already <strong>${r.status}</strong>.</p>`;
+      }
+
+      document.getElementById('details-modal').classList.add('active');
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('details-modal').classList.remove('active');
+    }
+
+    async function grantRegistration(id) {
+      const r = registrations.find(x => x.id === id);
+      if (!r) return;
+      
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        // 1. Update Registration Status
+        const { error: regErr } = await supabase.from('registrations').update({ status: 'confirmed' }).eq('id', id);
+        if (regErr) throw regErr;
+
+        // 2. Create a Team
+        const teamName = r.team_details && r.team_details[0] ? r.team_details[0].name + "'s Team" : "Team " + r.users?.full_name;
+        const { data: teamData, error: teamErr } = await supabase.from('teams').insert({
+          name: teamName,
+          event_id: r.event_id,
+          created_by: r.user_id
+        }).select().single();
+        if (teamErr) throw teamErr;
+
+        // 3. Add user as Team Leader
+        const { error: memErr } = await supabase.from('team_members').insert({
+          team_id: teamData.id,
+          user_id: r.user_id,
+          role: 'leader'
+        });
+        if (memErr) throw memErr;
+
+        // Also link the registration to the team (optional but good practice)
+        await supabase.from('registrations').update({ team_id: teamData.id }).eq('id', id);
+
+        showToast('Registration approved and team created successfully!', 'success');
+        closeDetailsModal();
+        await loadRegistrations();
+      } catch (err) {
+        showToast(err.message || 'Failed to grant registration', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Verify Payment & Grant Access';
+      }
+    }
+
+    async function rejectRegistration(id) {
+      if(!confirm("Are you sure you want to reject this registration?")) return;
+      
+      const btn = event.target;
+      btn.disabled = true;
+      
+      try {
+        const { error } = await supabase.from('registrations').update({ status: 'cancelled' }).eq('id', id);
+        if (error) throw error;
+        
+        showToast('Registration rejected.', 'info');
+        closeDetailsModal();
+        await loadRegistrations();
+      } catch (err) {
+        showToast(err.message || 'Failed to reject registration', 'error');
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

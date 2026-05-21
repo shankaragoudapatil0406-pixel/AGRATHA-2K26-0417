@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Events - AGRATHA 2K26</title>
-  <meta name="description" content="Admin panel to create, edit, and delete events for AGRATHA 2K26.">
+  <title>Manage Events - VAIBHAV 2K26</title>
+  <meta name="description" content="Admin panel to create, edit, and delete events for VAIBHAV 2K26.">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -142,6 +142,10 @@
             <label>Team Size</label>
             <input type="number" id="f-team" class="input-field" value="1" min="1">
           </div>
+          <div class="form-group">
+            <label>Registration Fee (₹)</label>
+            <input type="number" id="f-fee" class="input-field" placeholder="e.g. 500" min="0">
+          </div>
         </div>
 
         <div class="form-group">
@@ -199,7 +203,7 @@
     async function loadAdminEvents() {
       const { data } = await supabase.from('events').select('*').order('created_at', { ascending: false });
       adminEvents = data || [];
-
+      
       // Get registration counts
       const { data: regs } = await supabase.from('registrations').select('event_id');
       adminRegCounts = {};
@@ -275,6 +279,7 @@
       document.getElementById('edit-id').value = '';
       document.getElementById('event-form').reset();
       document.getElementById('f-team').value = '1';
+      document.getElementById('f-fee').value = '0';
       document.getElementById('f-status').value = 'upcoming';
       document.getElementById('event-modal').classList.add('active');
     }
@@ -292,6 +297,7 @@
       document.getElementById('f-status').value = event.status || 'upcoming';
       document.getElementById('f-max').value = event.max_participants || '';
       document.getElementById('f-team').value = event.team_size || 1;
+      document.getElementById('f-fee').value = event.registration_fee || 0;
       document.getElementById('f-rules').value = event.rules || '';
       document.getElementById('f-prizes').value = event.prizes || '';
       document.getElementById('f-image').value = event.image_url || '';
@@ -322,6 +328,7 @@
         status: document.getElementById('f-status').value,
         max_participants: parseInt(document.getElementById('f-max').value) || null,
         team_size: parseInt(document.getElementById('f-team').value) || 1,
+        registration_fee: parseInt(document.getElementById('f-fee').value) || 0,
         rules: document.getElementById('f-rules').value,
         prizes: document.getElementById('f-prizes').value,
         image_url: document.getElementById('f-image').value || null,

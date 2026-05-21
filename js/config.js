@@ -1,5 +1,5 @@
 /**
- * AGRATHA 2K26 - Supabase Configuration
+ * VAIBHAV 2K26 - Supabase Configuration
  * Initialize Supabase client for auth, database, and realtime
  */
 
