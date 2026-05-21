@@ -1,5 +1,5 @@
 /**
- * AGRATHA 2K26 - Shared Utilities
+ * VAIBHAV 2K26 - Shared Utilities
  * Navigation, toast, auth guards, and common helpers
  */
 
@@ -45,7 +45,8 @@ async function requireAuth(role) {
 }
 
 async function handleLogout() {
-  await supabase.auth.signOut();
+  localStorage.removeItem('localAdmin');
+  try { await supabase.auth.signOut(); } catch (e) {}
   showToast('Logged out successfully', 'info');
   setTimeout(() => window.location.href = 'index.html', 500);
 }
@@ -67,7 +68,7 @@ function renderNavbar(activePage) {
       <a href="register.html" class="btn btn-primary btn-sm">Register</a>
     `;
     nav.innerHTML = `
-      <a href="index.html" class="navbar-brand">AGRATHA 2K26</a>
+      <a href="index.html" class="navbar-brand">VAIBHAV 2K26</a>
       <div class="navbar-links">${links}</div>
       <button class="mobile-menu-btn" onclick="this.nextElementSibling.classList.toggle('show')" aria-label="Menu">
         <i data-lucide="menu" style="width:24px;height:24px"></i>
@@ -96,6 +97,7 @@ function renderSidebar(role, activePage) {
   const adminLinks = [
     { href: 'admin.html', icon: 'layout-dashboard', label: 'Dashboard', id: 'dashboard' },
     { href: 'admin-events.html', icon: 'calendar-plus', label: 'Manage Events', id: 'manage-events' },
+    { href: 'admin-registrations.html', icon: 'clipboard-list', label: 'Registrations', id: 'manage-regs' },
     { href: 'admin-users.html', icon: 'users', label: 'Manage Users', id: 'manage-users' },
     { href: 'announcements.html', icon: 'megaphone', label: 'Announcements', id: 'announcements' },
     { href: 'leaderboard.html', icon: 'trophy', label: 'Leaderboard', id: 'leaderboard' },
@@ -127,7 +129,7 @@ function renderFooter() {
   const footer = document.getElementById('footer');
   if (!footer) return;
   footer.innerHTML = `
-    <p>&copy; 2026 <a href="index.html">AGRATHA 2K26</a> — College Fest Management Portal. All rights reserved.</p>
+    <p>&copy; 2026 <a href="index.html">VAIBHAV 2K26</a> — College Fest Management Portal. All rights reserved.</p>
   `;
 }
 

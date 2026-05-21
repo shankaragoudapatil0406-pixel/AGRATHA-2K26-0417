@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* ============================================
-   AGRATHA 2K26 - Design System
+   VAIBHAV 2K26 - Design System
    ============================================ */
 
 :root {
   --bg-primary: #0a0a0f;
   --bg-secondary: #12121a;
-  --bg-card: rgba(18, 18, 26, 0.8);
-  --bg-glass: rgba(255, 255, 255, 0.03);
-  --border-glass: rgba(255, 255, 255, 0.08);
+  --bg-card: #161622; /* Solid color to prevent text overlap visibility */
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --border-glass: rgba(255, 255, 255, 0.1);
   --text-primary: #f0f0f5;
   --text-secondary: #8a8a9a;
   --text-muted: #5a5a6a;
@@ -292,11 +292,13 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
 /* ===== LEADERBOARD ===== */
 .leaderboard-row {
   display: flex; align-items: center; gap: 16px; padding: 16px;
-  background: var(--bg-card); border: 1px solid var(--border-glass);
+  background: linear-gradient(90deg, #181824, #12121c); /* Distinct solid color */
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-md); margin-bottom: 8px;
   transition: all 0.3s;
+  flex-wrap: wrap; /* Prevents overlap on small phones */
 }
-.leaderboard-row:hover { border-color: rgba(0, 212, 255, 0.3); }
+.leaderboard-row:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateX(4px); }
 .leaderboard-row .rank {
   font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
   min-width: 40px; text-align: center;
@@ -304,7 +306,11 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
 .leaderboard-row .rank.gold { color: #fbbf24; }
 .leaderboard-row .rank.silver { color: #9ca3af; }
 .leaderboard-row .rank.bronze { color: #d97706; }
-.leaderboard-row .name { flex: 1; font-weight: 600; }
+.leaderboard-row .name { 
+  flex: 1; font-weight: 600; 
+  min-width: 120px; /* Forces wrap if too tight */
+  word-wrap: break-word; /* Prevents long names from breaking layout */
+}
 .leaderboard-row .score {
   font-family: var(--font-display); font-weight: 700; color: var(--accent-cyan);
 }
