@@ -2,48 +2,381 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaderboard - VAIBHAV 2K26</title>
+  <title>Leaderboard — VAIBHAV 2K26</title>
+  <meta name="description" content="Live leaderboard rankings for VAIBHAV 2K26 fest participants.">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
+  <style>
+    .lb-hero {
+      text-align: center;
+      padding: 120px 32px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .lb-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(245,158,11,0.07) 0%, transparent 70%);
+    }
+    .lb-hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 50px;
+      background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--accent-orange); letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .lb-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 12px;
+    }
+    .lb-hero p { color: var(--text-secondary); font-size: 1.05rem; }
+
+    /* ===== PODIUM ===== */
+    .podium-section {
+      max-width: 700px;
+      margin: 0 auto 60px;
+      padding: 0 32px;
+    }
+    .podium-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 16px;
+    }
+    .podium-card {
+      flex: 1;
+      max-width: 200px;
+      border-radius: var(--radius-lg);
+      padding: 24px 16px;
+      text-align: center;
+      border: 1px solid;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s;
+    }
+    .podium-card:hover { transform: translateY(-6px); }
+    .podium-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      opacity: 0.05;
+    }
+
+    .podium-1 {
+      background: rgba(251,191,36,0.06);
+      border-color: rgba(251,191,36,0.3);
+      box-shadow: 0 0 40px rgba(251,191,36,0.1);
+      order: 2; /* Center */
+    }
+    .podium-2 {
+      background: rgba(156,163,175,0.06);
+      border-color: rgba(156,163,175,0.25);
+      order: 1;
+    }
+    .podium-3 {
+      background: rgba(217,119,6,0.06);
+      border-color: rgba(217,119,6,0.25);
+      order: 3;
+    }
+
+    .podium-crown { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .podium-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 700;
+      margin: 0 auto 12px;
+    }
+    .podium-1 .podium-avatar { background: rgba(251,191,36,0.2); color: #fbbf24; border: 2px solid rgba(251,191,36,0.4); }
+    .podium-2 .podium-avatar { background: rgba(156,163,175,0.2); color: #9ca3af; border: 2px solid rgba(156,163,175,0.4); }
+    .podium-3 .podium-avatar { background: rgba(217,119,6,0.2); color: #d97706; border: 2px solid rgba(217,119,6,0.4); }
+
+    .podium-name {
+      font-family: var(--font-heading);
+      font-size: 0.95rem; font-weight: 700;
+      margin-bottom: 4px; color: var(--text-primary);
+    }
+    .podium-college { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px; }
+    .podium-pts {
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 800;
+    }
+    .podium-1 .podium-pts { color: #fbbf24; }
+    .podium-2 .podium-pts { color: #9ca3af; }
+    .podium-3 .podium-pts { color: #d97706; }
+    .podium-pts-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    .podium-base {
+      margin-top: 12px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      padding: 8px;
+    }
+    .podium-1 .podium-base { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .podium-2 .podium-base { background: rgba(156,163,175,0.12); color: #9ca3af; }
+    .podium-3 .podium-base { background: rgba(217,119,6,0.12); color: #d97706; }
+
+    /* ===== SEARCH + FILTER ===== */
+    .lb-controls {
+      max-width: 800px;
+      margin: 0 auto 24px;
+      padding: 0 32px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .lb-search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .lb-search-wrap i {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); width: 16px; height: 16px; pointer-events: none;
+    }
+    .lb-search {
+      width: 100%; padding: 11px 16px 11px 40px;
+      background: var(--bg-card); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm); color: var(--text-primary);
+      font-family: var(--font-body); font-size: 0.875rem; outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .lb-search:focus {
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+    }
+
+    /* ===== RANKED LIST ===== */
+    .lb-list {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      transition: all 0.3s;
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .lb-row::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gradient-main);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .lb-row:hover {
+      border-color: rgba(0,212,255,0.25);
+      transform: translateX(4px);
+      box-shadow: 0 4px 20px rgba(0,212,255,0.08);
+    }
+    .lb-row:hover::before { opacity: 1; }
+
+    .lb-row.me {
+      background: rgba(0,240,255,0.04);
+      border-color: rgba(0,240,255,0.2);
+    }
+    .lb-row.me::before { opacity: 1; }
+
+    .lb-rank {
+      font-family: var(--font-display);
+      font-size: 1.1rem; font-weight: 700;
+      min-width: 40px; text-align: center;
+      color: var(--text-muted);
+    }
+    .lb-rank.top { color: var(--accent-orange); }
+
+    .lb-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(189,0,255,0.2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+      color: var(--accent-cyan); flex-shrink: 0;
+    }
+
+    .lb-info { flex: 1; min-width: 0; }
+    .lb-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+    .lb-college { font-size: 0.75rem; color: var(--text-muted); }
+
+    .lb-score {
+      font-family: var(--font-display);
+      font-size: 1.2rem; font-weight: 800;
+      color: var(--accent-cyan);
+    }
+    .lb-score-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; text-align: right; }
+
+    .lb-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px 12px;
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--text-muted); font-weight: 600;
+      border-bottom: 1px solid var(--border-glass);
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .lb-hero { padding: 100px 16px 32px; }
+      .podium-section { padding: 0 16px; }
+      .lb-controls { padding: 0 16px; }
+      .lb-list { padding: 0 16px 60px; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="particles-canvas"></canvas>
   <nav class="navbar" id="navbar"></nav>
-  <div class="main-content" style="max-width:800px;margin-left:auto;margin-right:auto">
-    <div class="section-header" style="margin-top:20px">
-      <h2>🏆 Leaderboard</h2>
-      <p>Top performers across all events</p>
-    </div>
-    <div id="leaderboard-list"><div class="loading-spinner"></div></div>
+
+  <div class="lb-hero">
+    <div class="lb-hero-badge">🏆 Live Rankings</div>
+    <h1>Leaderboard</h1>
+    <p>Top performers competing across all events</p>
   </div>
+
+  <!-- PODIUM -->
+  <div class="podium-section">
+    <div class="podium-row" id="podium">
+      <!-- Injected by JS -->
+      <div style="text-align:center;color:var(--text-muted);padding:40px"><div class="loading-spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="lb-controls">
+    <div class="lb-search-wrap">
+      <i data-lucide="search"></i>
+      <input type="text" class="lb-search" id="lb-search" placeholder="Search by name or college..." oninput="filterLeaderboard()">
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="lb-list">
+    <div class="lb-header-row">
+      <span>Rank &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Participant</span>
+      <span>Points</span>
+    </div>
+    <div id="lb-rows">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
   <footer class="footer" id="footer"></footer>
+
   <script>
+    let allUsers = [];
+    let currentUserId = null;
+
     document.addEventListener('DOMContentLoaded', async () => {
       renderNavbar('leaderboard');
       renderFooter();
-      initParticles('particles-canvas', 30);
+      initParticles('particles-canvas', 25);
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      const { data: users } = await supabase.from('users').select('full_name, college, points').order('points', { ascending: false }).limit(50);
-      const el = document.getElementById('leaderboard-list');
+
+      try {
+        const session = await supabase.auth.getSession();
+        currentUserId = session?.data?.session?.user?.id || null;
+      } catch(e) {}
+
+      try {
+        const { data } = await supabase.from('users').select('id, full_name, college, points').order('points', { ascending: false }).limit(100);
+        allUsers = data || [];
+      } catch(e) {
+        allUsers = [];
+      }
+
+      renderPodium(allUsers.slice(0, 3));
+      renderRows(allUsers);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+
+    function getInitials(name) {
+      return (name || 'A').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    function renderPodium(top3) {
+      const podium = document.getElementById('podium');
+      if (!top3 || !top3.length) {
+        podium.innerHTML = '<div class="empty-state"><h3>No rankings yet</h3><p>Participate in events to earn points!</p></div>';
+        return;
+      }
+
+      const medals = ['🥇', '🥈', '🥉'];
+      const classes = ['podium-1', 'podium-2', 'podium-3'];
+      const labels = ['1st', '2nd', '3rd'];
+
+      // Ensure order: 2nd, 1st, 3rd visually
+      const display = [top3[1], top3[0], top3[2]].filter(Boolean);
+      const displayClasses = top3[1] ? [classes[1], classes[0], classes[2]] : [classes[0], classes[2]].filter(Boolean);
+
+      podium.innerHTML = top3.slice(0, 3).map((u, i) => `
+        <div class="podium-card ${classes[i]}" style="animation:fadeInUp 0.5s ease ${i * 0.1}s forwards;opacity:0;${i===0?'margin-bottom:0;':''}">
+          <span class="podium-crown">${medals[i]}</span>
+          <div class="podium-avatar">${getInitials(u.full_name)}</div>
+          <div class="podium-name">${u.full_name || 'Anonymous'}</div>
+          <div class="podium-college">${u.college || 'VAIBHAV'}</div>
+          <div class="podium-pts">${u.points || 0}</div>
+          <div class="podium-pts-label">points</div>
+          <div class="podium-base">${labels[i]}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRows(users) {
+      const el = document.getElementById('lb-rows');
       if (!users || !users.length) {
-        el.innerHTML = '<div class="empty-state"><h3>No rankings yet</h3><p>Participate in events to earn points!</p></div>';
+        el.innerHTML = '<div class="empty-state"><h3>No rankings yet</h3><p>Participate in events to earn points and appear here!</p></div>';
         return;
       }
       el.innerHTML = users.map((u, i) => `
-        <div class="leaderboard-row fade-in-up" style="animation-delay:${i * 0.05}s">
-          <div class="rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">#${i + 1}</div>
-          <div class="name">
-            <div style="font-weight:600">${u.full_name || 'Anonymous'}</div>
-            <div style="font-size:0.75rem;color:var(--text-muted)">${u.college || ''}</div>
+        <div class="lb-row ${u.id === currentUserId ? 'me' : ''}" style="animation-delay:${Math.min(i * 0.03, 0.5)}s">
+          <div class="lb-rank ${i < 3 ? 'top' : ''}">#${i + 1}</div>
+          <div class="lb-avatar">${getInitials(u.full_name)}</div>
+          <div class="lb-info">
+            <div class="lb-name">${u.full_name || 'Anonymous'}${u.id === currentUserId ? ' <span style="color:var(--accent-cyan);font-size:0.7rem">• You</span>' : ''}</div>
+            <div class="lb-college">${u.college || '—'}</div>
           </div>
-          <div class="score">${u.points || 0} pts</div>
+          <div>
+            <div class="lb-score">${u.points || 0}</div>
+            <div class="lb-score-label">pts</div>
+          </div>
         </div>
       `).join('');
-    });
+    }
+
+    function filterLeaderboard() {
+      const q = document.getElementById('lb-search').value.toLowerCase();
+      const filtered = allUsers.filter(u =>
+        (u.full_name || '').toLowerCase().includes(q) ||
+        (u.college || '').toLowerCase().includes(q)
+      );
+      renderRows(filtered);
+    }
   </script>
 </body>
 </html>

@@ -2,48 +2,282 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Announcements - VAIBHAV 2K26</title>
+  <title>Announcements — VAIBHAV 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
+  <style>
+    .ann-hero {
+      text-align: center;
+      padding: 120px 32px 48px;
+      position: relative;
+    }
+    .ann-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 20%, rgba(236,72,153,0.07) 0%, transparent 65%);
+    }
+    .ann-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 50px;
+      background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2);
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--accent-pink); letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .ann-badge .bell-icon { animation: bellRing 2.5s ease-in-out infinite; display: inline-block; }
+    @keyframes bellRing {
+      0%, 100% { transform: rotate(0deg); }
+      10%, 30% { transform: rotate(-15deg); }
+      20%, 40% { transform: rotate(15deg); }
+      50% { transform: rotate(0deg); }
+    }
+    .ann-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 12px;
+    }
+    .ann-hero p { color: var(--text-secondary); font-size: 1rem; }
+
+    /* ===== FILTER TABS ===== */
+    .ann-filters {
+      max-width: 800px;
+      margin: 0 auto 32px;
+      padding: 0 32px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ann-filter-btn {
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 0.82rem; font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid var(--border-glass);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+    }
+    .ann-filter-btn:hover { color: var(--text-primary); }
+    .ann-filter-btn.active-all { background: rgba(0,212,255,0.15); color: var(--accent-cyan); border-color: rgba(0,212,255,0.3); }
+    .ann-filter-btn.active-urgent { background: rgba(239,68,68,0.15); color: #ef4444; border-color: rgba(239,68,68,0.3); }
+    .ann-filter-btn.active-important { background: rgba(245,158,11,0.15); color: var(--accent-orange); border-color: rgba(245,158,11,0.3); }
+    .ann-filter-btn.active-normal { background: rgba(16,185,129,0.12); color: var(--accent-green); border-color: rgba(16,185,129,0.25); }
+
+    /* ===== ANNOUNCEMENT CARDS ===== */
+    .ann-list {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    .ann-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s;
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
+      border-left: 4px solid transparent;
+    }
+    .ann-card:hover {
+      transform: translateX(4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+
+    .ann-card.urgent {
+      border-left-color: #ef4444;
+      background: linear-gradient(90deg, rgba(239,68,68,0.04), var(--bg-card));
+    }
+    .ann-card.urgent .ann-pulse {
+      animation: urgentPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes urgentPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+    }
+
+    .ann-card.important { border-left-color: #f59e0b; background: linear-gradient(90deg, rgba(245,158,11,0.04), var(--bg-card)); }
+    .ann-card.normal { border-left-color: var(--accent-cyan); background: linear-gradient(90deg, rgba(0,212,255,0.03), var(--bg-card)); }
+
+    .ann-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .ann-title-area { flex: 1; }
+    .ann-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 4px; color: var(--text-primary);
+    }
+    .ann-meta {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+    .ann-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .ann-badge-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 50px;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .ann-badge-pill.urgent { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .ann-badge-pill.urgent .ann-dot { background: #ef4444; }
+    .ann-badge-pill.important { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+    .ann-badge-pill.important .ann-dot { background: #f59e0b; }
+    .ann-badge-pill.normal { background: rgba(16,185,129,0.12); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.2); }
+    .ann-badge-pill.normal .ann-dot { background: var(--accent-green); }
+
+    .ann-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .ann-card.urgent .ann-dot { animation: urgentPulse 1.5s ease-in-out infinite; }
+
+    .ann-content {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .ann-empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+    }
+    .ann-empty h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-secondary); }
+
+    @media (max-width: 768px) {
+      .ann-hero { padding: 100px 16px 32px; }
+      .ann-filters { padding: 0 16px; }
+      .ann-list { padding: 0 16px 60px; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="particles-canvas"></canvas>
   <nav class="navbar" id="navbar"></nav>
-  <div class="main-content" style="max-width:800px;margin-left:auto;margin-right:auto">
-    <div class="section-header" style="margin-top:20px">
-      <h2>📢 Announcements</h2>
-      <p>Stay updated with the latest news</p>
+
+  <div class="ann-hero">
+    <div class="ann-badge">
+      <span class="bell-icon">🔔</span>
+      Live Updates
     </div>
-    <div id="announcements-list"><div class="loading-spinner"></div></div>
+    <h1>Announcements</h1>
+    <p>Stay updated with the latest fest news and alerts</p>
   </div>
+
+  <div class="ann-filters">
+    <button class="ann-filter-btn active-all" onclick="filterAnn('all', this)">All</button>
+    <button class="ann-filter-btn" onclick="filterAnn('urgent', this)">🔴 Urgent</button>
+    <button class="ann-filter-btn" onclick="filterAnn('important', this)">🟡 Important</button>
+    <button class="ann-filter-btn" onclick="filterAnn('normal', this)">🟢 Normal</button>
+  </div>
+
+  <div class="ann-list" id="ann-list">
+    <div class="loading-spinner"></div>
+  </div>
+
   <footer class="footer" id="footer"></footer>
+
   <script>
+    let allAnn = [];
+    let activeFilter = 'all';
+
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const m = Math.floor(diff / 60000);
+      const h = Math.floor(diff / 3600000);
+      const d = Math.floor(diff / 86400000);
+      if (m < 1) return 'Just now';
+      if (m < 60) return `${m}m ago`;
+      if (h < 24) return `${h}h ago`;
+      if (d < 7) return `${d}d ago`;
+      return formatDate(dateStr);
+    }
+
+    function renderAnn(data) {
+      const el = document.getElementById('ann-list');
+      if (!data || !data.length) {
+        el.innerHTML = '<div class="ann-empty"><h3>No announcements yet</h3><p>Check back soon for updates and news.</p></div>';
+        return;
+      }
+      el.innerHTML = data.map((a, i) => {
+        const p = a.priority || 'normal';
+        return `
+          <div class="ann-card ${p}" style="animation-delay:${Math.min(i * 0.06, 0.4)}s">
+            <div class="ann-card-header">
+              <div class="ann-title-area">
+                <div class="ann-title">${a.title || 'Untitled'}</div>
+                <div class="ann-meta">
+                  <span><i data-lucide="clock" style="width:12px;height:12px"></i> ${timeAgo(a.created_at)}</span>
+                  <span>${formatDateTime(a.created_at)}</span>
+                </div>
+              </div>
+              <div class="ann-badge-pill ${p}">
+                <span class="ann-dot"></span>
+                ${p}
+              </div>
+            </div>
+            <div class="ann-content">${a.content || ''}</div>
+          </div>
+        `;
+      }).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function filterAnn(type, btn) {
+      activeFilter = type;
+      // Update button styles
+      document.querySelectorAll('.ann-filter-btn').forEach(b => {
+        b.className = 'ann-filter-btn';
+      });
+      btn.classList.add(`active-${type}`);
+
+      const filtered = type === 'all' ? allAnn : allAnn.filter(a => (a.priority || 'normal') === type);
+      renderAnn(filtered);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       renderNavbar('announcements');
       renderFooter();
-      initParticles('particles-canvas', 30);
+      initParticles('particles-canvas', 20);
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      const { data: anns } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
-      const el = document.getElementById('announcements-list');
-      if (!anns || !anns.length) {
-        el.innerHTML = '<div class="empty-state"><h3>No announcements yet</h3><p>Check back later for updates.</p></div>';
-        return;
+
+      try {
+        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
+        allAnn = data || [];
+      } catch(e) { allAnn = []; }
+
+      renderAnn(allAnn);
+
+      // Real-time subscription
+      if (window.supabase) {
+        supabase.channel('ann-live')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, payload => {
+            allAnn.unshift(payload.new);
+            showToast(`📢 ${payload.new.title}`, payload.new.priority === 'urgent' ? 'error' : 'info');
+            const filtered = activeFilter === 'all' ? allAnn : allAnn.filter(a => (a.priority || 'normal') === activeFilter);
+            renderAnn(filtered);
+          }).subscribe();
       }
-      const priorityColors = { urgent: 'var(--accent-red)', important: 'var(--accent-orange)', normal: 'var(--accent-cyan)' };
-      el.innerHTML = anns.map(a => `
-        <div class="glass-card fade-in-up" style="margin-bottom:16px;border-left:3px solid ${priorityColors[a.priority] || priorityColors.normal}">
-          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
-            <h3 style="font-family:var(--font-heading);font-size:1.1rem">${a.title}</h3>
-            <span class="badge ${a.priority === 'urgent' ? 'badge-red' : a.priority === 'important' ? 'badge-orange' : 'badge-cyan'}">${a.priority || 'normal'}</span>
-          </div>
-          <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:12px">${a.content}</p>
-          <div style="font-size:0.75rem;color:var(--text-muted)">${formatDateTime(a.created_at)}</div>
-        </div>
-      `).join('');
     });
   </script>
 </body>
