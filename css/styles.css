@@ -440,10 +440,23 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   .navbar { padding: 0 16px; }
   .navbar-links { display: none; }
   .mobile-menu-btn { display: block; }
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-  .main-content.with-sidebar { margin-left: 0; }
-  .main-content { padding: 20px 16px; }
+
+  /* Sidebar: hidden off-screen by default on mobile */
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 910;
+    box-shadow: none;
+    transition: transform 0.3s ease, box-shadow 0.3s;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 40px rgba(0,0,0,0.5);
+  }
+
+  /* Main content: NO left margin on mobile — sidebar overlays, not pushes */
+  .main-content { margin-left: 0 !important; padding: 20px 16px; }
+  .main-content.with-sidebar { margin-left: 0 !important; }
+
   .hero h1 { font-size: 2rem; }
   .hero { padding: 100px 16px 60px; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
@@ -1220,4 +1233,108 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
     linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+
+/* =============================================
+   MOBILE NAV DRAWER & OVERLAY
+   Appended to body by app.js — avoids
+   backdrop-filter stacking context bug
+   ============================================= */
+
+/* Full-screen dark overlay */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 905;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.nav-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Slide-in drawer (right-to-left) */
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 260px;
+  bottom: 0;
+  z-index: 910;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-glass);
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+.mobile-nav-drawer.open { right: 0; }
+
+.drawer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border-glass);
+  flex-shrink: 0;
+}
+.drawer-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+.drawer-close-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass);
+}
+
+.drawer-nav {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.drawer-nav a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.drawer-nav a:hover,
+.drawer-nav a.active {
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--accent-cyan);
+}
+.drawer-nav a.btn {
+  margin-top: 8px;
+  text-align: center;
+  color: #fff;
+  border-radius: 50px;
+}
+
+/* Sidebar brand strip */
+.sidebar-brand {
+  padding: 20px 16px 0;
+  margin-bottom: 8px;
+  display: none;
+}
+@media (max-width: 768px) {
+  .sidebar-brand { display: block; }
 }

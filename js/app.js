@@ -51,12 +51,78 @@ async function handleLogout() {
   setTimeout(() => window.location.href = 'index.html', 500);
 }
 
+// ===== MOBILE MENU (drawer appended to BODY to avoid stacking-context bug) =====
+function _createMobileDrawer(links) {
+  // Remove old drawer if exists
+  const old = document.getElementById('mobile-nav-drawer');
+  if (old) old.remove();
+  const oldOv = document.getElementById('nav-overlay');
+  if (oldOv) oldOv.remove();
+
+  // Overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'nav-overlay';
+  overlay.className = 'nav-overlay';
+  overlay.onclick = closeMobileMenu;
+
+  // Drawer
+  const drawer = document.createElement('div');
+  drawer.id = 'mobile-nav-drawer';
+  drawer.className = 'mobile-nav-drawer';
+  drawer.innerHTML = `
+    <div class="drawer-top">
+      <span class="navbar-brand" style="font-size:1.1rem">VAIBHAV 2K26</span>
+      <button onclick="closeMobileMenu()" class="drawer-close-btn" aria-label="Close">
+        <i data-lucide="x" style="width:22px;height:22px"></i>
+      </button>
+    </div>
+    <nav class="drawer-nav">${links}</nav>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(drawer);
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function toggleMobileMenu() {
+  const drawer = document.getElementById('mobile-nav-drawer');
+  const overlay = document.getElementById('nav-overlay');
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('mobile-menu-btn');
+
+  const isOpen = drawer && drawer.classList.contains('open');
+
+  if (isOpen) {
+    closeMobileMenu();
+  } else {
+    if (drawer) drawer.classList.add('open');
+    if (overlay) overlay.classList.add('show');
+    // On mobile, also show the sidebar if present (for pages with sidebar)
+    if (sidebar && window.innerWidth <= 768) sidebar.classList.add('open');
+    if (btn) { btn.innerHTML = '<i data-lucide="x" style="width:24px;height:24px"></i>'; lucide.createIcons(); }
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobileMenu() {
+  const drawer = document.getElementById('mobile-nav-drawer');
+  const overlay = document.getElementById('nav-overlay');
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('mobile-menu-btn');
+
+  if (drawer) drawer.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
+  if (sidebar) sidebar.classList.remove('open');
+  if (btn) { btn.innerHTML = '<i data-lucide="menu" style="width:24px;height:24px"></i>'; lucide.createIcons(); }
+  document.body.style.overflow = '';
+}
+
 // ===== NAVBAR RENDERER =====
 function renderNavbar(activePage) {
   const nav = document.getElementById('navbar');
   if (!nav) return;
   getCurrentUser().then(user => {
-    const links = user ? `
+    const authLinks = user ? `
       <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="events.html" class="${activePage === 'events' ? 'active' : ''}">Events</a>
       <a href="leaderboard.html" class="${activePage === 'leaderboard' ? 'active' : ''}">Leaderboard</a>
@@ -69,14 +135,18 @@ function renderNavbar(activePage) {
       <a href="login.html" class="${activePage === 'login' ? 'active' : ''}">Login</a>
       <a href="register.html" class="btn btn-primary btn-sm">Register</a>
     `;
+
+    // Navbar only contains brand + desktop links + hamburger button
     nav.innerHTML = `
       <a href="index.html" class="navbar-brand">VAIBHAV 2K26</a>
-      <div class="navbar-links">${links}</div>
-      <button class="mobile-menu-btn" onclick="this.nextElementSibling.classList.toggle('show')" aria-label="Menu">
+      <div class="navbar-links">${authLinks}</div>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" id="mobile-menu-btn">
         <i data-lucide="menu" style="width:24px;height:24px"></i>
       </button>
-      <div class="mobile-nav" style="display:none">${links}</div>
     `;
+
+    // Drawer is appended directly to <body> — avoids backdrop-filter stacking context bug
+    _createMobileDrawer(authLinks);
     if (typeof lucide !== 'undefined') lucide.createIcons();
   });
 }
@@ -108,10 +178,13 @@ function renderSidebar(role, activePage) {
 
   const links = role === 'admin' ? adminLinks : participantLinks;
   sidebar.innerHTML = `
+    <div class="sidebar-brand">
+      <span class="navbar-brand" style="font-size:1rem">VAIBHAV 2K26</span>
+    </div>
     <div class="sidebar-section">
       <h4>${role === 'admin' ? 'Admin Panel' : 'Navigation'}</h4>
       ${links.map(l => `
-        <a href="${l.href}" class="sidebar-link ${activePage === l.id ? 'active' : ''}">
+        <a href="${l.href}" class="sidebar-link ${activePage === l.id ? 'active' : ''}" onclick="closeMobileMenu()">
           <i data-lucide="${l.icon}"></i> ${l.label}
         </a>
       `).join('')}
@@ -124,6 +197,13 @@ function renderSidebar(role, activePage) {
     </div>
   `;
   if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  // On mobile, sidebar closes when a link is clicked
+  sidebar.querySelectorAll('.sidebar-link').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeMobileMenu();
+    });
+  });
 }
 
 // ===== FOOTER RENDERER =====
@@ -177,7 +257,7 @@ function getCategoryBadge(category) {
 }
 
 function getStatusBadge(status) {
-  const map = { upcoming: 'badge-cyan', ongoing: 'badge-green', completed: 'badge-purple', cancelled: 'badge-red' };
+  const map = { upcoming: 'badge-cyan', ongoing: 'badge-green', completed: 'badge-purple', cancelled: 'badge-red', confirmed: 'badge-green', pending: 'badge-orange', attended: 'badge-cyan' };
   return `<span class="badge ${map[status] || 'badge-cyan'}">${status || 'upcoming'}</span>`;
 }
 
@@ -187,13 +267,7 @@ function formatTime(dateStr) {
 }
 
 function getCategoryIcon(category) {
-  const icons = {
-    technical: '💻',
-    cultural: '🎭',
-    sports: '⚽',
-    workshop: '🔧',
-    gaming: '🎮'
-  };
+  const icons = { technical: '💻', cultural: '🎭', sports: '⚽', workshop: '🔧', gaming: '🎮' };
   return icons[category] || '🎯';
 }
 
@@ -212,14 +286,17 @@ function initRealtimeNotifications() {
       let toastType = 'info';
       if (announcement.priority === 'urgent') toastType = 'error';
       else if (announcement.priority === 'important') toastType = 'warning';
-      
       showToast(`📣 ${announcement.title}`, toastType);
     })
     .subscribe();
 }
 
+// Close mobile menu on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMobileMenu();
+});
+
 // Initialize realtime notifications on page load
 document.addEventListener('DOMContentLoaded', () => {
   initRealtimeNotifications();
 });
-

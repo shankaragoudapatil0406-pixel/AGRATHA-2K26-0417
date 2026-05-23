@@ -1,86 +1,519 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - VAIBHAV 2K26</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — VAIBHAV 2K26</title>
+  <meta name="description" content="Your personal dashboard for VAIBHAV 2K26 college fest.">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
+  <style>
+    /* ============================================
+       DASHBOARD PAGE STYLES
+       ============================================ */
+
+    /* Welcome Banner */
+    .dash-welcome-banner {
+      position: relative;
+      border-radius: var(--radius-xl);
+      padding: 36px 40px;
+      margin-bottom: 28px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0d0d20 0%, #0a1020 100%);
+      border: 1px solid rgba(0,212,255,0.15);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .dash-welcome-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 90% 50%, rgba(189,0,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 70% at 10% 50%, rgba(0,212,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .dash-welcome-banner::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--gradient-main);
+    }
+    .dash-banner-inner {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    }
+    .dash-avatar-block { display: flex; align-items: center; gap: 20px; }
+    .dash-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: #fff;
+      flex-shrink: 0; position: relative;
+    }
+    .dash-avatar::after {
+      content: ''; position: absolute; inset: -3px; border-radius: 50%;
+      background: var(--gradient-main); z-index: -1; opacity: 0.7;
+      animation: avatarRing 3s ease-in-out infinite;
+    }
+    @keyframes avatarRing {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.04); }
+    }
+    .dash-welcome-text {}
+    .dash-time-greeting {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--accent-cyan); font-weight: 600; margin-bottom: 4px;
+    }
+    .dash-welcome-name {
+      font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800;
+      line-height: 1.1; margin-bottom: 6px;
+    }
+    .dash-welcome-name span { color: var(--accent-cyan); }
+    .dash-welcome-sub { color: var(--text-secondary); font-size: 0.9rem; }
+
+    /* Quick action pills */
+    .dash-quick-pills {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .quick-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 600; font-family: var(--font-heading);
+      border: 1px solid var(--border-glass); background: rgba(255,255,255,0.04);
+      color: var(--text-secondary); cursor: pointer; transition: all 0.3s;
+      text-decoration: none;
+    }
+    .quick-pill i { width: 15px; height: 15px; }
+    .quick-pill:hover { background: rgba(0,212,255,0.1); border-color: var(--accent-cyan); color: var(--text-primary); transform: translateY(-2px); }
+    .quick-pill.primary { background: var(--gradient-main); border-color: transparent; color: #fff; box-shadow: 0 4px 15px rgba(0,212,255,0.25); }
+    .quick-pill.primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,212,255,0.4); }
+
+    /* ===== STATS ROW ===== */
+    .dash-stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-bottom: 28px;
+    }
+    .dstat {
+      background: var(--bg-card); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg); padding: 20px;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: 16px;
+      transition: all 0.35s; cursor: default;
+      animation: fadeInUp 0.4s ease forwards; opacity: 0;
+    }
+    .dstat:hover {
+      transform: translateY(-4px); border-color: rgba(0,212,255,0.25);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .dstat::before {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--gradient-main); opacity: 0; transition: opacity 0.3s;
+    }
+    .dstat:hover::before { opacity: 1; }
+    .dstat-icon {
+      width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dstat-icon i { width: 22px; height: 22px; }
+    .dstat-icon.c1 { background: rgba(0,212,255,0.12); color: var(--accent-cyan); }
+    .dstat-icon.c2 { background: rgba(168,85,247,0.12); color: var(--accent-purple); }
+    .dstat-icon.c3 { background: rgba(16,185,129,0.12); color: var(--accent-green); }
+    .dstat-icon.c4 { background: rgba(245,158,11,0.12); color: var(--accent-orange); }
+    .dstat-body { flex: 1; min-width: 0; }
+    .dstat-value {
+      font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
+      line-height: 1; margin-bottom: 4px; color: var(--text-primary);
+    }
+    .dstat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+    /* ===== MAIN GRID ===== */
+    .dash-grid {
+      display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px;
+    }
+
+    /* Panel card */
+    .dash-panel {
+      background: var(--bg-card); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      animation: fadeInUp 0.5s ease forwards; opacity: 0;
+    }
+    .panel-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-head-left { display: flex; align-items: center; gap: 10px; }
+    .panel-head-icon {
+      width: 32px; height: 32px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .panel-head-icon i { width: 16px; height: 16px; }
+    .picon-blue { background: rgba(0,212,255,0.12); color: var(--accent-cyan); }
+    .picon-pink { background: rgba(236,72,153,0.12); color: #ec4899; }
+    .panel-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; }
+    .panel-head a { font-size: 0.78rem; color: var(--text-muted); transition: color 0.3s; }
+    .panel-head a:hover { color: var(--accent-cyan); }
+    .panel-body { padding: 16px; flex: 1; overflow-y: auto; }
+
+    /* Progress strip */
+    .progress-strip {
+      margin: 0 16px 0;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(168,85,247,0.05));
+      border: 1px solid rgba(0,212,255,0.12);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+    }
+    .ps-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .ps-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    .ps-val { font-family: var(--font-display); font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700; }
+    .ps-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .ps-fill { height: 100%; background: var(--gradient-main); border-radius: 3px; width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+
+    /* Event items */
+    .ev-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+      margin-bottom: 10px; transition: all 0.3s;
+      text-decoration: none; color: inherit;
+      background: var(--bg-secondary);
+      position: relative; overflow: hidden;
+    }
+    .ev-item::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--gradient-main); opacity: 0; transition: opacity 0.3s;
+    }
+    .ev-item:hover { border-color: rgba(0,212,255,0.3); transform: translateX(4px); }
+    .ev-item:hover::before { opacity: 1; }
+    .ev-item:last-child { margin-bottom: 0; }
+    .ev-thumb {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .ev-info { flex: 1; min-width: 0; }
+    .ev-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ev-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* Announcement items */
+    .ann-item {
+      padding: 14px; border-radius: var(--radius-md);
+      background: var(--bg-secondary); border: 1px solid var(--border-glass);
+      margin-bottom: 10px; position: relative; overflow: hidden;
+      border-left: 3px solid transparent; transition: all 0.3s;
+    }
+    .ann-item:last-child { margin-bottom: 0; }
+    .ann-item:hover { transform: translateX(4px); }
+    .ann-item.urgent { border-left-color: #ef4444; background: linear-gradient(90deg, rgba(239,68,68,0.04), var(--bg-secondary)); }
+    .ann-item.important { border-left-color: #f59e0b; background: linear-gradient(90deg, rgba(245,158,11,0.04), var(--bg-secondary)); }
+    .ann-item.normal { border-left-color: var(--accent-cyan); }
+    .ann-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+    .ann-title-text { font-weight: 700; font-size: 0.88rem; color: var(--text-primary); }
+    .ann-snippet { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ann-time { font-size: 0.7rem; color: var(--text-muted); }
+
+    /* Empty state */
+    .dash-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+    .dash-empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
+    .dash-empty h4 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 6px; }
+    .dash-empty p { font-size: 0.85rem; margin-bottom: 20px; }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .dash-stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .dash-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .dash-welcome-banner { padding: 24px 20px; }
+      .dash-welcome-name { font-size: 1.4rem; }
+      .dash-avatar { width: 52px; height: 52px; font-size: 1.2rem; }
+      .dash-banner-inner { flex-direction: column; align-items: flex-start; }
+      .dstat-value { font-size: 1.5rem; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="particles-canvas"></canvas>
   <nav class="navbar" id="navbar"></nav>
   <aside class="sidebar" id="sidebar"></aside>
+
   <div class="main-content with-sidebar">
-    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:8px" id="greeting">Welcome back!</h1>
-    <p style="color:var(--text-secondary);margin-bottom:32px">Here's your activity overview</p>
-    <div class="grid-4" id="stats-grid">
-      <div class="stat-card"><div class="stat-value" id="stat-events">0</div><div class="stat-label">Registered Events</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-teams">0</div><div class="stat-label">Teams Joined</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-tickets">0</div><div class="stat-label">Tickets</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-points">0</div><div class="stat-label">Points</div></div>
-    </div>
-    <div class="grid-2" style="margin-top:32px">
-      <div class="glass-card">
-        <h3 style="font-family:var(--font-heading);margin-bottom:16px">My Registered Events</h3>
-        <div id="my-events"><div class="loading-spinner"></div></div>
+
+    <!-- ===== WELCOME BANNER ===== -->
+    <div class="dash-welcome-banner">
+      <div class="dash-banner-inner">
+        <div class="dash-avatar-block">
+          <div class="dash-avatar" id="dash-avatar" style="background: linear-gradient(135deg, #00d4ff, #a855f7)">?</div>
+          <div class="dash-welcome-text">
+            <div class="dash-time-greeting" id="time-greeting">Loading...</div>
+            <div class="dash-welcome-name">Welcome back, <span id="user-first-name">Participant</span>!</div>
+            <div class="dash-welcome-sub" id="user-college">Your fest journey starts here 🎉</div>
+          </div>
+        </div>
+        <div class="dash-quick-pills">
+          <a href="events.html" class="quick-pill primary">
+            <i data-lucide="search"></i> Browse Events
+          </a>
+          <a href="tickets.html" class="quick-pill">
+            <i data-lucide="ticket"></i> My Tickets
+          </a>
+          <a href="leaderboard.html" class="quick-pill">
+            <i data-lucide="trophy"></i> Rankings
+          </a>
+          <a href="profile.html" class="quick-pill">
+            <i data-lucide="user"></i> Profile
+          </a>
+        </div>
       </div>
-      <div class="glass-card">
-        <h3 style="font-family:var(--font-heading);margin-bottom:16px">Recent Announcements</h3>
-        <div id="recent-announcements"><div class="loading-spinner"></div></div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div class="dash-stats-row">
+      <div class="dstat" style="animation-delay:0.05s">
+        <div class="dstat-icon c1"><i data-lucide="zap"></i></div>
+        <div class="dstat-body">
+          <div class="dstat-value" id="stat-events">—</div>
+          <div class="dstat-label">Events Joined</div>
+        </div>
+      </div>
+      <div class="dstat" style="animation-delay:0.1s">
+        <div class="dstat-icon c2"><i data-lucide="users"></i></div>
+        <div class="dstat-body">
+          <div class="dstat-value" id="stat-teams">—</div>
+          <div class="dstat-label">Teams</div>
+        </div>
+      </div>
+      <div class="dstat" style="animation-delay:0.15s">
+        <div class="dstat-icon c3"><i data-lucide="ticket"></i></div>
+        <div class="dstat-body">
+          <div class="dstat-value" id="stat-tickets">—</div>
+          <div class="dstat-label">Tickets</div>
+        </div>
+      </div>
+      <div class="dstat" style="animation-delay:0.2s">
+        <div class="dstat-icon c4"><i data-lucide="star"></i></div>
+        <div class="dstat-body">
+          <div class="dstat-value" id="stat-points">—</div>
+          <div class="dstat-label">Points</div>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- ===== MAIN GRID ===== -->
+    <div class="dash-grid">
+
+      <!-- LEFT: Events Panel -->
+      <div class="dash-panel" style="animation-delay:0.25s">
+        <div class="panel-head">
+          <div class="panel-head-left">
+            <div class="panel-head-icon picon-blue"><i data-lucide="calendar-days"></i></div>
+            <span class="panel-title">My Registered Events</span>
+          </div>
+          <a href="events.html">Browse all →</a>
+        </div>
+
+        <!-- Progress strip (hidden until loaded) -->
+        <div class="progress-strip" id="progress-strip" style="display:none; margin-top:16px;">
+          <div class="ps-row">
+            <span class="ps-label">🎯 Fest Readiness</span>
+            <span class="ps-val" id="ps-val">0 / 5</span>
+          </div>
+          <div class="ps-bar"><div class="ps-fill" id="ps-fill"></div></div>
+        </div>
+
+        <div class="panel-body" id="my-events">
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Announcements Panel -->
+      <div class="dash-panel" style="animation-delay:0.35s">
+        <div class="panel-head">
+          <div class="panel-head-left">
+            <div class="panel-head-icon picon-pink"><i data-lucide="bell"></i></div>
+            <span class="panel-title">Announcements</span>
+          </div>
+          <a href="announcements.html">See all →</a>
+        </div>
+        <div class="panel-body" id="recent-announcements">
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /.main-content -->
+
   <script>
+    /* ===== Helpers ===== */
+    function getGreeting() {
+      const h = new Date().getHours();
+      if (h < 5)  return '🌙 Good night';
+      if (h < 12) return '🌅 Good morning';
+      if (h < 17) return '☀️ Good afternoon';
+      if (h < 21) return '🌆 Good evening';
+      return '🌙 Good night';
+    }
+
+    const avatarColors = [
+      'linear-gradient(135deg,#00d4ff,#0066ff)',
+      'linear-gradient(135deg,#a855f7,#7c3aed)',
+      'linear-gradient(135deg,#ec4899,#be185d)',
+      'linear-gradient(135deg,#10b981,#059669)',
+      'linear-gradient(135deg,#f59e0b,#d97706)',
+    ];
+    function getAvatarBg(name) {
+      return avatarColors[(name || 'A').charCodeAt(0) % avatarColors.length];
+    }
+    function getInitials(name) {
+      return (name || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    function animateCount(el, end, dur = 1400) {
+      if (!el) return;
+      let start = null;
+      const step = ts => {
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / dur, 1);
+        const ease = 1 - Math.pow(1 - p, 4);
+        el.textContent = Math.floor(ease * end);
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function getCatThumbClass(cat) {
+      const m = { technical: 'ic-1', cultural: 'ic-2', sports: 'ic-3', workshop: 'ic-4', gaming: 'ic-2' };
+      return m[cat] || 'ic-1';
+    }
+
+    /* ===== Main Load ===== */
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await requireAuth('participant');
       if (!user) return;
+
       renderNavbar('dashboard');
       renderSidebar('participant', 'overview');
-      initParticles('particles-canvas', 20);
+      initParticles('particles-canvas', 12);
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      document.getElementById('greeting').textContent = 'Welcome, ' + (user.full_name || 'Participant') + '!';
 
-      // Load stats
-      const { count: evtCount } = await supabase.from('registrations').select('id', { count: 'exact', head: true }).eq('user_id', user.id);
-      const { count: teamCount } = await supabase.from('team_members').select('id', { count: 'exact', head: true }).eq('user_id', user.id);
-      document.getElementById('stat-events').textContent = evtCount || 0;
-      document.getElementById('stat-teams').textContent = teamCount || 0;
-      document.getElementById('stat-tickets').textContent = evtCount || 0;
-      document.getElementById('stat-points').textContent = user.points || 0;
+      /* ── Banner ── */
+      const first = (user.full_name || 'Participant').split(' ')[0];
+      document.getElementById('time-greeting').textContent = getGreeting();
+      document.getElementById('user-first-name').textContent = first;
+      if (user.college) document.getElementById('user-college').textContent = `${user.college} · ${user.department || 'VAIBHAV 2K26'}`;
+      const av = document.getElementById('dash-avatar');
+      av.textContent = getInitials(user.full_name);
+      av.style.background = getAvatarBg(user.full_name);
 
-      // Load registered events
-      const { data: regs } = await supabase.from('registrations').select('*, events(*)').eq('user_id', user.id).limit(5);
+      /* ── Stats ── */
+      let evtCount = 0, teamCount = 0;
+      try {
+        const [r, t] = await Promise.all([
+          supabase.from('registrations').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+          supabase.from('team_members').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        ]);
+        evtCount = r.count || 0;
+        teamCount = t.count || 0;
+      } catch(e) {}
+
+      const pts = user.points || 0;
+      setTimeout(() => {
+        animateCount(document.getElementById('stat-events'), evtCount);
+        animateCount(document.getElementById('stat-teams'), teamCount);
+        animateCount(document.getElementById('stat-tickets'), evtCount);
+        animateCount(document.getElementById('stat-points'), pts);
+      }, 200);
+
+      /* ── Progress strip ── */
+      if (evtCount > 0) {
+        document.getElementById('progress-strip').style.display = 'block';
+        document.getElementById('ps-val').textContent = `${evtCount} / 5`;
+        setTimeout(() => {
+          document.getElementById('ps-fill').style.width = Math.min(100, (evtCount / 5) * 100) + '%';
+        }, 600);
+      }
+
+      /* ── Events ── */
       const evDiv = document.getElementById('my-events');
-      if (!regs || !regs.length) {
-        evDiv.innerHTML = '<div class="empty-state"><p>No events yet. <a href="events.html">Browse events</a></p></div>';
-      } else {
-        evDiv.innerHTML = regs.map(r => `
-          <a href="event-detail.html?id=${r.event_id}" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border-glass);margin-bottom:8px;color:inherit;text-decoration:none;transition:background 0.3s" onmouseover="this.style.background='var(--bg-glass)'" onmouseout="this.style.background='transparent'">
-            <div style="width:40px;height:40px;border-radius:var(--radius-sm);background:var(--gradient-main);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${(r.events?.title || '?').charAt(0)}</div>
-            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.events?.title || 'Event'}</div><div style="font-size:0.75rem;color:var(--text-muted)">${formatDate(r.events?.event_date)}</div></div>
-            ${getStatusBadge(r.status || 'confirmed')}
-          </a>
-        `).join('');
+      try {
+        const { data: regs } = await supabase
+          .from('registrations')
+          .select('*, events(*)')
+          .eq('user_id', user.id)
+          .limit(6);
+
+        if (!regs || !regs.length) {
+          evDiv.innerHTML = `
+            <div class="dash-empty">
+              <div class="dash-empty-icon">📅</div>
+              <h4>No events registered</h4>
+              <p>Explore the events and sign up for ones you love!</p>
+              <a href="events.html" class="btn btn-primary btn-sm">Browse Events</a>
+            </div>`;
+        } else {
+          evDiv.innerHTML = regs.map(r => {
+            const ev = r.events || {};
+            return `
+              <a href="event-detail.html?id=${r.event_id}" class="ev-item">
+                <div class="ev-thumb ${getCatThumbClass(ev.category)}">${getCategoryIcon(ev.category)}</div>
+                <div class="ev-info">
+                  <div class="ev-name">${ev.title || 'Event'}</div>
+                  <div class="ev-meta">
+                    <span>📅 ${formatDate(ev.event_date)}</span>
+                    <span>📍 ${ev.venue || 'TBD'}</span>
+                  </div>
+                </div>
+                ${getStatusBadge(r.status || 'confirmed')}
+              </a>`;
+          }).join('');
+        }
+      } catch(e) {
+        evDiv.innerHTML = '<div class="dash-empty"><p>Could not load events.</p></div>';
       }
 
-      // Load announcements
-      const { data: anns } = await supabase.from('announcements').select('*').order('created_at', { ascending: false }).limit(3);
+      /* ── Announcements ── */
       const annDiv = document.getElementById('recent-announcements');
-      if (!anns || !anns.length) {
-        annDiv.innerHTML = '<div class="empty-state"><p>No announcements yet.</p></div>';
-      } else {
-        annDiv.innerHTML = anns.map(a => `
-          <div style="padding:12px;border:1px solid var(--border-glass);border-radius:var(--radius-sm);margin-bottom:8px">
-            <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px">${a.title}</div>
-            <div style="font-size:0.8rem;color:var(--text-secondary)">${(a.content || '').substring(0, 80)}...</div>
-            <div style="font-size:0.7rem;color:var(--text-muted);margin-top:6px">${formatDateTime(a.created_at)}</div>
-          </div>
-        `).join('');
+      try {
+        const { data: anns } = await supabase
+          .from('announcements').select('*')
+          .order('created_at', { ascending: false }).limit(5);
+
+        if (!anns || !anns.length) {
+          annDiv.innerHTML = `
+            <div class="dash-empty">
+              <div class="dash-empty-icon">📢</div>
+              <h4>No announcements yet</h4>
+              <p>Check back soon for news and updates.</p>
+            </div>`;
+        } else {
+          annDiv.innerHTML = anns.map(a => {
+            const p = a.priority || 'normal';
+            const badge = p === 'urgent'
+              ? '<span class="badge badge-red" style="font-size:0.6rem;padding:2px 8px">Urgent</span>'
+              : p === 'important'
+                ? '<span class="badge badge-orange" style="font-size:0.6rem;padding:2px 8px">Important</span>'
+                : '';
+            return `
+              <div class="ann-item ${p}">
+                <div class="ann-row">
+                  <div class="ann-title-text">${a.title || 'Announcement'}</div>
+                  ${badge}
+                </div>
+                <div class="ann-snippet">${a.content || ''}</div>
+                <div class="ann-time">${formatDateTime(a.created_at)}</div>
+              </div>`;
+          }).join('');
+        }
+      } catch(e) {
+        annDiv.innerHTML = '<div class="dash-empty"><p>Could not load announcements.</p></div>';
       }
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     });
   </script>
 </body>
