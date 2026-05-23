@@ -2,59 +2,378 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile - VAIBHAV 2K26</title>
+  <title>My Profile — VAIBHAV 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
+  <style>
+    .profile-header {
+      background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(168,85,247,0.1));
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient-main);
+    }
+
+    .profile-avatar {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      border: 3px solid rgba(0,212,255,0.3);
+      box-shadow: 0 0 30px rgba(0,212,255,0.2);
+      position: relative;
+    }
+    .profile-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      z-index: -1;
+      animation: avatarGlow 3s ease-in-out infinite;
+    }
+    @keyframes avatarGlow {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .profile-info { flex: 1; }
+    .profile-name {
+      font-family: var(--font-heading);
+      font-size: 1.8rem; font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .profile-email { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; }
+    .profile-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .profile-stats {
+      display: flex; gap: 32px; flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .profile-stat { text-align: center; }
+    .profile-stat-num {
+      font-family: var(--font-display);
+      font-size: 1.8rem; font-weight: 800;
+      background: var(--gradient-main);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: block; line-height: 1;
+    }
+    .profile-stat-lbl { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    /* Form card */
+    .profile-form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+    }
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .card-title i { width: 18px; height: 18px; color: var(--accent-cyan); }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field-group { margin-bottom: 16px; }
+    .field-group label {
+      display: block; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 7px;
+    }
+
+    .btn-save {
+      padding: 12px 32px;
+      border-radius: var(--radius-sm);
+      background: var(--gradient-main); color: #fff;
+      font-family: var(--font-heading); font-size: 0.9rem; font-weight: 700;
+      border: none; cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,240,255,0.2);
+    }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,240,255,0.35); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Sidebar cards */
+    .profile-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+    .sidebar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+    }
+
+    .activity-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .activity-text { flex: 1; }
+    .activity-text .act-title { font-size: 0.875rem; font-weight: 600; }
+    .activity-text .act-time { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* Danger zone */
+    .danger-zone {
+      background: rgba(239,68,68,0.04);
+      border: 1px solid rgba(239,68,68,0.15);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+    }
+    .danger-zone .card-title { color: var(--accent-red); border-bottom-color: rgba(239,68,68,0.15); }
+    .danger-zone .card-title i { color: var(--accent-red); }
+    .danger-zone p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    .btn-logout {
+      width: 100%; padding: 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(239,68,68,0.1); color: var(--accent-red);
+      border: 1px solid rgba(239,68,68,0.2);
+      font-family: var(--font-heading); font-size: 0.875rem; font-weight: 700;
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-logout:hover { background: rgba(239,68,68,0.2); border-color: var(--accent-red); }
+
+    @media (max-width: 1024px) {
+      .profile-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .profile-header { flex-direction: column; text-align: center; }
+      .profile-stats { margin: 0 auto; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="particles-canvas"></canvas>
   <nav class="navbar" id="navbar"></nav>
   <aside class="sidebar" id="sidebar"></aside>
+
   <div class="main-content with-sidebar">
-    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:32px">My Profile</h1>
-    <div class="glass-card" style="max-width:600px">
-      <form id="profile-form">
-        <div class="form-group"><label>Full Name</label><input type="text" id="p-name" class="input-field" required></div>
-        <div class="form-group"><label>Email</label><input type="email" id="p-email" class="input-field" disabled></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="p-phone" class="input-field"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="form-group"><label>College</label><input type="text" id="p-college" class="input-field"></div>
-          <div class="form-group"><label>Department</label><input type="text" id="p-dept" class="input-field"></div>
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header fade-in-up" id="profile-header">
+      <div class="profile-avatar" id="avatar-el" style="background: linear-gradient(135deg, #00d4ff, #a855f7);">?</div>
+      <div class="profile-info">
+        <div class="profile-name" id="ph-name">Loading...</div>
+        <div class="profile-email" id="ph-email"></div>
+        <div class="profile-badges" id="ph-badges"></div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <span class="profile-stat-num" id="stat-events">—</span>
+          <span class="profile-stat-lbl">Events</span>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%">Update Profile</button>
-      </form>
+        <div class="profile-stat">
+          <span class="profile-stat-num" id="stat-pts">—</span>
+          <span class="profile-stat-lbl">Points</span>
+        </div>
+        <div class="profile-stat">
+          <span class="profile-stat-num" id="stat-teams">—</span>
+          <span class="profile-stat-lbl">Teams</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="profile-layout">
+
+      <!-- LEFT: FORM -->
+      <div class="profile-form-card fade-in-up" style="animation-delay:0.1s">
+        <div class="card-title">
+          <i data-lucide="user"></i>
+          Personal Information
+        </div>
+        <form id="profile-form">
+          <div class="form-grid">
+            <div class="field-group">
+              <label>Full Name *</label>
+              <input type="text" id="p-name" class="input-field" required>
+            </div>
+            <div class="field-group">
+              <label>Email (read-only)</label>
+              <input type="email" id="p-email" class="input-field" disabled style="opacity:0.6">
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Phone Number</label>
+            <input type="tel" id="p-phone" class="input-field" placeholder="+91 98765 43210">
+          </div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label>College</label>
+              <input type="text" id="p-college" class="input-field" placeholder="Your college name">
+            </div>
+            <div class="field-group">
+              <label>Department</label>
+              <input type="text" id="p-dept" class="input-field" placeholder="CSE, ECE, etc.">
+            </div>
+          </div>
+          <button type="submit" class="btn-save" id="save-btn">
+            <span>Save Changes</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT: SIDEBAR -->
+      <div class="profile-sidebar">
+        <!-- Activity -->
+        <div class="sidebar-card fade-in-up" style="animation-delay:0.2s">
+          <div class="card-title">
+            <i data-lucide="activity"></i>
+            Recent Activity
+          </div>
+          <div id="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(0,212,255,0.1)">🎯</div>
+              <div class="activity-text">
+                <div class="act-title">Account Created</div>
+                <div class="act-time">Welcome to VAIBHAV 2K26!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="danger-zone fade-in-up" style="animation-delay:0.3s">
+          <div class="card-title">
+            <i data-lucide="log-out"></i>
+            Account
+          </div>
+          <p>Sign out from your account. Your data and registrations will be saved.</p>
+          <button class="btn-logout" onclick="handleLogout()">
+            <i data-lucide="log-out" style="width:16px;height:16px"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
   <script>
+    // Avatar color palette based on initials
+    const avatarColors = [
+      'linear-gradient(135deg, #00d4ff, #0066ff)',
+      'linear-gradient(135deg, #a855f7, #7c3aed)',
+      'linear-gradient(135deg, #ec4899, #be185d)',
+      'linear-gradient(135deg, #10b981, #059669)',
+      'linear-gradient(135deg, #f59e0b, #d97706)',
+      'linear-gradient(135deg, #ef4444, #dc2626)',
+    ];
+
+    function getAvatarColor(name) {
+      const code = (name || 'A').charCodeAt(0);
+      return avatarColors[code % avatarColors.length];
+    }
+
+    function getInitials(name) {
+      return (name || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await requireAuth();
       if (!user) return;
+
       renderNavbar('profile');
       renderSidebar(user.role, 'profile');
       initParticles('particles-canvas', 20);
       if (typeof lucide !== 'undefined') lucide.createIcons();
+
+      // Populate header
+      const avatarEl = document.getElementById('avatar-el');
+      avatarEl.textContent = getInitials(user.full_name);
+      avatarEl.style.background = getAvatarColor(user.full_name);
+
+      document.getElementById('ph-name').textContent = user.full_name || 'Your Name';
+      document.getElementById('ph-email').textContent = user.email || '';
+      document.getElementById('ph-badges').innerHTML = `
+        <span class="badge ${user.role === 'admin' ? 'badge-red' : 'badge-cyan'}">${user.role || 'participant'}</span>
+        ${user.college ? `<span class="badge badge-purple">${user.college}</span>` : ''}
+      `;
+
+      // Stats
+      document.getElementById('stat-pts').textContent = user.points || 0;
+
+      // Fetch stats
+      try {
+        const [regsRes, teamsRes] = await Promise.all([
+          supabase.from('registrations').select('id', { count: 'exact' }).eq('user_id', user.id),
+          supabase.from('team_members').select('id', { count: 'exact' }).eq('user_id', user.id),
+        ]);
+        document.getElementById('stat-events').textContent = regsRes.count || 0;
+        document.getElementById('stat-teams').textContent = teamsRes.count || 0;
+      } catch(e) {
+        document.getElementById('stat-events').textContent = '—';
+        document.getElementById('stat-teams').textContent = '—';
+      }
+
+      // Populate form
       document.getElementById('p-name').value = user.full_name || '';
       document.getElementById('p-email').value = user.email || '';
       document.getElementById('p-phone').value = user.phone || '';
       document.getElementById('p-college').value = user.college || '';
       document.getElementById('p-dept').value = user.department || '';
+
+      // Save handler
       document.getElementById('profile-form').onsubmit = async (e) => {
         e.preventDefault();
-        const btn = e.target.querySelector('button');
-        btn.disabled = true; btn.textContent = 'Saving...';
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Saving...';
+
+        const newName = document.getElementById('p-name').value;
         const { error } = await supabase.from('users').update({
-          full_name: document.getElementById('p-name').value,
+          full_name: newName,
           phone: document.getElementById('p-phone').value,
           college: document.getElementById('p-college').value,
           department: document.getElementById('p-dept').value,
         }).eq('id', user.id);
-        if (error) showToast(error.message, 'error');
-        else showToast('Profile updated!', 'success');
-        btn.disabled = false; btn.textContent = 'Update Profile';
+
+        if (error) {
+          showToast(error.message, 'error');
+        } else {
+          showToast('✅ Profile updated successfully!', 'success');
+          // Update header avatar
+          document.getElementById('ph-name').textContent = newName;
+          avatarEl.textContent = getInitials(newName);
+          avatarEl.style.background = getAvatarColor(newName);
+        }
+
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Save Changes';
       };
     });
   </script>

@@ -2,56 +2,320 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Tickets - VAIBHAV 2K26</title>
+  <title>My Tickets — VAIBHAV 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
+  <style>
+    .page-header {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .page-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem; font-weight: 800; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* ===== TICKET GRID ===== */
+    .tickets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    /* ===== HOLOGRAPHIC TICKET ===== */
+    .ticket {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+    .ticket:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    /* Shimmer overlay */
+    .ticket::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
+      background-size: 200% 100%;
+      animation: holoShimmer 4s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes holoShimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Top color stripe by category */
+    .ticket-stripe {
+      height: 6px;
+      width: 100%;
+    }
+    .stripe-technical { background: linear-gradient(90deg, #00d4ff, #a855f7); }
+    .stripe-cultural { background: linear-gradient(90deg, #ec4899, #a855f7); }
+    .stripe-sports { background: linear-gradient(90deg, #10b981, #00d4ff); }
+    .stripe-workshop { background: linear-gradient(90deg, #f59e0b, #10b981); }
+    .stripe-gaming { background: linear-gradient(90deg, #7c3aed, #ec4899); }
+    .stripe-general { background: var(--gradient-main); }
+
+    .ticket-top {
+      padding: 20px 20px 0;
+      position: relative;
+    }
+    .ticket-event-name {
+      font-family: var(--font-heading);
+      font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .ticket-category { margin-bottom: 16px; }
+
+    .ticket-info-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      padding: 16px 0;
+      border-bottom: none;
+    }
+    .ticket-info-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; color: var(--text-secondary);
+    }
+    .ticket-info-item i { width: 14px; height: 14px; color: var(--accent-cyan); flex-shrink: 0; }
+
+    /* Perforated divider */
+    .ticket-perforation {
+      position: relative;
+      height: 1px;
+      background: repeating-linear-gradient(90deg, var(--border-glass) 0px, var(--border-glass) 6px, transparent 6px, transparent 12px);
+      margin: 0 20px;
+    }
+    .ticket-perforation::before, .ticket-perforation::after {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--bg-primary);
+      top: 50%; transform: translateY(-50%);
+    }
+    .ticket-perforation::before { left: -32px; }
+    .ticket-perforation::after { right: -32px; }
+
+    /* Bottom section */
+    .ticket-bottom {
+      padding: 16px 20px 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    /* QR Placeholder */
+    .ticket-qr {
+      width: 72px; height: 72px;
+      border-radius: 8px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .qr-pattern {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+      padding: 6px;
+      width: 100%; height: 100%;
+    }
+    .qr-cell {
+      border-radius: 1px;
+    }
+
+    .ticket-id-area { flex: 1; }
+    .ticket-id-label {
+      font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .ticket-id-value {
+      font-family: var(--font-display);
+      font-size: 0.9rem; color: var(--accent-cyan);
+      letter-spacing: 3px; font-weight: 700;
+    }
+    .ticket-status-chip {
+      position: absolute;
+      top: 16px; right: 16px;
+      z-index: 2;
+    }
+
+    /* Print button */
+    .ticket-actions {
+      display: flex; gap: 8px;
+      padding: 0 20px 16px;
+    }
+    .btn-ticket-action {
+      flex: 1; padding: 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem; font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      border: 1px solid var(--border-glass);
+      background: var(--bg-glass); color: var(--text-secondary);
+    }
+    .btn-ticket-action:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.05);
+    }
+    .btn-ticket-action i { width: 14px; height: 14px; }
+
+    .empty-tickets {
+      text-align: center; padding: 80px 20px;
+      color: var(--text-muted); grid-column: 1/-1;
+    }
+    .empty-tickets .empty-icon { font-size: 4rem; margin-bottom: 16px; }
+    .empty-tickets h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-secondary); }
+
+    @media (max-width: 768px) {
+      .tickets-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="particles-canvas"></canvas>
   <nav class="navbar" id="navbar"></nav>
   <aside class="sidebar" id="sidebar"></aside>
+
   <div class="main-content with-sidebar">
-    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:8px">My Tickets</h1>
-    <p style="color:var(--text-secondary);margin-bottom:32px">Your digital event passes</p>
-    <div id="tickets-list"><div class="loading-spinner"></div></div>
+    <div class="page-header fade-in-up">
+      <h1>
+        <span style="font-size:1.6rem">🎫</span>
+        My Tickets
+      </h1>
+      <p>Your digital event passes — show QR at the venue entrance</p>
+    </div>
+
+    <div class="tickets-grid" id="tickets-grid">
+      <div class="loading-spinner" style="grid-column:1/-1"></div>
+    </div>
   </div>
+
   <script>
+    function getStripeClass(cat) {
+      const map = { technical:'stripe-technical', cultural:'stripe-cultural', sports:'stripe-sports', workshop:'stripe-workshop', gaming:'stripe-gaming' };
+      return map[cat] || 'stripe-general';
+    }
+
+    function getStatusBadgeClass(status) {
+      const map = { confirmed:'badge-green', pending:'badge-orange', attended:'badge-cyan', cancelled:'badge-red' };
+      return map[status] || 'badge-cyan';
+    }
+
+    function generateQR(seed) {
+      // Decorative QR-like pattern
+      const cells = [];
+      for (let i = 0; i < 25; i++) {
+        const on = (seed.charCodeAt(i % seed.length) + i) % 3 !== 0;
+        cells.push(`<div class="qr-cell" style="background:${on ? 'var(--accent-cyan)' : 'transparent'};opacity:${on ? 0.8 : 0.1}"></div>`);
+      }
+      return cells.join('');
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
-      const user = await requireAuth('participant');
+      const user = await requireAuth();
       if (!user) return;
+
       renderNavbar('tickets');
       renderSidebar('participant', 'tickets');
-      initParticles('particles-canvas', 20);
+      initParticles('particles-canvas', 15);
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      const { data: regs } = await supabase.from('registrations').select('*, events(*)').eq('user_id', user.id);
-      const el = document.getElementById('tickets-list');
-      if (!regs || !regs.length) {
-        el.innerHTML = '<div class="empty-state"><h3>No tickets yet</h3><p>Register for events to get your digital tickets. <a href="events.html">Browse events</a></p></div>';
+
+      let regs = [];
+      try {
+        const { data } = await supabase.from('registrations').select('*, events(*)').eq('user_id', user.id).order('created_at', { ascending: false });
+        regs = data || [];
+      } catch(e) {}
+
+      const grid = document.getElementById('tickets-grid');
+
+      if (!regs.length) {
+        grid.innerHTML = `
+          <div class="empty-tickets">
+            <div class="empty-icon">🎫</div>
+            <h3>No tickets yet</h3>
+            <p>Register for events to receive your digital tickets here.</p>
+            <a href="events.html" class="btn btn-primary" style="margin-top:20px">Browse Events</a>
+          </div>
+        `;
         return;
       }
-      el.innerHTML = '<div class="grid-2">' + regs.map(r => `
-        <div class="ticket-card">
-          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
-            <div>
-              <h3 style="font-family:var(--font-heading);margin-bottom:4px">${r.events?.title || 'Event'}</h3>
-              <p style="font-size:0.8rem;color:var(--text-muted)">${formatDate(r.events?.event_date)}</p>
+
+      grid.innerHTML = regs.map((r, i) => {
+        const ev = r.events || {};
+        const ticketId = (r.id || '').substring(0, 8).toUpperCase();
+        const cat = ev.category || 'general';
+        const status = r.status || 'confirmed';
+
+        return `
+          <div class="ticket fade-in-up" style="animation-delay:${i * 0.08}s">
+            <div class="ticket-stripe ${getStripeClass(cat)}"></div>
+            <div class="ticket-top">
+              <span class="ticket-status-chip">
+                <span class="badge ${getStatusBadgeClass(status)}">${status}</span>
+              </span>
+              <div class="ticket-event-name">${ev.title || 'Event'}</div>
+              <div class="ticket-category">${getCategoryBadge(cat)}</div>
+              <div class="ticket-info-row">
+                <div class="ticket-info-item">
+                  <i data-lucide="calendar"></i>
+                  ${formatDate(ev.event_date)}
+                </div>
+                <div class="ticket-info-item">
+                  <i data-lucide="clock"></i>
+                  ${formatTime(ev.event_date) || 'TBD'}
+                </div>
+                <div class="ticket-info-item">
+                  <i data-lucide="map-pin"></i>
+                  ${ev.venue || 'TBD'}
+                </div>
+              </div>
             </div>
-            ${getStatusBadge(r.status || 'confirmed')}
+
+            <div class="ticket-perforation"></div>
+
+            <div class="ticket-bottom">
+              <div class="ticket-qr">
+                <div class="qr-pattern">${generateQR(ticketId)}</div>
+              </div>
+              <div class="ticket-id-area">
+                <div class="ticket-id-label">Ticket ID</div>
+                <div class="ticket-id-value">${ticketId}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">${user.full_name || 'Participant'}</div>
+              </div>
+            </div>
+
+            <div class="ticket-actions">
+              <button class="btn-ticket-action" onclick="navigator.clipboard?.writeText('${ticketId}');showToast('Ticket ID copied!','success')">
+                <i data-lucide="copy"></i> Copy ID
+              </button>
+              <button class="btn-ticket-action" onclick="window.print()">
+                <i data-lucide="printer"></i> Print
+              </button>
+            </div>
           </div>
-          <div style="display:flex;gap:16px;font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px">
-            <span><i data-lucide="map-pin" style="width:14px;height:14px;display:inline"></i> ${r.events?.venue || 'TBD'}</span>
-            <span>${getCategoryBadge(r.events?.category)}</span>
-          </div>
-          <div style="padding:12px;background:var(--bg-glass);border-radius:var(--radius-sm);text-align:center;border:1px dashed var(--border-glass)">
-            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px">TICKET ID</div>
-            <div style="font-family:var(--font-display);font-size:0.85rem;color:var(--accent-cyan);letter-spacing:2px">${(r.id || '').substring(0, 8).toUpperCase()}</div>
-          </div>
-        </div>
-      `).join('') + '</div>';
+        `;
+      }).join('');
+
       if (typeof lucide !== 'undefined') lucide.createIcons();
     });
   </script>

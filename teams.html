@@ -2,47 +2,312 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Teams - VAIBHAV 2K26</title>
+  <title>My Teams — VAIBHAV 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
+  <style>
+    .page-header {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .page-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem; font-weight: 800; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+    .teams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    /* ===== TEAM CARD ===== */
+    .team-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+      position: relative;
+    }
+    .team-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient-main);
+    }
+    .team-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(0,212,255,0.12);
+      border-color: rgba(0,212,255,0.25);
+    }
+
+    .team-card-top {
+      padding: 24px 24px 16px;
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+
+    .team-avatar {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.3rem; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+
+    .team-meta { flex: 1; min-width: 0; }
+    .team-name {
+      font-family: var(--font-heading);
+      font-size: 1.15rem; font-weight: 700;
+      margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .team-event {
+      font-size: 0.8rem; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .team-badges { margin-left: auto; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+
+    /* Members avatars */
+    .team-members-section {
+      padding: 0 24px 16px;
+      border-top: 1px solid var(--border-glass);
+      border-bottom: 1px solid var(--border-glass);
+      padding-top: 16px;
+    }
+    .members-label {
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--text-muted);
+      margin-bottom: 10px; font-weight: 600;
+    }
+    .members-row {
+      display: flex; align-items: center;
+    }
+    .member-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      border: 2px solid var(--bg-card);
+      margin-left: -8px; color: #fff;
+      font-family: var(--font-display);
+    }
+    .member-avatar:first-child { margin-left: 0; }
+    .member-more {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700;
+      background: var(--bg-glass); color: var(--text-muted);
+      border: 2px solid var(--bg-card);
+      margin-left: -8px;
+    }
+
+    /* Invite code */
+    .team-invite {
+      padding: 16px 24px;
+    }
+    .invite-label {
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--text-muted);
+      margin-bottom: 8px; font-weight: 600;
+    }
+    .invite-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .invite-code {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 3px;
+    }
+    .btn-copy {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.08);
+      color: var(--accent-cyan);
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; font-weight: 600;
+      font-family: var(--font-body); white-space: nowrap;
+    }
+    .btn-copy:hover { background: rgba(0,212,255,0.15); border-color: var(--accent-cyan); }
+    .btn-copy i { width: 14px; height: 14px; }
+
+    .empty-teams {
+      text-align: center; padding: 80px 20px;
+      color: var(--text-muted); grid-column: 1/-1;
+    }
+    .empty-teams .empty-icon { font-size: 4rem; margin-bottom: 16px; display: block; }
+    .empty-teams h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-secondary); }
+
+    /* Avatar color palette */
+    @media (max-width: 768px) {
+      .teams-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="particles-canvas"></canvas>
   <nav class="navbar" id="navbar"></nav>
   <aside class="sidebar" id="sidebar"></aside>
+
   <div class="main-content with-sidebar">
-    <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin-bottom:8px">My Teams</h1>
-    <p style="color:var(--text-secondary);margin-bottom:32px">Manage your teams and members</p>
-    <div id="teams-list"><div class="loading-spinner"></div></div>
+    <div class="page-header fade-in-up">
+      <h1>
+        <span style="font-size:1.6rem">👥</span>
+        My Teams
+      </h1>
+      <p>Manage your teams, view members, and share invite codes</p>
+    </div>
+
+    <div class="teams-grid" id="teams-grid">
+      <div class="loading-spinner" style="grid-column:1/-1"></div>
+    </div>
   </div>
+
   <script>
+    const avatarPalette = [
+      'linear-gradient(135deg,#00d4ff,#0066ff)',
+      'linear-gradient(135deg,#a855f7,#7c3aed)',
+      'linear-gradient(135deg,#ec4899,#be185d)',
+      'linear-gradient(135deg,#10b981,#059669)',
+      'linear-gradient(135deg,#f59e0b,#d97706)',
+    ];
+
+    function getInitials(name) {
+      return (name || 'T').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    function getColor(name) {
+      const idx = (name || 'A').charCodeAt(0) % avatarPalette.length;
+      return avatarPalette[idx];
+    }
+
+    async function copyCode(code, btn) {
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.innerHTML = '<i data-lucide="check" style="width:14px;height:14px"></i> Copied!';
+        btn.style.color = 'var(--accent-green)';
+        btn.style.borderColor = 'var(--accent-green)';
+        showToast('Invite code copied! 🎉', 'success');
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="copy" style="width:14px;height:14px"></i> Copy';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 2000);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      } catch(e) {
+        showToast('Could not copy', 'error');
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
-      const user = await requireAuth('participant');
+      const user = await requireAuth();
       if (!user) return;
+
       renderNavbar('teams');
       renderSidebar('participant', 'teams');
-      initParticles('particles-canvas', 20);
+      initParticles('particles-canvas', 15);
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      const { data: memberships } = await supabase.from('team_members').select('*, teams(*, events(title))').eq('user_id', user.id);
-      const el = document.getElementById('teams-list');
-      if (!memberships || !memberships.length) {
-        el.innerHTML = '<div class="empty-state"><h3>No teams yet</h3><p>Register for team events to create or join teams. <a href="events.html">Browse events</a></p></div>';
+
+      let memberships = [];
+      try {
+        const { data } = await supabase
+          .from('team_members')
+          .select('*, teams(*, events(title, category), team_members(users(full_name)))')
+          .eq('user_id', user.id);
+        memberships = data || [];
+      } catch(e) {}
+
+      const grid = document.getElementById('teams-grid');
+
+      if (!memberships.length) {
+        grid.innerHTML = `
+          <div class="empty-teams">
+            <span class="empty-icon">👥</span>
+            <h3>No teams yet</h3>
+            <p>Register for team events to create or join teams.</p>
+            <a href="events.html" class="btn btn-primary" style="margin-top:20px">Browse Events</a>
+          </div>
+        `;
         return;
       }
-      el.innerHTML = '<div class="grid-2">' + memberships.map(m => `
-        <div class="glass-card">
-          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
-            <h3 style="font-family:var(--font-heading)">${m.teams?.name || 'Team'}</h3>
-            <span class="badge badge-cyan">${m.role || 'member'}</span>
+
+      grid.innerHTML = memberships.map((m, i) => {
+        const team = m.teams || {};
+        const ev = team.events || {};
+        const members = team.team_members || [];
+        const isLeader = m.role === 'leader';
+        const inviteCode = team.invite_code || 'N/A';
+
+        // Show up to 4 member avatars + overflow
+        const visibleMembers = members.slice(0, 4);
+        const overflow = members.length - 4;
+
+        const memberAvatars = visibleMembers.map(tm => {
+          const name = tm.users?.full_name || '?';
+          return `<div class="member-avatar" style="background:${getColor(name)}" title="${name}">${getInitials(name)}</div>`;
+        }).join('');
+
+        return `
+          <div class="team-card" style="animation-delay:${i * 0.08}s">
+            <div class="team-card-top">
+              <div class="team-avatar" style="background:${getColor(team.name || 'T')}">${getInitials(team.name)}</div>
+              <div class="team-meta">
+                <div class="team-name">${team.name || 'Team'}</div>
+                <div class="team-event">
+                  <i data-lucide="calendar" style="width:12px;height:12px;display:inline;vertical-align:middle"></i>
+                  ${ev.title || 'Unknown Event'}
+                </div>
+              </div>
+              <div class="team-badges">
+                <span class="badge ${isLeader ? 'badge-orange' : 'badge-cyan'}">${isLeader ? '👑 Leader' : 'Member'}</span>
+                ${ev.category ? getCategoryBadge(ev.category) : ''}
+              </div>
+            </div>
+
+            <div class="team-members-section">
+              <div class="members-label">Team Members (${members.length})</div>
+              <div class="members-row">
+                ${memberAvatars}
+                ${overflow > 0 ? `<div class="member-more">+${overflow}</div>` : ''}
+              </div>
+            </div>
+
+            <div class="team-invite">
+              <div class="invite-label">Invite Code</div>
+              <div class="invite-row">
+                <div class="invite-code">${inviteCode}</div>
+                <button class="btn-copy" id="copy-btn-${i}" onclick="copyCode('${inviteCode}', this)">
+                  <i data-lucide="copy" style="width:14px;height:14px"></i>
+                  Copy
+                </button>
+              </div>
+            </div>
           </div>
-          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">Event: ${m.teams?.events?.title || 'Unknown'}</p>
-          <p style="font-size:0.8rem;color:var(--text-muted)">Invite Code: <code style="background:var(--bg-glass);padding:2px 8px;border-radius:4px">${m.teams?.invite_code || 'N/A'}</code></p>
-        </div>
-      `).join('') + '</div>';
+        `;
+      }).join('');
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     });
   </script>
 </body>
