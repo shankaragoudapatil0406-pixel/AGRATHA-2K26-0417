@@ -1,4 +1,4 @@
-# AGRATHA 2K26 - College Fest Management Portal
+# VAIBHAV 2K26 - College Fest Management Portal
 
 A futuristic, full-stack college fest management platform built with **pure HTML, CSS, and vanilla JavaScript**. It uses Supabase for backend services (Auth, Database, Realtime).
 
