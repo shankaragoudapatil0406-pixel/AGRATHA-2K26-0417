@@ -57,11 +57,13 @@ function renderNavbar(activePage) {
   if (!nav) return;
   getCurrentUser().then(user => {
     const links = user ? `
+      <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="events.html" class="${activePage === 'events' ? 'active' : ''}">Events</a>
       <a href="leaderboard.html" class="${activePage === 'leaderboard' ? 'active' : ''}">Leaderboard</a>
       <a href="announcements.html" class="${activePage === 'announcements' ? 'active' : ''}">Announcements</a>
       <a href="${user.role === 'admin' ? 'admin.html' : 'dashboard.html'}" class="btn btn-primary btn-sm">Dashboard</a>
     ` : `
+      <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="events.html" class="${activePage === 'events' ? 'active' : ''}">Events</a>
       <a href="leaderboard.html" class="${activePage === 'leaderboard' ? 'active' : ''}">Leaderboard</a>
       <a href="login.html" class="${activePage === 'login' ? 'active' : ''}">Login</a>
