@@ -336,12 +336,9 @@
       const classes = ['podium-1', 'podium-2', 'podium-3'];
       const labels = ['1st', '2nd', '3rd'];
 
-      // Ensure order: 2nd, 1st, 3rd visually
-      const display = [top3[1], top3[0], top3[2]].filter(Boolean);
-      const displayClasses = top3[1] ? [classes[1], classes[0], classes[2]] : [classes[0], classes[2]].filter(Boolean);
-
+      // Render each user with their correct rank class (CSS order handles visual positioning: 2nd left, 1st center, 3rd right)
       podium.innerHTML = top3.slice(0, 3).map((u, i) => `
-        <div class="podium-card ${classes[i]}" style="animation:fadeInUp 0.5s ease ${i * 0.1}s forwards;opacity:0;${i===0?'margin-bottom:0;':''}">
+        <div class="podium-card ${classes[i]}" style="animation:fadeInUp 0.5s ease ${i * 0.1}s forwards;opacity:0;">
           <span class="podium-crown">${medals[i]}</span>
           <div class="podium-avatar">${getInitials(u.full_name)}</div>
           <div class="podium-name">${u.full_name || 'Anonymous'}</div>
@@ -352,6 +349,7 @@
         </div>
       `).join('');
     }
+
 
     function renderRows(users) {
       const el = document.getElementById('lb-rows');
