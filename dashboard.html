@@ -407,8 +407,13 @@
       document.getElementById('user-first-name').textContent = first;
       if (user.college) document.getElementById('user-college').textContent = `${user.college} · ${user.department || 'VAIBHAV 2K26'}`;
       const av = document.getElementById('dash-avatar');
-      av.textContent = getInitials(user.full_name);
-      av.style.background = getAvatarBg(user.full_name);
+      if (user.avatar_url) {
+        av.innerHTML = `<img src="${user.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="Avatar">`;
+        av.style.background = 'transparent';
+      } else {
+        av.textContent = getInitials(user.full_name);
+        av.style.background = getAvatarBg(user.full_name);
+      }
 
       /* ── Stats ── */
       let evtCount = 0, teamCount = 0;

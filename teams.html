@@ -233,7 +233,7 @@
       try {
         const { data } = await supabase
           .from('team_members')
-          .select('*, teams(*, events(title, category), team_members(users(full_name)))')
+          .select('*, teams(*, events(title, category), team_members(users(full_name, avatar_url)))')
           .eq('user_id', user.id);
         memberships = data || [];
       } catch(e) {}
@@ -265,6 +265,10 @@
 
         const memberAvatars = visibleMembers.map(tm => {
           const name = tm.users?.full_name || '?';
+          const avatarUrl = tm.users?.avatar_url;
+          if (avatarUrl) {
+            return `<img src="${avatarUrl}" class="member-avatar" style="object-fit:cover;" title="${name}" alt="${name}">`;
+          }
           return `<div class="member-avatar" style="background:${getColor(name)}" title="${name}">${getInitials(name)}</div>`;
         }).join('');
 
