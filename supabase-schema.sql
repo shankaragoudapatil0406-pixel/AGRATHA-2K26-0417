@@ -115,42 +115,42 @@ CREATE POLICY "Admins can update profiles" ON users FOR UPDATE USING (
 
 -- Events policies
 CREATE POLICY "Anyone can view events" ON events FOR SELECT USING (true);
-CREATE POLICY "Admins can manage events" ON events FOR ALL USING (
-  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and Organizers can manage events" ON events FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'organizer'))
 );
 
 -- Registrations policies
 CREATE POLICY "Users can view own registrations" ON registrations FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can register" ON registrations FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can cancel own registration" ON registrations FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Admins can manage registrations" ON registrations FOR ALL USING (
-  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and Organizers can manage registrations" ON registrations FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'organizer'))
 );
 
 -- Teams policies
 CREATE POLICY "Anyone can view teams" ON teams FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can create teams" ON teams FOR INSERT WITH CHECK (auth.uid() = created_by);
-CREATE POLICY "Admins can manage teams" ON teams FOR ALL USING (
-  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and Organizers can manage teams" ON teams FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'organizer'))
 );
 
 -- Team members policies
 CREATE POLICY "Anyone can view team members" ON team_members FOR SELECT USING (true);
 CREATE POLICY "Users can join teams" ON team_members FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Admins can manage team members" ON team_members FOR ALL USING (
-  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and Organizers can manage team members" ON team_members FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'organizer'))
 );
 
 -- Announcements policies
 CREATE POLICY "Anyone can view announcements" ON announcements FOR SELECT USING (true);
-CREATE POLICY "Admins can create announcements" ON announcements FOR INSERT WITH CHECK (
-  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and Organizers can create announcements" ON announcements FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'organizer'))
 );
 
 -- Scores policies
 CREATE POLICY "Anyone can view scores" ON scores FOR SELECT USING (true);
-CREATE POLICY "Admins can manage scores" ON scores FOR ALL USING (
-  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and Organizers can manage scores" ON scores FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'organizer'))
 );
 
 -- ===== REALTIME =====

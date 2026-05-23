@@ -79,7 +79,7 @@
     let registrations = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
-      adminUser = await requireAuth('admin');
+      adminUser = await requireAuth(['admin', 'organizer']);
       if (!adminUser) return;
       renderNavbar('admin');
       renderSidebar('admin', 'manage-regs');

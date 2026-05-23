@@ -33,13 +33,17 @@ async function getCurrentUser() {
   } catch { return null; }
 }
 
-async function requireAuth(role) {
+async function requireAuth(allowedRoles) {
   const user = await getCurrentUser();
   if (!user) { window.location.href = 'login.html'; return null; }
-  if (role && user.role !== role) {
-    showToast('Access denied. You need ' + role + ' privileges.', 'error');
-    window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
-    return null;
+
+  if (allowedRoles) {
+    const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+    if (!rolesArray.includes(user.role)) {
+      showToast('Access denied. You need ' + rolesArray.join(' or ') + ' privileges.', 'error');
+      window.location.href = (user.role === 'admin' || user.role === 'organizer') ? 'admin.html' : 'dashboard.html';
+      return null;
+    }
   }
   return user;
 }
@@ -127,7 +131,7 @@ function renderNavbar(activePage) {
       <a href="events.html" class="${activePage === 'events' ? 'active' : ''}">Events</a>
       <a href="leaderboard.html" class="${activePage === 'leaderboard' ? 'active' : ''}">Leaderboard</a>
       <a href="announcements.html" class="${activePage === 'announcements' ? 'active' : ''}">Announcements</a>
-      <a href="${user.role === 'admin' ? 'admin.html' : 'dashboard.html'}" class="btn btn-primary btn-sm">Dashboard</a>
+      <a href="${(user.role === 'admin' || user.role === 'organizer') ? 'admin.html' : 'dashboard.html'}" class="btn btn-primary btn-sm">Dashboard</a>
     ` : `
       <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
       <a href="events.html" class="${activePage === 'events' ? 'active' : ''}">Events</a>
@@ -170,19 +174,19 @@ function renderSidebar(role, activePage) {
     { href: 'admin.html', icon: 'layout-dashboard', label: 'Dashboard', id: 'dashboard' },
     { href: 'admin-events.html', icon: 'calendar-plus', label: 'Manage Events', id: 'manage-events' },
     { href: 'admin-registrations.html', icon: 'clipboard-list', label: 'Registrations', id: 'manage-regs' },
-    { href: 'admin-users.html', icon: 'users', label: 'Manage Users', id: 'manage-users' },
+    ...(role === 'admin' ? [{ href: 'admin-users.html', icon: 'users', label: 'Manage Users', id: 'manage-users' }] : []),
     { href: 'announcements.html', icon: 'megaphone', label: 'Announcements', id: 'announcements' },
     { href: 'leaderboard.html', icon: 'trophy', label: 'Leaderboard', id: 'leaderboard' },
     { href: 'profile.html', icon: 'user', label: 'Profile', id: 'profile' },
   ];
 
-  const links = role === 'admin' ? adminLinks : participantLinks;
+  const links = (role === 'admin' || role === 'organizer') ? adminLinks : participantLinks;
   sidebar.innerHTML = `
     <div class="sidebar-brand">
       <span class="navbar-brand" style="font-size:1rem">VAIBHAV 2K26</span>
     </div>
     <div class="sidebar-section">
-      <h4>${role === 'admin' ? 'Admin Panel' : 'Navigation'}</h4>
+      <h4>${(role === 'admin' || role === 'organizer') ? 'Admin Panel' : 'Navigation'}</h4>
       ${links.map(l => `
         <a href="${l.href}" class="sidebar-link ${activePage === l.id ? 'active' : ''}" onclick="closeMobileMenu()">
           <i data-lucide="${l.icon}"></i> ${l.label}

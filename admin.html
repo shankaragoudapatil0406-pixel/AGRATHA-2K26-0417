@@ -58,7 +58,7 @@
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      const user = await requireAuth('admin');
+      const user = await requireAuth(['admin', 'organizer']);
       if (!user) return;
       renderNavbar('admin');
       renderSidebar('admin', 'dashboard');

@@ -207,7 +207,7 @@ async function handleLogin(e) {
 
     showToast('Welcome back! 🎉', 'success');
     setTimeout(() => {
-      window.location.href = (userRole === 'admin') ? 'admin.html' : 'dashboard.html';
+      window.location.href = (userRole === 'admin' || userRole === 'organizer') ? 'admin.html' : 'dashboard.html';
     }, 600);
 
   } catch (err) {
