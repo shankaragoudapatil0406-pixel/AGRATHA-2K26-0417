@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile — VAIBHAV 2K26</title>
+  <title>My Profile — AGRATHA 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -30,6 +30,14 @@
       background: var(--gradient-main);
     }
 
+    /* ===== AVATAR UPLOAD ===== */
+    .avatar-wrapper {
+      position: relative;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .avatar-wrapper:hover .avatar-overlay { opacity: 1; }
+
     .profile-avatar {
       width: 88px; height: 88px;
       border-radius: 50%;
@@ -37,10 +45,12 @@
       font-family: var(--font-display);
       font-size: 2rem; font-weight: 800;
       color: #fff;
-      flex-shrink: 0;
       border: 3px solid rgba(0,212,255,0.3);
       box-shadow: 0 0 30px rgba(0,212,255,0.2);
       position: relative;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
     }
     .profile-avatar::after {
       content: '';
@@ -54,6 +64,52 @@
     @keyframes avatarGlow {
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
+    }
+    .profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      position: absolute; inset: 0;
+    }
+
+    .avatar-overlay {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .avatar-overlay svg { width: 20px; height: 20px; }
+
+    .avatar-upload-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px dashed rgba(0,212,255,0.5);
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+    .avatar-wrapper:hover .avatar-upload-ring { opacity: 1; }
+
+    /* Upload progress bar */
+    .avatar-progress {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--gradient-main);
+      border-radius: 0 0 50px 50px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
     }
 
     .profile-info { flex: 1; }
@@ -186,7 +242,21 @@
 
     <!-- PROFILE HEADER -->
     <div class="profile-header fade-in-up" id="profile-header">
-      <div class="profile-avatar" id="avatar-el" style="background: linear-gradient(135deg, #00d4ff, #a855f7);">?</div>
+      <!-- AVATAR WRAPPER (clickable) -->
+      <div class="avatar-wrapper" id="avatar-wrapper" title="Click to change profile photo">
+        <div class="profile-avatar" id="avatar-el" style="background: linear-gradient(135deg, #00d4ff, #a855f7);">?</div>
+        <div class="avatar-overlay">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+          </svg>
+          <span>Change</span>
+        </div>
+        <div class="avatar-upload-ring"></div>
+        <div class="avatar-progress" id="avatar-progress"></div>
+      </div>
+      <!-- Hidden file input -->
+      <input type="file" id="avatar-input" accept="image/*" style="display:none">
       <div class="profile-info">
         <div class="profile-name" id="ph-name">Loading...</div>
         <div class="profile-email" id="ph-email"></div>
@@ -303,6 +373,31 @@
       return (name || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     }
 
+    /** Render avatar: show photo if avatar_url exists, else initials gradient */
+    function renderAvatar(avatarEl, avatarUrl, name) {
+      // Remove any existing img tag
+      const existingImg = avatarEl.querySelector('img');
+      if (existingImg) existingImg.remove();
+
+      if (avatarUrl) {
+        avatarEl.textContent = '';
+        avatarEl.style.background = 'transparent';
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = name || 'Profile Photo';
+        img.onerror = () => {
+          // Fallback to initials if image fails
+          img.remove();
+          avatarEl.textContent = getInitials(name);
+          avatarEl.style.background = getAvatarColor(name);
+        };
+        avatarEl.appendChild(img);
+      } else {
+        avatarEl.textContent = getInitials(name);
+        avatarEl.style.background = getAvatarColor(name);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await requireAuth();
       if (!user) return;
@@ -312,10 +407,9 @@
       initParticles('particles-canvas', 20);
       if (typeof lucide !== 'undefined') lucide.createIcons();
 
-      // Populate header
+      // Populate header avatar
       const avatarEl = document.getElementById('avatar-el');
-      avatarEl.textContent = getInitials(user.full_name);
-      avatarEl.style.background = getAvatarColor(user.full_name);
+      renderAvatar(avatarEl, user.avatar_url, user.full_name);
 
       document.getElementById('ph-name').textContent = user.full_name || 'Your Name';
       document.getElementById('ph-email').textContent = user.email || '';
@@ -347,6 +441,84 @@
       document.getElementById('p-college').value = user.college || '';
       document.getElementById('p-dept').value = user.department || '';
 
+      // ===== PROFILE PHOTO UPLOAD =====
+      const avatarWrapper = document.getElementById('avatar-wrapper');
+      const avatarInput  = document.getElementById('avatar-input');
+      const progressBar  = document.getElementById('avatar-progress');
+
+      avatarWrapper.addEventListener('click', () => avatarInput.click());
+
+      avatarInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type & size (max 5 MB)
+        if (!file.type.startsWith('image/')) {
+          showToast('Please select a valid image file.', 'error');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          showToast('Image must be smaller than 5 MB.', 'error');
+          return;
+        }
+
+        // --- Instant local preview ---
+        const reader = new FileReader();
+        reader.onload = (ev) => renderAvatar(avatarEl, ev.target.result, user.full_name);
+        reader.readAsDataURL(file);
+
+        // --- Animate progress bar ---
+        progressBar.style.transform = 'scaleX(0.4)';
+
+        try {
+          // Build a unique storage path per user
+          const ext = file.name.split('.').pop().toLowerCase();
+          const storagePath = `avatars/${user.id}.${ext}`;
+
+          // Upload to Supabase Storage bucket "avatars"
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(storagePath, file, { upsert: true, contentType: file.type });
+
+          if (uploadError) throw uploadError;
+
+          progressBar.style.transform = 'scaleX(0.7)';
+
+          // Get public URL
+          const { data: urlData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(storagePath);
+
+          const publicUrl = urlData?.publicUrl;
+          if (!publicUrl) throw new Error('Could not retrieve public URL.');
+
+          // Save to DB
+          const { error: dbError } = await supabase
+            .from('users')
+            .update({ avatar_url: publicUrl })
+            .eq('id', user.id);
+
+          if (dbError) throw dbError;
+
+          // Cache bust & render
+          const finalUrl = `${publicUrl}?t=${Date.now()}`;
+          renderAvatar(avatarEl, finalUrl, user.full_name);
+          user.avatar_url = finalUrl;
+
+          progressBar.style.transform = 'scaleX(1)';
+          showToast('🖼️ Profile photo updated!', 'success');
+
+        } catch (err) {
+          console.error('Avatar upload error:', err);
+          showToast(`Upload failed: ${err.message}`, 'error');
+        } finally {
+          // Reset progress bar
+          setTimeout(() => { progressBar.style.transform = 'scaleX(0)'; }, 600);
+          avatarInput.value = '';
+        }
+      });
+      // ===== END PHOTO UPLOAD =====
+
       // Save handler
       document.getElementById('profile-form').onsubmit = async (e) => {
         e.preventDefault();
@@ -366,10 +538,12 @@
           showToast(error.message, 'error');
         } else {
           showToast('✅ Profile updated successfully!', 'success');
-          // Update header avatar
           document.getElementById('ph-name').textContent = newName;
-          avatarEl.textContent = getInitials(newName);
-          avatarEl.style.background = getAvatarColor(newName);
+          // Only update initials if no photo set
+          if (!user.avatar_url) {
+            avatarEl.textContent = getInitials(newName);
+            avatarEl.style.background = getAvatarColor(newName);
+          }
         }
 
         btn.disabled = false;

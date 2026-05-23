@@ -156,3 +156,25 @@ CREATE POLICY "Admins can manage scores" ON scores FOR ALL USING (
 -- ===== REALTIME =====
 -- Enable Realtime for the announcements table to support Live Toast Notifications
 ALTER PUBLICATION supabase_realtime ADD TABLE announcements;
+
+-- ===== STORAGE: AVATARS BUCKET =====
+-- Run this in Supabase SQL Editor to set up the avatars storage bucket.
+
+-- 1. Create the bucket (public so profile photos are viewable by anyone)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- 2. Allow authenticated users to upload/update ONLY their own avatar
+CREATE POLICY "Users can upload own avatar" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'avatars' AND name = 'avatars/' || auth.uid() || '.' || split_part(name, '.', 2));
+
+CREATE POLICY "Users can update own avatar" ON storage.objects
+  FOR UPDATE TO authenticated
+  USING (bucket_id = 'avatars' AND owner = auth.uid());
+
+-- 3. Allow anyone to read avatars (bucket is public)
+CREATE POLICY "Avatars are publicly readable" ON storage.objects
+  FOR SELECT USING (bucket_id = 'avatars');
+
