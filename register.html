@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - VAIBHAV 2K26</title>
+  <title>Register — VAIBHAV 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,94 +11,314 @@
   <script src="js/auth.js" defer></script>
   <script src="js/particles.js" defer></script>
   <style>
-    .auth-icon {
-      width: 72px; height: 72px; margin: 0 auto 20px;
-      border-radius: 50%;
-      background: var(--gradient-main);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.75rem;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
-      animation: pulseGlowSoft 3s ease-in-out infinite;
-    }
-    .input-field {
-      transition: all 0.3s;
-    }
-    .input-field:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1), 0 0 15px rgba(0, 240, 255, 0.05);
-    }
-    .auth-footer {
-      text-align: center; margin-top: 24px;
-      color: var(--text-secondary); font-size: 0.9rem;
-    }
-    .auth-footer a {
-      color: var(--accent-cyan); font-weight: 600;
-      position: relative;
-    }
-    .auth-footer a::after {
-      content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
-      height: 1px; background: var(--accent-cyan);
-      transform: scaleX(0); transition: transform 0.3s;
-    }
-    .auth-footer a:hover::after { transform: scaleX(1); }
+    body { overflow-x: hidden; }
+    .auth-split { min-height: 100vh; display: grid; grid-template-columns: 1fr 1.4fr; }
 
-    .input-hint {
-      font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;
+    .auth-left {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 48px;
+      background: linear-gradient(150deg, #0a0a14 0%, #0d0d1f 60%, #080810 100%);
+      overflow: hidden;
+    }
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(189,0,255,0.12) 0%, transparent 70%);
+      top: -120px; right: -120px;
+      animation: floatOrb 14s ease-in-out infinite alternate;
+    }
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      width: 350px; height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,240,255,0.08) 0%, transparent 70%);
+      bottom: -60px; left: -60px;
+      animation: floatOrb 18s ease-in-out infinite alternate-reverse;
+    }
+    .auth-grid-deco {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+    }
+    .auth-left-content { position: relative; z-index: 1; }
+    .auth-brand {
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 800;
+      background: var(--gradient-main);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 40px; display: inline-block;
+    }
+    .auth-left h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2rem; font-weight: 800;
+      line-height: 1.2; margin-bottom: 16px;
+    }
+    .auth-left h1 span {
+      background: var(--gradient-main);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .auth-left p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; margin-bottom: 32px; }
+
+    .steps-list { display: flex; flex-direction: column; gap: 20px; }
+    .step-item {
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 0.8rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-num.s1 { background: rgba(0,240,255,0.15); color: var(--accent-cyan); border: 1px solid rgba(0,240,255,0.3); }
+    .step-num.s2 { background: rgba(189,0,255,0.15); color: var(--accent-purple); border: 1px solid rgba(189,0,255,0.3); }
+    .step-num.s3 { background: rgba(0,255,157,0.15); color: var(--accent-green); border: 1px solid rgba(0,255,157,0.3); }
+    .step-item h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+    .step-item p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+    /* Right panel */
+    .auth-right {
+      display: flex;
+      align-items: center; justify-content: center;
+      padding: 80px 48px;
+      background: var(--bg-primary);
+    }
+    .auth-form-box { width: 100%; max-width: 500px; }
+    .form-eyebrow {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--accent-purple); margin-bottom: 12px;
+    }
+    .auth-form-box h2 { font-family: var(--font-heading); font-size: 1.9rem; font-weight: 800; margin-bottom: 6px; }
+    .auth-form-box .form-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 32px; }
+
+    .auth-error-box {
+      display: none; padding: 14px 16px;
+      background: rgba(255,51,102,0.08); border: 1px solid rgba(255,51,102,0.25);
+      border-radius: var(--radius-sm); color: var(--accent-red);
+      font-size: 0.85rem; margin-bottom: 24px; line-height: 1.5;
+      animation: shakeX 0.4s ease;
+    }
+    @keyframes shakeX {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field-group { margin-bottom: 16px; }
+    .field-group label {
+      display: block; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 7px;
+    }
+
+    .field-wrap { position: relative; }
+    .field-wrap .toggle-pw {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-muted); cursor: pointer;
+      padding: 0; display: flex; align-items: center; transition: color 0.3s;
+    }
+    .field-wrap .toggle-pw:hover { color: var(--accent-cyan); }
+    .field-wrap .input-field { padding-right: 44px; }
+
+    /* Password strength */
+    .pw-strength { margin-top: 8px; }
+    .pw-strength-bar {
+      height: 4px; border-radius: 2px;
+      background: var(--border-glass);
+      overflow: hidden; margin-bottom: 5px;
+    }
+    .pw-strength-fill {
+      height: 100%; border-radius: 2px;
+      width: 0%; transition: width 0.4s ease, background 0.4s ease;
+    }
+    .pw-strength-label { font-size: 0.72rem; color: var(--text-muted); }
+
+    .btn-auth {
+      width: 100%; padding: 14px;
+      border-radius: var(--radius-sm);
+      background: var(--gradient-main); color: #fff;
+      font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700;
+      border: none; cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(0,240,255,0.25);
+      margin-top: 8px;
+    }
+    .btn-auth:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,240,255,0.4); }
+    .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .auth-footer-link {
+      text-align: center; margin-top: 24px;
+      font-size: 0.875rem; color: var(--text-secondary);
+    }
+    .auth-footer-link a { color: var(--accent-cyan); font-weight: 600; }
+    .auth-footer-link a:hover { text-decoration: underline; }
+
+    .input-hint { font-size: 0.73rem; color: var(--text-muted); margin-top: 5px; }
+
+    @media (max-width: 768px) {
+      .auth-split { grid-template-columns: 1fr; }
+      .auth-left { display: none; }
+      .auth-right { padding: 100px 20px 40px; }
+      .form-row-2 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <nav class="navbar" id="navbar"></nav>
-  <div class="auth-wrapper">
-    <div class="auth-card fade-in-up" style="max-width:520px">
-      <div class="auth-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+
+  <div class="auth-split">
+    <!-- LEFT -->
+    <div class="auth-left">
+      <div class="auth-grid-deco"></div>
+      <div class="auth-left-content fade-in-up">
+        <span class="auth-brand">VAIBHAV 2K26</span>
+        <h1>Join the<br><span>Fest Experience</span></h1>
+        <p>Create your account in seconds and unlock access to 20+ events, live leaderboards, and your digital ticket wallet.</p>
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-num s1">01</div>
+            <div>
+              <h4>Create Account</h4>
+              <p>Fill in your name, email, and college details</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num s2">02</div>
+            <div>
+              <h4>Browse & Register</h4>
+              <p>Explore events and register with QR payment</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num s3">03</div>
+            <div>
+              <h4>Compete & Win</h4>
+              <p>Attend with your digital ticket and chase glory</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <h2>Join VAIBHAV 2K26</h2>
-      <p class="subtitle">Create your account and start participating</p>
-      <div id="auth-error" style="display:none;padding:14px 16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);color:var(--accent-red);font-size:0.85rem;margin-bottom:20px;line-height:1.5"></div>
-      <form onsubmit="handleRegister(event)">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="fullName" class="input-field" placeholder="Your full name" required>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="auth-right">
+      <div class="auth-form-box fade-in-up">
+        <div class="form-eyebrow">
+          <i data-lucide="user-plus" style="width:14px;height:14px"></i>
+          Free Registration
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="email" class="input-field" placeholder="you@college.edu" required>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="password" class="input-field" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" required minlength="6">
-          <div class="input-hint">Minimum 6 characters</div>
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="phone" class="input-field" placeholder="+91 98765 43210">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="form-group">
-            <label>College</label>
-            <input type="text" id="college" class="input-field" placeholder="College name">
+        <h2>Create Account</h2>
+        <p class="form-sub">Join VAIBHAV 2K26 and start participating</p>
+
+        <div id="auth-error" class="auth-error-box"></div>
+
+        <form onsubmit="handleRegister(event)">
+          <div class="field-group">
+            <label>Full Name *</label>
+            <input type="text" id="fullName" class="input-field" placeholder="Your full name" required>
           </div>
-          <div class="form-group">
-            <label>Department</label>
-            <input type="text" id="department" class="input-field" placeholder="CSE, ECE, etc.">
+
+          <div class="field-group">
+            <label>Email Address *</label>
+            <input type="email" id="email" class="input-field" placeholder="you@college.edu" required>
           </div>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%">Create Account</button>
-      </form>
-      <p class="auth-footer">
-        Already have an account? <a href="login.html">Sign in</a>
-      </p>
+
+          <div class="field-group">
+            <label>Password *</label>
+            <div class="field-wrap">
+              <input type="password" id="password" class="input-field" placeholder="Min. 6 characters" required minlength="6" oninput="updateStrength(this.value)">
+              <button type="button" class="toggle-pw" onclick="togglePassword()">
+                <i data-lucide="eye" id="pw-icon" style="width:18px;height:18px"></i>
+              </button>
+            </div>
+            <div class="pw-strength">
+              <div class="pw-strength-bar">
+                <div class="pw-strength-fill" id="pw-fill"></div>
+              </div>
+              <span class="pw-strength-label" id="pw-label">Enter a password</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Phone (optional)</label>
+            <input type="tel" id="phone" class="input-field" placeholder="+91 98765 43210">
+          </div>
+
+          <div class="form-row-2">
+            <div class="field-group">
+              <label>College</label>
+              <input type="text" id="college" class="input-field" placeholder="College name">
+            </div>
+            <div class="field-group">
+              <label>Department</label>
+              <input type="text" id="department" class="input-field" placeholder="CSE, ECE, etc.">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-auth" id="register-btn">Create Account →</button>
+        </form>
+
+        <p class="auth-footer-link">
+          Already have an account? <a href="login.html">Sign in</a>
+        </p>
+      </div>
     </div>
   </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       renderNavbar('register');
-      initParticles('particles-canvas', 30);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 
+    function togglePassword() {
+      const pw = document.getElementById('password');
+      const icon = document.getElementById('pw-icon');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        pw.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
 
+    function updateStrength(val) {
+      const fill = document.getElementById('pw-fill');
+      const label = document.getElementById('pw-label');
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = [
+        { w: '0%', c: 'transparent', t: 'Enter a password' },
+        { w: '25%', c: '#ef4444', t: 'Weak' },
+        { w: '50%', c: '#f59e0b', t: 'Fair' },
+        { w: '75%', c: '#3b82f6', t: 'Good' },
+        { w: '100%', c: '#10b981', t: 'Strong 💪' },
+      ];
+
+      const lvl = Math.min(score, 4);
+      fill.style.width = levels[lvl].w;
+      fill.style.background = levels[lvl].c;
+      label.textContent = levels[lvl].t;
+      label.style.color = levels[lvl].c;
+    }
   </script>
 </body>
 </html>
