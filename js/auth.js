@@ -182,7 +182,7 @@ async function handleLogin(e) {
 
       if (!profile) {
          // Profile is missing, auto-create it
-         const autoRole = data.user.email.toLowerCase() === 'admin@vaibhav.com' ? 'admin' : 'participant';
+         const autoRole = data.user.email.toLowerCase() === 'chetankenchappanavar803@gmail.com' ? 'admin' : 'participant';
          await supabase.from('users').insert({
              id: data.user.id,
              email: data.user.email,
@@ -191,7 +191,7 @@ async function handleLogin(e) {
          userRole = autoRole;
       } else {
          // Profile exists
-         if (data.user.email.toLowerCase() === 'admin@vaibhav.com' && profile.role !== 'admin') {
+         if (data.user.email.toLowerCase() === 'chetankenchappanavar803@gmail.com' && profile.role !== 'admin') {
              // Auto-elevate to admin
              await supabase.from('users').update({ role: 'admin' }).eq('id', data.user.id);
              userRole = 'admin';
@@ -202,7 +202,7 @@ async function handleLogin(e) {
       console.log('👤 User role resolved to:', userRole);
     } catch (profileErr) {
       console.warn('⚠️ Profile auto-resolution failed:', profileErr);
-      if (data.user.email.toLowerCase() === 'admin@vaibhav.com') userRole = 'admin';
+      if (data.user.email.toLowerCase() === 'chetankenchappanavar803@gmail.com') userRole = 'admin';
     }
 
     showToast('Welcome back! 🎉', 'success');
