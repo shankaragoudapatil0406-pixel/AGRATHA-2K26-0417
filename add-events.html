@@ -2,37 +2,311 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Sample Events - VAIBHAV 2K26</title>
+  <title>Setup Events - VAIBHAV 2K26</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
+  <style>
+    .setup-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 60px;
+      position: relative;
+    }
+    .setup-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      width: 100%;
+      max-width: 640px;
+      backdrop-filter: blur(20px);
+      text-align: center;
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    .setup-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 24px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+      animation: pulseGlowSoft 3s ease-in-out infinite;
+    }
+    .setup-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease infinite;
+      background-size: 200% 200%;
+    }
+    .setup-card .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .event-preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .event-preview-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+    .event-preview-item:nth-child(1) { animation-delay: 0.1s; }
+    .event-preview-item:nth-child(2) { animation-delay: 0.15s; }
+    .event-preview-item:nth-child(3) { animation-delay: 0.2s; }
+    .event-preview-item:nth-child(4) { animation-delay: 0.25s; }
+    .event-preview-item:nth-child(5) { animation-delay: 0.3s; }
+    .event-preview-item:nth-child(6) { animation-delay: 0.35s; }
+    .event-preview-item:hover {
+      border-color: rgba(0, 240, 255, 0.3);
+      transform: translateX(4px);
+      background: rgba(0, 240, 255, 0.03);
+    }
+    .event-preview-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .event-preview-icon.tech { background: rgba(0, 240, 255, 0.15); }
+    .event-preview-icon.workshop { background: rgba(255, 170, 0, 0.15); }
+    .event-preview-icon.cultural { background: rgba(255, 0, 127, 0.15); }
+    .event-preview-info { flex: 1; min-width: 0; }
+    .event-preview-info .ep-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .event-preview-info .ep-cat {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .setup-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 18px 32px;
+      border-radius: 50px;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: none;
+      color: #fff;
+      background: var(--gradient-main);
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .setup-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+      animation: shimmerBtn 3s infinite;
+    }
+    .setup-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(0, 240, 255, 0.5);
+    }
+    .setup-btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+    .setup-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .setup-btn:disabled::after { display: none; }
+    .setup-btn .btn-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      animation: btnDotPulse 1.2s ease-in-out infinite;
+    }
+    .setup-btn .btn-dot:nth-child(2) { animation-delay: 0.2s; }
+    .setup-btn .btn-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes btnDotPulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1.2); }
+    }
+    .setup-status {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      min-height: 24px;
+      transition: all 0.3s;
+    }
+    .setup-success {
+      color: var(--accent-green) !important;
+      font-weight: 600;
+    }
+    .setup-error {
+      color: var(--accent-red) !important;
+      font-weight: 600;
+    }
+    .setup-progress {
+      margin-top: 16px;
+      width: 100%;
+      height: 4px;
+      background: var(--bg-glass);
+      border-radius: 2px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .setup-progress.active { opacity: 1; }
+    .setup-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--gradient-main);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+    .setup-progress-bar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmerBar 1.5s infinite;
+    }
+    .setup-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: color 0.3s, gap 0.3s;
+    }
+    .setup-back:hover {
+      color: var(--accent-cyan);
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .setup-card { padding: 32px 24px; }
+      .event-preview-grid { grid-template-columns: 1fr; }
+      .setup-icon { width: 64px; height: 64px; font-size: 1.5rem; }
+      .setup-card h2 { font-size: 1.2rem; }
+    }
+  </style>
 </head>
 <body>
-  <div class="auth-wrapper">
-    <div class="auth-card" style="max-width:560px;text-align:center">
-      <div style="font-size:3rem;margin-bottom:12px">🚀</div>
-      <h2>Setup VAIBHAV Events</h2>
-      <p class="subtitle">Click below to populate your database with 6 sample events</p>
-      <div style="text-align:left;margin-bottom:24px">
-        <div class="glass-card" style="padding:16px">
-          <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--text-secondary)">
-            <div style="display:flex;align-items:center;gap:8px">💻 <strong style="color:var(--text-primary)">Hackathon 2026</strong> — Technical</div>
-            <div style="display:flex;align-items:center;gap:8px">💻 <strong style="color:var(--text-primary)">Coding Challenge</strong> — Technical</div>
-            <div style="display:flex;align-items:center;gap:8px">💻 <strong style="color:var(--text-primary)">Tech Quiz</strong> — Technical</div>
-            <div style="display:flex;align-items:center;gap:8px">🔧 <strong style="color:var(--text-primary)">Robo Race</strong> — Workshop</div>
-            <div style="display:flex;align-items:center;gap:8px">🎭 <strong style="color:var(--text-primary)">Cultural Night</strong> — Cultural</div>
-            <div style="display:flex;align-items:center;gap:8px">🔧 <strong style="color:var(--text-primary)">Workshop on AI</strong> — Workshop</div>
+  <div class="setup-wrapper">
+    <div class="setup-card">
+      <div class="setup-icon">&#9889;</div>
+      <h2>VAIBHAV 2K26 Setup</h2>
+      <p class="subtitle">Populate your database with 6 sample events across Technical, Workshop, and Cultural categories. Ready in seconds.</p>
+
+      <div class="event-preview-grid">
+        <div class="event-preview-item">
+          <div class="event-preview-icon tech">&#128187;</div>
+          <div class="event-preview-info">
+            <div class="ep-title">Hackathon 2026</div>
+            <div class="ep-cat">Technical</div>
+          </div>
+        </div>
+        <div class="event-preview-item">
+          <div class="event-preview-icon tech">&#128187;</div>
+          <div class="event-preview-info">
+            <div class="ep-title">Coding Challenge</div>
+            <div class="ep-cat">Technical</div>
+          </div>
+        </div>
+        <div class="event-preview-item">
+          <div class="event-preview-icon tech">&#128187;</div>
+          <div class="event-preview-info">
+            <div class="ep-title">Tech Quiz</div>
+            <div class="ep-cat">Technical</div>
+          </div>
+        </div>
+        <div class="event-preview-item">
+          <div class="event-preview-icon workshop">&#128295;</div>
+          <div class="event-preview-info">
+            <div class="ep-title">Robo Race</div>
+            <div class="ep-cat">Workshop</div>
+          </div>
+        </div>
+        <div class="event-preview-item">
+          <div class="event-preview-icon cultural">&#127917;</div>
+          <div class="event-preview-info">
+            <div class="ep-title">Cultural Night</div>
+            <div class="ep-cat">Cultural</div>
+          </div>
+        </div>
+        <div class="event-preview-item">
+          <div class="event-preview-icon workshop">&#128295;</div>
+          <div class="event-preview-info">
+            <div class="ep-title">Workshop on AI</div>
+            <div class="ep-cat">Workshop</div>
           </div>
         </div>
       </div>
-      <button id="add-btn" class="btn btn-primary btn-lg" style="width:100%;margin-bottom:16px" onclick="addSampleEvents()">
-        <i data-lucide="database" style="width:18px;height:18px"></i> Add Sample Events
+
+      <button id="add-btn" class="setup-btn" onclick="addSampleEvents()">
+        <i data-lucide="database" style="width:20px;height:20px"></i>
+        <span id="btn-text">Add Sample Events</span>
       </button>
-      <div id="status" style="color:var(--text-secondary);font-size:0.9rem"></div>
-      <a href="events.html" style="display:inline-block;margin-top:16px;font-size:0.85rem">← Back to Events</a>
+
+      <div class="setup-progress" id="setup-progress">
+        <div class="setup-progress-bar" id="setup-progress-bar"></div>
+      </div>
+
+      <div class="setup-status" id="status"></div>
+
+      <a href="events.html" class="setup-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Events
+      </a>
     </div>
   </div>
+
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -41,9 +315,23 @@
 
     async function addSampleEvents() {
       const btn = document.getElementById('add-btn');
+      const btnText = document.getElementById('btn-text');
       const status = document.getElementById('status');
-      btn.disabled = true; btn.textContent = '⏳ Adding Events...';
-      status.textContent = 'Inserting events into Supabase...';
+      const progress = document.getElementById('setup-progress');
+      const progressBar = document.getElementById('setup-progress-bar');
+
+      btn.disabled = true;
+      btnText.textContent = 'Adding Events';
+      status.textContent = 'Initializing...';
+      progress.classList.add('active');
+
+      const steps = ['Connecting to database...', 'Creating events...', 'Almost done...'];
+      let stepIdx = 0;
+      const stepInterval = setInterval(() => {
+        stepIdx = Math.min(stepIdx + 1, steps.length - 1);
+        status.textContent = steps[stepIdx];
+        progressBar.style.width = Math.round((stepIdx + 1) / steps.length * 90) + '%';
+      }, 800);
 
       const events = [
         {
@@ -58,7 +346,7 @@
           team_size: 4,
           registration_fee: 500,
           rules: '1. Teams of up to 4 members\n2. 24-hour continuous coding\n3. Any programming language or framework allowed\n4. Pre-built templates not allowed\n5. All code must be written during the event\n6. Final demo and pitch required',
-          prizes: '🥇 1st Place: ₹50,000 + Internship Offers\n🥈 2nd Place: ₹25,000\n🥉 3rd Place: ₹10,000\n🏆 Best UI/UX: ₹5,000\n🏆 Most Innovative: ₹5,000',
+          prizes: '\U0001f947 1st Place: \u20b950,000 + Internship Offers\n\U0001f948 2nd Place: \u20b925,000\n\U0001f949 3rd Place: \u20b910,000\n\U0001f3c6 Best UI/UX: \u20b95,000\n\U0001f3c6 Most Innovative: \u20b95,000',
           image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop'
         },
         {
@@ -73,7 +361,7 @@
           team_size: 1,
           registration_fee: 200,
           rules: '1. Individual participation only\n2. 4-hour duration, 3 rounds\n3. Any programming language allowed\n4. Internet access restricted to documentation only\n5. Plagiarism = instant disqualification',
-          prizes: '🥇 1st: ₹15,000\n🥈 2nd: ₹8,000\n🥉 3rd: ₹4,000\n⭐ Top 10 get certificates of excellence',
+          prizes: '\U0001f947 1st: \u20b915,000\n\U0001f948 2nd: \u20b98,000\n\U0001f949 3rd: \u20b94,000\n\u2b50 Top 10 get certificates of excellence',
           image_url: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&h=400&fit=crop'
         },
         {
@@ -88,7 +376,7 @@
           team_size: 2,
           registration_fee: 300,
           rules: '1. Teams of 2 members\n2. 4 rounds: MCQ, Rapid Fire, Visual Round, Buzzer Round\n3. No electronic devices during the quiz\n4. Judges decision is final',
-          prizes: '🥇 1st: ₹8,000\n🥈 2nd: ₹4,000\n🥉 3rd: ₹2,000',
+          prizes: '\U0001f947 1st: \u20b98,000\n\U0001f948 2nd: \u20b94,000\n\U0001f949 3rd: \u20b92,000',
           image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop'
         },
         {
@@ -103,7 +391,7 @@
           team_size: 3,
           registration_fee: 400,
           rules: '1. Teams of 3 members\n2. Bot dimensions: max 30x30x30 cm\n3. Wired or wireless control allowed\n4. Bot must be self-built (no pre-made kits)\n5. Time-based scoring with penalties for obstacles',
-          prizes: '🥇 1st: ₹20,000\n🥈 2nd: ₹10,000\n🥉 3rd: ₹5,000\n🏆 Best Design: ₹3,000',
+          prizes: '\U0001f947 1st: \u20b920,000\n\U0001f948 2nd: \u20b910,000\n\U0001f949 3rd: \u20b95,000\n\U0001f3c6 Best Design: \u20b93,000',
           image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&h=400&fit=crop'
         },
         {
@@ -118,7 +406,7 @@
           team_size: 1,
           registration_fee: 150,
           rules: '1. Solo and group entries accepted\n2. Performance duration: 5-8 minutes\n3. Pre-register your act type (dance/music/drama/other)\n4. No offensive or inappropriate content\n5. Music tracks must be submitted 24 hours before',
-          prizes: '🥇 Best Performance: ₹15,000\n🥈 Runner Up: ₹8,000\n🏆 Best Solo Act: ₹5,000\n🏆 Best Group Act: ₹5,000\n⭐ Audience Choice: ₹3,000',
+          prizes: '\U0001f947 Best Performance: \u20b915,000\n\U0001f948 Runner Up: \u20b98,000\n\U0001f3c6 Best Solo Act: \u20b95,000\n\U0001f3c6 Best Group Act: \u20b95,000\n\u2b50 Audience Choice: \u20b93,000',
           image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop'
         },
         {
@@ -133,21 +421,34 @@
           team_size: 1,
           registration_fee: 250,
           rules: '1. Bring your own laptop\n2. Python basics recommended\n3. All materials and datasets provided\n4. Hands-on exercises throughout\n5. Certificate of completion for all attendees',
-          prizes: '📜 Certificates for all participants\n🏆 Best Project: ₹3,000\n⭐ Top 5 get LinkedIn recommendations from industry mentors',
+          prizes: '\U0001f4dc Certificates for all participants\n\U0001f3c6 Best Project: \u20b93,000\n\u2b50 Top 5 get LinkedIn recommendations from industry mentors',
           image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop'
         }
       ];
 
       try {
+        clearInterval(stepInterval);
+        status.textContent = 'Writing to database...';
+        progressBar.style.width = '95%';
+
         const { error } = await supabase.from('events').insert(events);
         if (error) throw error;
-        status.innerHTML = '<span style="color:var(--accent-green)">✅ ' + events.length + ' events added successfully!</span>';
-        btn.textContent = '✓ Done!';
+
+        progressBar.style.width = '100%';
+        status.className = 'setup-status setup-success';
+        status.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> ' + events.length + ' events added successfully! Redirecting...';
+        btnText.textContent = '\u2713 Done!';
         btn.style.background = 'var(--accent-green)';
+
         setTimeout(() => { window.location.href = 'events.html'; }, 1500);
       } catch (err) {
-        status.innerHTML = '<span style="color:var(--accent-red)">❌ Error: ' + err.message + '</span>';
-        btn.disabled = false; btn.textContent = '🔄 Try Again';
+        clearInterval(stepInterval);
+        progress.classList.remove('active');
+        status.className = 'setup-status setup-error';
+        status.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Error: ' + err.message;
+        btn.disabled = false;
+        btnText.textContent = 'Try Again';
+        btn.style.background = '';
       }
     }
   </script>
