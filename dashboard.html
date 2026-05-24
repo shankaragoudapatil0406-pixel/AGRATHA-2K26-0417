@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — VAIBHAV 2K26</title>
-  <meta name="description" content="Your personal mission control for VAIBHAV 2K26 college fest.">
+  <meta name="description" content="Participant Mission Control — VAIBHAV 2K26">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
@@ -15,523 +15,494 @@
   <script src="js/particles.js" defer></script>
 
   <style>
-    /* ==============================================
-       VAIBHAV 2K26 — DASHBOARD REDESIGN
-       ============================================== */
 
-    .db-page { padding-bottom: 60px; }
+    /* ===================================================
+       VAIBHAV 2K26 — COMPLETELY NEW DASHBOARD v3
+       Visually distinct: vivid cards, neon typography,
+       festival countdown hero, animated grid BG
+    =================================================== */
 
-    /* ── HERO BANNER ── */
-    .db-hero {
-      position: relative;
-      border-radius: 28px;
-      margin-bottom: 28px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #0d0018 0%, #000d1a 50%, #0d0018 100%);
-      border: 1px solid rgba(189,0,255,0.25);
-      box-shadow: 0 0 60px rgba(189,0,255,0.12), 0 0 120px rgba(0,240,255,0.06);
-    }
-    /* Animated top border */
-    .db-hero::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink), var(--accent-cyan));
-      background-size: 300% 100%;
-      animation: borderFlow 3s linear infinite;
-    }
-    @keyframes borderFlow {
-      0%   { background-position: 0% 0%; }
-      100% { background-position: 300% 0%; }
+    /* ── Page wrapper ── */
+    .xdb { display:flex; flex-direction:column; gap:24px; padding-bottom:60px; }
+
+    /* ══════════════════════════════════════════
+       HERO — Big festival-style banner
+    ══════════════════════════════════════════ */
+    .xhero {
+      border-radius:24px;
+      padding:40px 44px;
+      position:relative;
+      overflow:hidden;
+      /* Vivid gradient bg — completely different from old */
+      background: linear-gradient(125deg, #0a0025 0%, #1a0040 40%, #001a35 100%);
+      border:1px solid rgba(189,0,255,0.3);
+      box-shadow: 0 0 80px rgba(189,0,255,0.15), 0 0 0 1px rgba(0,240,255,0.05) inset;
     }
 
-    /* Big decorative glows inside the hero */
-    .db-hero-glow1 {
-      position: absolute; width: 400px; height: 400px;
-      border-radius: 50%; pointer-events: none;
-      right: -80px; top: -150px;
-      background: radial-gradient(circle, rgba(189,0,255,0.2) 0%, transparent 70%);
-      filter: blur(40px);
-      animation: breathe 5s ease-in-out infinite;
-    }
-    .db-hero-glow2 {
-      position: absolute; width: 300px; height: 300px;
-      border-radius: 50%; pointer-events: none;
-      left: 30%; bottom: -120px;
-      background: radial-gradient(circle, rgba(0,240,255,0.15) 0%, transparent 70%);
-      filter: blur(50px);
-      animation: breathe 7s ease-in-out infinite reverse;
-    }
-    @keyframes breathe {
-      0%, 100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 1; }
+    /* Dot grid overlay */
+    .xhero::after {
+      content:'';
+      position:absolute; inset:0;
+      background-image: radial-gradient(rgba(189,0,255,0.18) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events:none;
     }
 
-    .db-hero-inner {
-      position: relative; z-index: 2;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 32px; padding: 36px 40px; flex-wrap: wrap;
+    /* Big cyan glow bottom-right */
+    .xhero-glow {
+      position:absolute; width:500px; height:500px; border-radius:50%;
+      right:-100px; bottom:-200px; pointer-events:none;
+      background:radial-gradient(circle, rgba(0,240,255,0.14) 0%, transparent 65%);
+      filter:blur(30px);
+      animation:glowPulse 5s ease-in-out infinite;
+    }
+    .xhero-glow2 {
+      position:absolute; width:350px; height:350px; border-radius:50%;
+      left:-60px; top:-100px; pointer-events:none;
+      background:radial-gradient(circle, rgba(189,0,255,0.18) 0%, transparent 65%);
+      filter:blur(40px);
+      animation:glowPulse 7s ease-in-out infinite reverse;
+    }
+    @keyframes glowPulse {
+      0%,100%{ transform:scale(1); opacity:0.8; }
+      50%    { transform:scale(1.2); opacity:1; }
     }
 
-    /* Avatar */
-    .db-user-block { display: flex; align-items: center; gap: 24px; }
-    .db-avatar-wrap { position: relative; flex-shrink: 0; }
-    .db-avatar {
-      width: 80px; height: 80px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-display); font-size: 1.7rem; font-weight: 800;
-      color: #fff; overflow: hidden;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      position: relative; z-index: 1;
+    /* Flowing top border */
+    .xhero::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:4px;
+      background:linear-gradient(90deg,#00f0ff,#bd00ff,#ff007f,#00f0ff);
+      background-size:300% 100%;
+      animation:flowBorder 2.5s linear infinite;
     }
-    .db-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-    /* Spinning dashed ring */
-    .db-avatar-ring-svg {
-      position: absolute; inset: -8px;
-      width: calc(100% + 16px); height: calc(100% + 16px);
-      animation: rotateSlow 10s linear infinite;
-    }
-    @keyframes rotateSlow { to { transform: rotate(360deg); } }
-    /* Online badge */
-    .db-online-dot {
-      position: absolute; bottom: 4px; right: 4px;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: var(--accent-green);
-      border: 2px solid #000d1a;
-      box-shadow: 0 0 8px var(--accent-green);
-      z-index: 2;
+    @keyframes flowBorder { to { background-position:300% 0; } }
+
+    .xhero-inner {
+      position:relative; z-index:2;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:32px; flex-wrap:wrap;
     }
 
-    .db-user-info {}
-    .db-greeting-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(0,240,255,0.08);
-      border: 1px solid rgba(0,240,255,0.2);
-      border-radius: 50px; padding: 4px 12px;
-      font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      color: var(--accent-cyan); margin-bottom: 10px;
+    /* Avatar section */
+    .xuser { display:flex; align-items:center; gap:22px; }
+    .xav-shell {
+      position:relative; width:84px; height:84px; flex-shrink:0;
     }
-    .db-greeting-chip .blink-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent-cyan);
-      animation: dotBlink 1.5s ease-in-out infinite;
+    .xav {
+      width:84px; height:84px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Orbitron',sans-serif; font-size:1.75rem; font-weight:900;
+      color:#fff; overflow:hidden;
+      background:linear-gradient(135deg,#00f0ff,#bd00ff);
+      position:relative; z-index:1;
     }
-    @keyframes dotBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
+    .xav img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    /* Spinning ring */
+    .xav-svg {
+      position:absolute; inset:-9px;
+      width:calc(100% + 18px); height:calc(100% + 18px);
+      animation:spinRing 8s linear infinite;
     }
-    .db-user-name {
-      font-family: var(--font-heading);
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 800; line-height: 1.1;
-      margin-bottom: 8px;
-    }
-    .db-user-name .name-accent {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .db-user-meta {
-      font-size: 0.82rem; color: var(--text-secondary);
-      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    }
-    .db-user-meta .meta-dot { color: var(--accent-purple); }
-
-    /* Hero Action Buttons */
-    .db-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    .db-btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 13px 26px; border-radius: 50px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: #fff; font-size: 0.85rem; font-weight: 700;
-      font-family: var(--font-heading); text-decoration: none;
-      border: none; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0,240,255,0.3);
-      transition: all 0.3s;
-    }
-    .db-btn-primary:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 10px 30px rgba(0,240,255,0.45);
-      color: #fff;
-    }
-    .db-btn-ghost {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 24px; border-radius: 50px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;
-      font-family: var(--font-heading); text-decoration: none;
-      cursor: pointer; transition: all 0.3s;
-    }
-    .db-btn-ghost:hover {
-      background: rgba(189,0,255,0.1);
-      border-color: rgba(189,0,255,0.4);
-      color: #fff; transform: translateY(-2px);
-    }
-    .db-btn-primary i, .db-btn-ghost i { width: 16px; height: 16px; }
-
-    /* ── STATS STRIP ── */
-    .db-stats-strip {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
+    @keyframes spinRing{ to{ transform:rotate(360deg); } }
+    /* Online indicator */
+    .xav-online {
+      position:absolute; right:2px; bottom:2px; z-index:3;
+      width:16px; height:16px; border-radius:50%;
+      background:#00ff9d; border:3px solid #0a0025;
+      box-shadow:0 0 10px #00ff9d;
     }
 
-    .db-stat {
-      position: relative; overflow: hidden;
-      padding: 24px 22px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(15,5,30,0.9), rgba(5,15,30,0.9));
-      border: 1px solid rgba(255,255,255,0.08);
-      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-      cursor: default;
+    /* User text */
+    .xgreeting {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:4px 14px; border-radius:50px;
+      background:rgba(0,240,255,0.08); border:1px solid rgba(0,240,255,0.2);
+      font-size:0.68rem; font-weight:800; letter-spacing:2px;
+      text-transform:uppercase; color:#00f0ff; margin-bottom:10px;
     }
-    .db-stat:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    .xgreeting .dot {
+      width:5px; height:5px; border-radius:50%;
+      background:#00f0ff; animation:dotPulse 1.5s ease-in-out infinite;
     }
-    /* Top colored bar */
-    .db-stat::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      border-radius: 20px 20px 0 0;
-      transition: height 0.3s;
-    }
-    .db-stat:hover::before { height: 4px; }
-    .ds-c::before { background: linear-gradient(90deg, var(--accent-cyan), #0066ff); }
-    .ds-p::before { background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink)); }
-    .ds-g::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
-    .ds-o::before { background: linear-gradient(90deg, var(--accent-orange), var(--accent-pink)); }
+    @keyframes dotPulse{ 0%,100%{opacity:1;} 50%{opacity:0.15;} }
 
-    /* Large ghost number watermark */
-    .db-stat-ghost {
-      position: absolute; right: 12px; bottom: -8px;
-      font-family: var(--font-display); font-size: 4.5rem; font-weight: 900;
-      opacity: 0.04; line-height: 1; pointer-events: none;
-      transition: opacity 0.3s;
+    .xname {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(1.8rem,3.5vw,2.5rem);
+      font-weight:900; line-height:1.05; margin-bottom:10px;
     }
-    .db-stat:hover .db-stat-ghost { opacity: 0.07; }
+    .xname-accent {
+      background:linear-gradient(135deg,#00f0ff,#bd00ff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .xmeta {
+      display:flex; align-items:center; gap:8px;
+      font-size:0.8rem; color:rgba(255,255,255,0.45); flex-wrap:wrap;
+    }
+    .xmeta-sep{ color:rgba(189,0,255,0.6); font-size:0.6rem; }
 
-    .ds-icon-wrap {
-      width: 44px; height: 44px; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
+    /* Hero buttons */
+    .xbtns { display:flex; gap:10px; flex-wrap:wrap; }
+    .xbtn-main {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:14px 28px; border-radius:50px;
+      background:linear-gradient(135deg,#00f0ff,#bd00ff);
+      color:#fff; font-size:0.87rem; font-weight:800;
+      font-family:'Space Grotesk',sans-serif;
+      text-decoration:none; border:none; cursor:pointer;
+      box-shadow:0 6px 30px rgba(0,240,255,0.35);
+      transition:all 0.3s; white-space:nowrap;
     }
-    .ds-icon-wrap i { width: 22px; height: 22px; }
-    .ds-c .ds-icon-wrap { background: rgba(0,240,255,0.12); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.1); }
-    .ds-p .ds-icon-wrap { background: rgba(189,0,255,0.12); color: var(--accent-purple); box-shadow: 0 0 20px rgba(189,0,255,0.1); }
-    .ds-g .ds-icon-wrap { background: rgba(0,255,157,0.12); color: var(--accent-green); box-shadow: 0 0 20px rgba(0,255,157,0.1); }
-    .ds-o .ds-icon-wrap { background: rgba(255,170,0,0.12); color: var(--accent-orange); box-shadow: 0 0 20px rgba(255,170,0,0.1); }
+    .xbtn-main:hover { transform:translateY(-3px) scale(1.04); box-shadow:0 12px 40px rgba(0,240,255,0.5); color:#fff; }
+    .xbtn-out {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:13px 22px; border-radius:50px;
+      background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.7); font-size:0.85rem; font-weight:700;
+      font-family:'Space Grotesk',sans-serif;
+      text-decoration:none; cursor:pointer; transition:all 0.3s; white-space:nowrap;
+    }
+    .xbtn-out:hover { background:rgba(189,0,255,0.12); border-color:rgba(189,0,255,0.5); color:#fff; transform:translateY(-2px); }
+    .xbtn-main i, .xbtn-out i { width:16px; height:16px; }
 
-    .ds-value {
-      font-family: var(--font-display);
-      font-size: 2.4rem; font-weight: 900;
-      line-height: 1; margin-bottom: 6px;
+    /* ══════════════════════════════════════════
+       STAT CARDS — SOLID vivid backgrounds
+    ══════════════════════════════════════════ */
+    .xstats {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
     }
-    .ds-c .ds-value { color: var(--accent-cyan); text-shadow: 0 0 30px rgba(0,240,255,0.4); }
-    .ds-p .ds-value { color: var(--accent-purple); text-shadow: 0 0 30px rgba(189,0,255,0.4); }
-    .ds-g .ds-value { color: var(--accent-green); text-shadow: 0 0 30px rgba(0,255,157,0.4); }
-    .ds-o .ds-value { color: var(--accent-orange); text-shadow: 0 0 30px rgba(255,170,0,0.4); }
+    .xsc {
+      border-radius:20px;
+      padding:26px 22px 22px;
+      position:relative; overflow:hidden;
+      transition:transform 0.3s, box-shadow 0.3s;
+      cursor:default;
+    }
+    .xsc:hover { transform:translateY(-6px); }
 
-    .ds-label {
-      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1.5px; color: var(--text-muted);
+    /* Color themes — solid vivid backgrounds */
+    .xsc-1 {
+      background:linear-gradient(135deg,#001e2b,#003340);
+      border:1px solid rgba(0,240,255,0.3);
+      box-shadow:0 8px 32px rgba(0,240,255,0.1);
     }
-    .ds-sub {
-      font-size: 0.72rem; color: var(--accent-green);
-      margin-top: 6px; font-weight: 600;
-      display: flex; align-items: center; gap: 4px;
+    .xsc-1:hover { box-shadow:0 16px 48px rgba(0,240,255,0.25); }
+    .xsc-2 {
+      background:linear-gradient(135deg,#1a0030,#2d0055);
+      border:1px solid rgba(189,0,255,0.3);
+      box-shadow:0 8px 32px rgba(189,0,255,0.1);
     }
-    .ds-sub i { width: 11px; height: 11px; }
+    .xsc-2:hover { box-shadow:0 16px 48px rgba(189,0,255,0.25); }
+    .xsc-3 {
+      background:linear-gradient(135deg,#001a15,#003325);
+      border:1px solid rgba(0,255,157,0.3);
+      box-shadow:0 8px 32px rgba(0,255,157,0.1);
+    }
+    .xsc-3:hover { box-shadow:0 16px 48px rgba(0,255,157,0.25); }
+    .xsc-4 {
+      background:linear-gradient(135deg,#1a1000,#332000);
+      border:1px solid rgba(255,170,0,0.3);
+      box-shadow:0 8px 32px rgba(255,170,0,0.1);
+    }
+    .xsc-4:hover { box-shadow:0 16px 48px rgba(255,170,0,0.25); }
 
-    /* ── CONTENT GRID ── */
-    .db-content-grid {
-      display: grid;
-      grid-template-columns: 1.65fr 1fr;
-      gap: 20px;
-      align-items: start;
+    /* Large background icon */
+    .xsc-bg-icon {
+      position:absolute; right:-10px; bottom:-15px;
+      font-size:6rem; opacity:0.05; line-height:1;
+      pointer-events:none; transition:opacity 0.3s;
     }
-    .db-col-left { display: flex; flex-direction: column; gap: 20px; }
-    .db-col-right { display: flex; flex-direction: column; gap: 20px; }
+    .xsc:hover .xsc-bg-icon { opacity:0.1; }
 
-    /* ── PANEL ── */
-    .db-panel {
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(12,8,25,0.95), rgba(5,12,25,0.95));
-      border: 1px solid rgba(255,255,255,0.07);
-      overflow: hidden;
+    /* Icon badge */
+    .xsc-icon {
+      width:46px; height:46px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:16px;
     }
-    .db-panel-header {
-      padding: 20px 24px 0;
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 0;
-    }
-    .db-panel-title-group { display: flex; align-items: center; gap: 12px; }
-    .db-panel-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .db-panel-icon i { width: 17px; height: 17px; }
-    .pi-cyan   { background: rgba(0,240,255,0.12);  color: var(--accent-cyan); }
-    .pi-purple { background: rgba(189,0,255,0.12);  color: var(--accent-purple); }
-    .pi-pink   { background: rgba(255,0,127,0.12);  color: var(--accent-pink); }
-    .pi-green  { background: rgba(0,255,157,0.12);  color: var(--accent-green); }
-    .pi-orange { background: rgba(255,170,0,0.12);  color: var(--accent-orange); }
-    .db-panel-label { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; }
-    .db-panel-sublabel { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
-    .db-panel-viewall {
-      font-size: 0.75rem; color: var(--text-muted);
-      text-decoration: none; transition: color 0.3s;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .db-panel-viewall:hover { color: var(--accent-cyan); }
-    .db-panel-body { padding: 20px 24px; }
+    .xsc-icon i { width:22px; height:22px; }
+    .xsc-1 .xsc-icon { background:rgba(0,240,255,0.15); color:#00f0ff; box-shadow:0 0 20px rgba(0,240,255,0.2); }
+    .xsc-2 .xsc-icon { background:rgba(189,0,255,0.15); color:#bd00ff; box-shadow:0 0 20px rgba(189,0,255,0.2); }
+    .xsc-3 .xsc-icon { background:rgba(0,255,157,0.15); color:#00ff9d; box-shadow:0 0 20px rgba(0,255,157,0.2); }
+    .xsc-4 .xsc-icon { background:rgba(255,170,0,0.15); color:#ffaa00; box-shadow:0 0 20px rgba(255,170,0,0.2); }
 
-    /* ── READINESS BAR ── */
-    .db-readiness-strip {
-      display: none;
-      margin: 16px 24px 0;
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: rgba(0,240,255,0.04);
-      border: 1px solid rgba(0,240,255,0.1);
+    /* Number */
+    .xsc-num {
+      font-family:'Orbitron',sans-serif;
+      font-size:2.6rem; font-weight:900; line-height:1; margin-bottom:6px;
+      letter-spacing:-1px;
     }
-    .drs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .drs-title {
-      font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .drs-val { font-family: var(--font-display); font-size: 0.85rem; color: var(--accent-cyan); font-weight: 800; }
-    .drs-track { height: 7px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: visible; position: relative; }
-    .drs-fill {
-      height: 100%; border-radius: 10px; width: 0;
-      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
-      transition: width 1.5s cubic-bezier(0.22,1,0.36,1);
-      position: relative; box-shadow: 0 0 12px rgba(0,240,255,0.4);
-    }
-    .drs-fill::after {
-      content: '';
-      position: absolute; right: -5px; top: 50%; transform: translateY(-50%);
-      width: 12px; height: 12px; border-radius: 50%;
-      background: #fff; box-shadow: 0 0 10px var(--accent-cyan), 0 0 4px var(--accent-purple);
-    }
+    .xsc-1 .xsc-num { color:#00f0ff; text-shadow:0 0 30px rgba(0,240,255,0.6); }
+    .xsc-2 .xsc-num { color:#bd00ff; text-shadow:0 0 30px rgba(189,0,255,0.6); }
+    .xsc-3 .xsc-num { color:#00ff9d; text-shadow:0 0 30px rgba(0,255,157,0.6); }
+    .xsc-4 .xsc-num { color:#ffaa00; text-shadow:0 0 30px rgba(255,170,0,0.6); }
 
-    /* ── EVENT ITEMS ── */
-    .db-ev-list { display: flex; flex-direction: column; gap: 10px; }
-    .db-ev-card {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 16px; border-radius: 14px;
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      text-decoration: none; color: inherit;
-      transition: all 0.3s;
-      position: relative; overflow: hidden;
+    .xsc-label {
+      font-size:0.7rem; font-weight:800; text-transform:uppercase;
+      letter-spacing:2px; color:rgba(255,255,255,0.35);
     }
-    .db-ev-card::after {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0; width: 0;
-      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
-      border-radius: 14px 0 0 14px;
-      transition: width 0.3s;
+    .xsc-sub {
+      font-size:0.72rem; margin-top:8px; font-weight:600;
+      display:flex; align-items:center; gap:5px;
     }
-    .db-ev-card:hover {
-      background: rgba(0,240,255,0.05);
-      border-color: rgba(0,240,255,0.2);
-      transform: translateX(6px);
-    }
-    .db-ev-card:hover::after { width: 3px; }
-    .db-ev-emoji {
-      width: 48px; height: 48px; border-radius: 13px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-    }
-    .emi-t { background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(189,0,255,0.15)); }
-    .emi-c { background: linear-gradient(135deg, rgba(255,0,127,0.15), rgba(189,0,255,0.15)); }
-    .emi-s { background: linear-gradient(135deg, rgba(0,255,157,0.12), rgba(0,240,255,0.12)); }
-    .emi-w { background: linear-gradient(135deg, rgba(255,170,0,0.12), rgba(0,255,157,0.12)); }
-    .emi-g { background: linear-gradient(135deg, rgba(189,0,255,0.12), rgba(255,0,127,0.12)); }
-    .db-ev-info { flex: 1; min-width: 0; }
-    .db-ev-name {
-      font-family: var(--font-heading); font-weight: 700;
-      font-size: 0.92rem; margin-bottom: 4px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .db-ev-meta-row {
-      display: flex; gap: 12px; font-size: 0.73rem; color: var(--text-muted);
-    }
-    .db-ev-meta-row span { display: flex; align-items: center; gap: 3px; }
-    .db-ev-badge {
-      padding: 4px 10px; border-radius: 50px; font-size: 0.65rem;
-      font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
-    }
-    .evb-confirmed { background: rgba(0,255,157,0.12); color: var(--accent-green); border: 1px solid rgba(0,255,157,0.25); }
-    .evb-pending   { background: rgba(255,170,0,0.12);  color: var(--accent-orange); border: 1px solid rgba(255,170,0,0.25); }
-    .evb-attended  { background: rgba(0,240,255,0.12);  color: var(--accent-cyan);   border: 1px solid rgba(0,240,255,0.25); }
+    .xsc-1 .xsc-sub { color:rgba(0,240,255,0.7); }
+    .xsc-2 .xsc-sub { color:rgba(189,0,255,0.7); }
+    .xsc-3 .xsc-sub { color:rgba(0,255,157,0.7); }
+    .xsc-4 .xsc-sub { color:rgba(255,170,0,0.7); }
+    .xsc-sub i { width:12px; height:12px; }
 
-    /* ── COUNTDOWN ── */
-    .db-countdown {
-      padding: 4px 0;
-      background: transparent;
+    /* ══════════════════════════════════════════
+       MAIN CONTENT GRID
+    ══════════════════════════════════════════ */
+    .xgrid {
+      display:grid;
+      grid-template-columns:1.6fr 1fr;
+      gap:20px;
+      align-items:start;
     }
-    .dc-label {
-      text-align: center; font-size: 0.65rem; text-transform: uppercase;
-      letter-spacing: 2.5px; color: var(--text-muted); margin-bottom: 16px;
-      font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+    .xleft  { display:flex; flex-direction:column; gap:20px; }
+    .xright { display:flex; flex-direction:column; gap:20px; }
+
+    /* ── Panel ── */
+    .xpanel {
+      border-radius:20px;
+      background:linear-gradient(160deg,rgba(14,8,28,0.98),rgba(6,14,28,0.98));
+      border:1px solid rgba(255,255,255,0.07);
+      overflow:hidden;
     }
-    .dc-label::before, .dc-label::after {
-      content: ''; flex: 1; height: 1px;
-      background: linear-gradient(to right, transparent, rgba(255,255,255,0.08));
+    .xpanel-head {
+      padding:20px 24px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      display:flex; align-items:center; justify-content:space-between;
     }
-    .dc-label::after { background: linear-gradient(to left, transparent, rgba(255,255,255,0.08)); }
-    .dc-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    .xpanel-hgroup { display:flex; align-items:center; gap:12px; }
+    .xpanel-ico {
+      width:36px; height:36px; border-radius:11px;
+      display:flex; align-items:center; justify-content:center;
     }
-    .dc-unit {
-      text-align: center;
-      background: rgba(0,240,255,0.04);
-      border: 1px solid rgba(0,240,255,0.1);
-      border-radius: 14px; padding: 14px 6px;
-      position: relative; overflow: hidden;
-      transition: border-color 0.3s;
+    .xpanel-ico i { width:17px; height:17px; }
+    .xi-c  { background:rgba(0,240,255,0.12);  color:#00f0ff; }
+    .xi-p  { background:rgba(189,0,255,0.12);  color:#bd00ff; }
+    .xi-pk { background:rgba(255,0,127,0.12);  color:#ff007f; }
+    .xi-g  { background:rgba(0,255,157,0.12);  color:#00ff9d; }
+    .xi-o  { background:rgba(255,170,0,0.12);  color:#ffaa00; }
+    .xpanel-ttl { font-family:'Space Grotesk',sans-serif; font-size:0.95rem; font-weight:700; }
+    .xpanel-sub { font-size:0.7rem; color:rgba(255,255,255,0.3); margin-top:1px; }
+    .xpanel-all {
+      font-size:0.75rem; color:rgba(255,255,255,0.3);
+      text-decoration:none; display:flex; align-items:center; gap:4px; transition:color 0.3s;
     }
-    .dc-unit::before {
-      content: '';
-      position: absolute; top: 0; left: 25%; right: 25%; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    .xpanel-all:hover { color:#00f0ff; }
+    .xpanel-body { padding:20px 24px; }
+
+    /* ── Readiness bar ── */
+    .xready {
+      display:none; margin:0 24px 0;
+      padding:14px 18px; border-radius:14px;
+      background:rgba(0,240,255,0.04);
+      border:1px solid rgba(0,240,255,0.12);
+      margin-top:16px;
     }
-    .dc-num {
-      font-family: var(--font-display); font-weight: 800; font-size: 1.8rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; display: block; line-height: 1;
+    .xready-row {
+      display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;
     }
-    .dc-lbl {
-      font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px;
-      color: var(--text-muted); margin-top: 6px; display: block; font-weight: 700;
+    .xready-lbl {
+      font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.7);
+      display:flex; align-items:center; gap:8px;
     }
-    /* LIVE badge */
-    .dc-live-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-bottom: 8px;
-      background: rgba(255,51,102,0.12);
-      border: 1px solid rgba(255,51,102,0.25);
-      padding: 4px 12px; border-radius: 50px;
-      font-size: 0.65rem; color: var(--accent-red);
-      font-weight: 800; letter-spacing: 1px;
+    .xready-pct { font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#00f0ff; font-weight:900; }
+    .xready-track {
+      height:8px; background:rgba(255,255,255,0.06);
+      border-radius:10px; overflow:hidden;
     }
-    .dc-live-badge .pulse-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent-red);
-      animation: dotBlink 1s ease-in-out infinite;
+    .xready-fill {
+      height:100%; width:0; border-radius:10px;
+      background:linear-gradient(90deg,#00f0ff,#bd00ff);
+      transition:width 1.5s cubic-bezier(0.22,1,0.36,1);
+      box-shadow:0 0 14px rgba(0,240,255,0.5);
     }
 
-    /* ── QUICK NAV ── */
-    .db-qnav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .db-qnav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 16px; border-radius: 14px;
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      text-decoration: none; color: inherit;
-      transition: all 0.3s;
+    /* ── Event items ── */
+    .xev-list { display:flex; flex-direction:column; gap:10px; }
+    .xev-item {
+      display:flex; align-items:center; gap:14px;
+      padding:14px 16px; border-radius:14px;
+      background:rgba(255,255,255,0.025);
+      border:1px solid rgba(255,255,255,0.06);
+      text-decoration:none; color:inherit;
+      transition:all 0.3s; position:relative; overflow:hidden;
     }
-    .db-qnav-item:hover {
-      transform: translateY(-3px);
-      background: rgba(189,0,255,0.07);
-      border-color: rgba(189,0,255,0.2);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    /* Left glow bar */
+    .xev-item::before {
+      content:''; position:absolute;
+      left:0; top:0; bottom:0; width:3px;
+      background:linear-gradient(180deg,#00f0ff,#bd00ff);
+      transform:scaleY(0); transform-origin:top;
+      transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      border-radius:0 2px 2px 0;
     }
-    .qnav-icon {
-      width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .qnav-icon i { width: 18px; height: 18px; }
-    .qni-c  { background: rgba(0,240,255,0.12);  color: var(--accent-cyan); }
-    .qni-p  { background: rgba(189,0,255,0.12);  color: var(--accent-purple); }
-    .qni-pk { background: rgba(255,0,127,0.12);  color: var(--accent-pink); }
-    .qni-g  { background: rgba(0,255,157,0.12);  color: var(--accent-green); }
-    .qnav-text {}
-    .qnav-label { font-size: 0.83rem; font-weight: 700; color: var(--text-primary); }
-    .qnav-sub   { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+    .xev-item:hover { background:rgba(0,240,255,0.05); border-color:rgba(0,240,255,0.2); transform:translateX(6px); }
+    .xev-item:hover::before { transform:scaleY(1); }
 
-    /* ── ANNOUNCEMENTS ── */
-    .db-ann-list { display: flex; flex-direction: column; gap: 10px; }
-    .db-ann-item {
-      padding: 14px 16px; border-radius: 14px;
-      background: rgba(255,255,255,0.025);
-      border-left: 3px solid rgba(255,255,255,0.1);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-right: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      transition: all 0.3s;
+    .xev-thumb {
+      width:50px; height:50px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0;
     }
-    .db-ann-item:hover { transform: translateX(4px); background: rgba(255,255,255,0.04); }
-    .db-ann-item.urgent   { border-left-color: var(--accent-red);    background: rgba(255,51,102,0.04); }
-    .db-ann-item.important{ border-left-color: var(--accent-orange);  background: rgba(255,170,0,0.04); }
-    .db-ann-item.normal   { border-left-color: var(--accent-cyan); }
-    .ann-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
-    .ann-title-text { font-weight: 700; font-size: 0.87rem; }
-    .ann-badge {
-      padding: 2px 8px; border-radius: 50px; font-size: 0.6rem;
-      font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
-    }
-    .ann-badge.urgent   { background: rgba(255,51,102,0.15);  color: var(--accent-red);    border: 1px solid rgba(255,51,102,0.3); }
-    .ann-badge.important{ background: rgba(255,170,0,0.15);  color: var(--accent-orange); border: 1px solid rgba(255,170,0,0.3); }
-    .ann-content { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 6px;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .ann-time { font-size: 0.68rem; color: var(--text-muted); }
+    .eth-t{ background:linear-gradient(135deg,rgba(0,240,255,0.15),rgba(189,0,255,0.15)); }
+    .eth-c{ background:linear-gradient(135deg,rgba(255,0,127,0.15),rgba(189,0,255,0.15)); }
+    .eth-s{ background:linear-gradient(135deg,rgba(0,255,157,0.15),rgba(0,240,255,0.12)); }
+    .eth-w{ background:linear-gradient(135deg,rgba(255,170,0,0.12),rgba(0,255,157,0.12)); }
+    .eth-g{ background:linear-gradient(135deg,rgba(189,0,255,0.15),rgba(255,0,127,0.15)); }
 
-    /* ── EMPTY STATE ── */
-    .db-empty {
-      text-align: center; padding: 48px 20px;
-      color: var(--text-muted);
+    .xev-info { flex:1; min-width:0; }
+    .xev-name {
+      font-family:'Space Grotesk',sans-serif; font-weight:800;
+      font-size:0.9rem; margin-bottom:4px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .db-empty-emoji { font-size: 3rem; display: block; margin-bottom: 16px; filter: saturate(0.5); }
-    .db-empty h4 { font-family: var(--font-heading); font-size: 1rem; color: var(--text-secondary); margin-bottom: 8px; }
-    .db-empty p  { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.6; }
-    .db-empty-cta {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 22px; border-radius: 50px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      color: #fff; font-size: 0.82rem; font-weight: 700;
-      text-decoration: none; transition: all 0.3s;
+    .xev-meta { font-size:0.72rem; color:rgba(255,255,255,0.35); display:flex; gap:12px; flex-wrap:wrap; }
+    .xev-meta span { display:flex; align-items:center; gap:3px; }
+    .xev-status {
+      padding:4px 12px; border-radius:50px; flex-shrink:0;
+      font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;
     }
-    .db-empty-cta i { width: 14px; height: 14px; }
-    .db-empty-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,240,255,0.3); color: #fff; }
+    .xs-confirmed { background:rgba(0,255,157,0.12); color:#00ff9d; border:1px solid rgba(0,255,157,0.25); }
+    .xs-pending   { background:rgba(255,170,0,0.12);  color:#ffaa00; border:1px solid rgba(255,170,0,0.25); }
+    .xs-attended  { background:rgba(0,240,255,0.12);  color:#00f0ff; border:1px solid rgba(0,240,255,0.25); }
 
-    /* ── ANIMATIONS ── */
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* ── Countdown ── */
+    .xcd-wrap {}
+    .xcd-title {
+      text-align:center; font-size:0.62rem;
+      text-transform:uppercase; letter-spacing:3px;
+      color:rgba(255,255,255,0.25); margin-bottom:16px; font-weight:700;
     }
-    .anim-slide-up { animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; }
-    .d1 { animation-delay: 0.05s; }
-    .d2 { animation-delay: 0.12s; }
-    .d3 { animation-delay: 0.19s; }
-    .d4 { animation-delay: 0.26s; }
-    .d5 { animation-delay: 0.33s; }
-    .d6 { animation-delay: 0.40s; }
-    .d7 { animation-delay: 0.47s; }
-    .d8 { animation-delay: 0.54s; }
+    .xcd-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .xcd-seg {
+      background:linear-gradient(135deg,rgba(0,240,255,0.05),rgba(189,0,255,0.05));
+      border:1px solid rgba(0,240,255,0.15);
+      border-radius:14px; padding:14px 4px; text-align:center;
+      position:relative; overflow:hidden;
+    }
+    .xcd-seg::before {
+      content:''; position:absolute;
+      top:0; left:20%; right:20%; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,240,255,0.5),transparent);
+    }
+    .xcd-n {
+      font-family:'Orbitron',sans-serif; font-size:1.9rem; font-weight:900;
+      background:linear-gradient(135deg,#00f0ff,#bd00ff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; display:block; line-height:1;
+    }
+    .xcd-l {
+      font-size:0.52rem; text-transform:uppercase; letter-spacing:1.5px;
+      color:rgba(255,255,255,0.25); display:block; margin-top:6px; font-weight:700;
+    }
+    /* Live badge on countdown header */
+    .xcd-live {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(255,51,102,0.12); border:1px solid rgba(255,51,102,0.3);
+      color:#ff3366; padding:3px 10px; border-radius:50px;
+      font-size:0.6rem; font-weight:900; letter-spacing:1px;
+    }
+    .xcd-live-dot {
+      width:6px; height:6px; border-radius:50%;
+      background:#ff3366; animation:dotPulse 1s ease-in-out infinite;
+    }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1100px) {
-      .db-content-grid { grid-template-columns: 1fr; }
-      .db-col-right { display: grid; grid-template-columns: 1fr 1fr; }
+    /* ── Quick Nav ── */
+    .xqnav { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .xqnav-card {
+      display:flex; align-items:center; gap:12px;
+      padding:14px; border-radius:14px;
+      background:rgba(255,255,255,0.025);
+      border:1px solid rgba(255,255,255,0.06);
+      text-decoration:none; color:inherit; transition:all 0.3s;
     }
-    @media (max-width: 900px) {
-      .db-stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .xqnav-card:hover { transform:translateY(-3px); background:rgba(189,0,255,0.08); border-color:rgba(189,0,255,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .xqnav-ico {
+      width:40px; height:40px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
     }
-    @media (max-width: 700px) {
-      .db-hero-inner { flex-direction: column; align-items: flex-start; }
-      .db-hero-actions { width: 100%; }
-      .db-col-right { grid-template-columns: 1fr; }
+    .xqnav-ico i { width:18px; height:18px; }
+    .xqi-c  { background:rgba(0,240,255,0.12);  color:#00f0ff; }
+    .xqi-p  { background:rgba(189,0,255,0.12);  color:#bd00ff; }
+    .xqi-pk { background:rgba(255,0,127,0.12);  color:#ff007f; }
+    .xqi-g  { background:rgba(0,255,157,0.12);  color:#00ff9d; }
+    .xqnav-ttl { font-size:0.82rem; font-weight:700; }
+    .xqnav-sub { font-size:0.67rem; color:rgba(255,255,255,0.3); margin-top:1px; }
+
+    /* ── Announcements ── */
+    .xann-list { display:flex; flex-direction:column; gap:10px; }
+    .xann-item {
+      padding:14px 16px; border-radius:14px;
+      background:rgba(255,255,255,0.02);
+      border-left:3px solid rgba(255,255,255,0.1);
+      border-top:1px solid rgba(255,255,255,0.05);
+      border-right:1px solid rgba(255,255,255,0.05);
+      border-bottom:1px solid rgba(255,255,255,0.05);
+      transition:all 0.3s;
     }
-    @media (max-width: 520px) {
-      .db-stats-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .db-hero-inner { padding: 24px 20px; }
-      .db-qnav-grid { grid-template-columns: 1fr 1fr; }
+    .xann-item:hover { transform:translateX(4px); background:rgba(255,255,255,0.04); }
+    .xann-item.urgent    { border-left-color:#ff3366; background:rgba(255,51,102,0.04); }
+    .xann-item.important { border-left-color:#ffaa00; background:rgba(255,170,0,0.04); }
+    .xann-item.normal    { border-left-color:#00f0ff; }
+    .xann-row { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:5px; }
+    .xann-ttl { font-weight:700; font-size:0.87rem; }
+    .xann-badge {
+      padding:2px 8px; border-radius:50px; flex-shrink:0;
+      font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;
     }
+    .xab-urgent   { background:rgba(255,51,102,0.15);  color:#ff3366; border:1px solid rgba(255,51,102,0.3); }
+    .xab-important{ background:rgba(255,170,0,0.15);   color:#ffaa00; border:1px solid rgba(255,170,0,0.3); }
+    .xann-body { font-size:0.78rem; color:rgba(255,255,255,0.45); line-height:1.55; margin-bottom:6px;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .xann-time { font-size:0.67rem; color:rgba(255,255,255,0.2); }
+
+    /* ── Empty state ── */
+    .xempty { text-align:center; padding:48px 20px; }
+    .xempty-icon { font-size:3.5rem; display:block; margin-bottom:16px; }
+    .xempty h4 { font-family:'Space Grotesk',sans-serif; font-size:1rem; color:rgba(255,255,255,0.6); margin-bottom:8px; font-weight:700; }
+    .xempty p  { font-size:0.82rem; color:rgba(255,255,255,0.3); margin-bottom:20px; line-height:1.6; }
+    .xempty-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:11px 24px; border-radius:50px;
+      background:linear-gradient(135deg,#00f0ff,#bd00ff);
+      color:#fff; font-size:0.82rem; font-weight:800; text-decoration:none; transition:all 0.3s;
+    }
+    .xempty-btn i { width:14px; height:14px; }
+    .xempty-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,240,255,0.35); color:#fff; }
+
+    /* ══════════════════════════════════════════
+       ANIMATIONS — staggered slide-up
+    ══════════════════════════════════════════ */
+    @keyframes xup {
+      from { opacity:0; transform:translateY(28px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .xu { animation:xup 0.55s cubic-bezier(0.22,1,0.36,1) forwards; opacity:0; }
+    .u1{ animation-delay:0.04s; }
+    .u2{ animation-delay:0.10s; }
+    .u3{ animation-delay:0.16s; }
+    .u4{ animation-delay:0.22s; }
+    .u5{ animation-delay:0.28s; }
+    .u6{ animation-delay:0.34s; }
+    .u7{ animation-delay:0.40s; }
+    .u8{ animation-delay:0.46s; }
+    .u9{ animation-delay:0.52s; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media(max-width:1100px){ .xgrid{grid-template-columns:1fr;} .xright{display:grid;grid-template-columns:1fr 1fr;} }
+    @media(max-width:900px) { .xstats{grid-template-columns:repeat(2,1fr);} }
+    @media(max-width:700px) { .xhero{padding:24px 20px;} .xhero-inner{flex-direction:column;align-items:flex-start;} .xright{grid-template-columns:1fr;} }
+    @media(max-width:520px) { .xstats{grid-template-columns:1fr 1fr;gap:10px;} .xqnav{grid-template-columns:1fr 1fr;} }
   </style>
 </head>
 <body>
@@ -540,412 +511,306 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <div class="main-content with-sidebar">
-    <div class="db-page">
+  <div class="xdb">
 
-      <!-- ════ HERO ════ -->
-      <div class="db-hero anim-slide-up d1">
-        <div class="db-hero-glow1"></div>
-        <div class="db-hero-glow2"></div>
-        <div class="db-hero-inner">
+    <!-- ══ HERO ══ -->
+    <div class="xhero xu u1">
+      <div class="xhero-glow"></div>
+      <div class="xhero-glow2"></div>
+      <div class="xhero-inner">
 
-          <div class="db-user-block">
-            <div class="db-avatar-wrap">
-              <!-- Spinning SVG ring -->
-              <svg class="db-avatar-ring-svg" viewBox="0 0 96 96" fill="none">
-                <circle cx="48" cy="48" r="44" stroke="url(#rg)" stroke-width="2"
-                  stroke-dasharray="210 65" stroke-linecap="round"/>
-                <defs>
-                  <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%"   stop-color="#00f0ff" stop-opacity="0.9"/>
-                    <stop offset="100%" stop-color="#bd00ff" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div class="db-avatar" id="dash-avatar">?</div>
-              <div class="db-online-dot"></div>
-            </div>
-
-            <div class="db-user-info">
-              <div class="db-greeting-chip">
-                <span class="blink-dot"></span>
-                <span id="time-greeting">Loading…</span>
-              </div>
-              <div class="db-user-name">
-                Welcome back, <span class="name-accent" id="user-first-name">Participant</span>!
-              </div>
-              <div class="db-user-meta">
-                <span id="user-college">VAIBHAV 2K26</span>
-                <span class="meta-dot">⬡</span>
-                <span>Mission Control</span>
-                <span class="meta-dot">⬡</span>
-                <span id="user-role-chip">Participant</span>
-              </div>
-            </div>
+        <div class="xuser">
+          <div class="xav-shell">
+            <svg class="xav-svg" viewBox="0 0 102 102" fill="none">
+              <defs>
+                <linearGradient id="xrg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#00f0ff" stop-opacity="0.9"/>
+                  <stop offset="60%"  stop-color="#bd00ff" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#ff007f" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <circle cx="51" cy="51" r="47" stroke="url(#xrg)" stroke-width="2.5"
+                stroke-dasharray="225 70" stroke-linecap="round"/>
+            </svg>
+            <div class="xav" id="dash-avatar">?</div>
+            <div class="xav-online"></div>
           </div>
 
-          <div class="db-hero-actions">
-            <a href="events.html" class="db-btn-primary">
-              <i data-lucide="search"></i> Browse Events
-            </a>
-            <a href="tickets.html" class="db-btn-ghost">
-              <i data-lucide="ticket"></i> My Tickets
-            </a>
-            <a href="leaderboard.html" class="db-btn-ghost">
-              <i data-lucide="trophy"></i> Leaderboard
-            </a>
+          <div>
+            <div class="xgreeting"><span class="dot"></span><span id="time-greeting">Loading…</span></div>
+            <div class="xname">Hey, <span class="xname-accent" id="user-first-name">Participant</span>! 👋</div>
+            <div class="xmeta">
+              <span id="user-college">VAIBHAV 2K26</span>
+              <span class="xmeta-sep">◆</span>
+              <span>Mission Control</span>
+              <span class="xmeta-sep">◆</span>
+              <span id="user-role-label">Participant</span>
+            </div>
           </div>
+        </div>
 
+        <div class="xbtns">
+          <a href="events.html" class="xbtn-main"><i data-lucide="search"></i>Browse Events</a>
+          <a href="tickets.html" class="xbtn-out"><i data-lucide="ticket"></i>Tickets</a>
+          <a href="leaderboard.html" class="xbtn-out"><i data-lucide="trophy"></i>Rankings</a>
         </div>
       </div>
-
-      <!-- ════ STAT STRIP ════ -->
-      <div class="db-stats-strip">
-        <div class="db-stat ds-c anim-slide-up d2">
-          <div class="db-stat-ghost" id="ghost-events">0</div>
-          <div class="ds-icon-wrap"><i data-lucide="zap"></i></div>
-          <div class="ds-value" id="stat-events">—</div>
-          <div class="ds-label">Events Joined</div>
-          <div class="ds-sub"><i data-lucide="activity"></i> Active participant</div>
-        </div>
-        <div class="db-stat ds-p anim-slide-up d3">
-          <div class="db-stat-ghost" id="ghost-teams">0</div>
-          <div class="ds-icon-wrap"><i data-lucide="users"></i></div>
-          <div class="ds-value" id="stat-teams">—</div>
-          <div class="ds-label">Teams</div>
-          <div class="ds-sub" style="color:var(--accent-purple)"><i data-lucide="shield"></i> Squad member</div>
-        </div>
-        <div class="db-stat ds-g anim-slide-up d4">
-          <div class="db-stat-ghost" id="ghost-tickets">0</div>
-          <div class="ds-icon-wrap"><i data-lucide="ticket"></i></div>
-          <div class="ds-value" id="stat-tickets">—</div>
-          <div class="ds-label">Tickets</div>
-          <div class="ds-sub"><i data-lucide="check-circle"></i> Confirmed</div>
-        </div>
-        <div class="db-stat ds-o anim-slide-up d5">
-          <div class="db-stat-ghost" id="ghost-points">0</div>
-          <div class="ds-icon-wrap"><i data-lucide="star"></i></div>
-          <div class="ds-value" id="stat-points">—</div>
-          <div class="ds-label">Points Earned</div>
-          <div class="ds-sub" style="color:var(--accent-orange)"><i data-lucide="award"></i> On leaderboard</div>
-        </div>
-      </div>
-
-      <!-- ════ CONTENT GRID ════ -->
-      <div class="db-content-grid">
-
-        <!-- LEFT COLUMN -->
-        <div class="db-col-left">
-
-          <!-- My Events -->
-          <div class="db-panel anim-slide-up d6">
-            <div class="db-panel-header">
-              <div class="db-panel-title-group">
-                <div class="db-panel-icon pi-cyan"><i data-lucide="calendar-days"></i></div>
-                <div>
-                  <div class="db-panel-label">My Registered Events</div>
-                  <div class="db-panel-sublabel">Your upcoming competitions &amp; workshops</div>
-                </div>
-              </div>
-              <a href="events.html" class="db-panel-viewall">
-                Browse all <i data-lucide="arrow-right" style="width:12px;height:12px"></i>
-              </a>
-            </div>
-
-            <!-- Readiness -->
-            <div class="db-readiness-strip" id="db-readiness">
-              <div class="drs-row">
-                <div class="drs-title">🎯 Fest Readiness Score</div>
-                <div class="drs-val" id="drs-val">0%</div>
-              </div>
-              <div class="drs-track"><div class="drs-fill" id="drs-fill"></div></div>
-            </div>
-
-            <div class="db-panel-body" id="my-events">
-              <div class="loading-spinner"></div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div class="db-col-right">
-
-          <!-- Countdown -->
-          <div class="db-panel anim-slide-up d6">
-            <div class="db-panel-header">
-              <div class="db-panel-title-group">
-                <div class="db-panel-icon pi-purple"><i data-lucide="clock"></i></div>
-                <div>
-                  <div class="db-panel-label">Fest Countdown</div>
-                  <div class="db-panel-sublabel">VAIBHAV 2K26 begins in</div>
-                </div>
-              </div>
-              <div class="dc-live-badge"><span class="pulse-dot"></span>LIVE</div>
-            </div>
-            <div class="db-panel-body">
-              <div class="db-countdown">
-                <div class="dc-label">Time remaining</div>
-                <div class="dc-grid">
-                  <div class="dc-unit"><span class="dc-num" id="cd-days">00</span><span class="dc-lbl">Days</span></div>
-                  <div class="dc-unit"><span class="dc-num" id="cd-hrs">00</span><span class="dc-lbl">Hours</span></div>
-                  <div class="dc-unit"><span class="dc-num" id="cd-min">00</span><span class="dc-lbl">Mins</span></div>
-                  <div class="dc-unit"><span class="dc-num" id="cd-sec">00</span><span class="dc-lbl">Secs</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Nav -->
-          <div class="db-panel anim-slide-up d7">
-            <div class="db-panel-header">
-              <div class="db-panel-title-group">
-                <div class="db-panel-icon pi-orange"><i data-lucide="layout-grid"></i></div>
-                <div>
-                  <div class="db-panel-label">Quick Access</div>
-                  <div class="db-panel-sublabel">Jump anywhere instantly</div>
-                </div>
-              </div>
-            </div>
-            <div class="db-panel-body">
-              <div class="db-qnav-grid">
-                <a href="events.html" class="db-qnav-item">
-                  <div class="qnav-icon qni-c"><i data-lucide="calendar"></i></div>
-                  <div class="qnav-text">
-                    <div class="qnav-label">Events</div>
-                    <div class="qnav-sub">Discover &amp; register</div>
-                  </div>
-                </a>
-                <a href="teams.html" class="db-qnav-item">
-                  <div class="qnav-icon qni-p"><i data-lucide="users"></i></div>
-                  <div class="qnav-text">
-                    <div class="qnav-label">My Teams</div>
-                    <div class="qnav-sub">Manage squads</div>
-                  </div>
-                </a>
-                <a href="leaderboard.html" class="db-qnav-item">
-                  <div class="qnav-icon qni-pk"><i data-lucide="trophy"></i></div>
-                  <div class="qnav-text">
-                    <div class="qnav-label">Leaderboard</div>
-                    <div class="qnav-sub">Top performers</div>
-                  </div>
-                </a>
-                <a href="profile.html" class="db-qnav-item">
-                  <div class="qnav-icon qni-g"><i data-lucide="user-circle"></i></div>
-                  <div class="qnav-text">
-                    <div class="qnav-label">Profile</div>
-                    <div class="qnav-sub">Your account</div>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Announcements -->
-          <div class="db-panel anim-slide-up d8">
-            <div class="db-panel-header">
-              <div class="db-panel-title-group">
-                <div class="db-panel-icon pi-pink"><i data-lucide="bell"></i></div>
-                <div>
-                  <div class="db-panel-label">Announcements</div>
-                  <div class="db-panel-sublabel">From organizers</div>
-                </div>
-              </div>
-              <a href="announcements.html" class="db-panel-viewall">
-                See all <i data-lucide="arrow-right" style="width:12px;height:12px"></i>
-              </a>
-            </div>
-            <div class="db-panel-body" id="recent-announcements">
-              <div class="loading-spinner"></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
+
+    <!-- ══ STATS ══ -->
+    <div class="xstats">
+      <div class="xsc xsc-1 xu u2">
+        <div class="xsc-bg-icon">⚡</div>
+        <div class="xsc-icon"><i data-lucide="zap"></i></div>
+        <div class="xsc-num" id="stat-events">0</div>
+        <div class="xsc-label">Events Joined</div>
+        <div class="xsc-sub"><i data-lucide="activity"></i> Active participant</div>
+      </div>
+      <div class="xsc xsc-2 xu u3">
+        <div class="xsc-bg-icon">👥</div>
+        <div class="xsc-icon"><i data-lucide="users"></i></div>
+        <div class="xsc-num" id="stat-teams">0</div>
+        <div class="xsc-label">Teams</div>
+        <div class="xsc-sub"><i data-lucide="shield"></i> Squad member</div>
+      </div>
+      <div class="xsc xsc-3 xu u4">
+        <div class="xsc-bg-icon">🎟</div>
+        <div class="xsc-icon"><i data-lucide="ticket"></i></div>
+        <div class="xsc-num" id="stat-tickets">0</div>
+        <div class="xsc-label">Tickets</div>
+        <div class="xsc-sub"><i data-lucide="check-circle"></i> Confirmed</div>
+      </div>
+      <div class="xsc xsc-4 xu u5">
+        <div class="xsc-bg-icon">⭐</div>
+        <div class="xsc-icon"><i data-lucide="star"></i></div>
+        <div class="xsc-num" id="stat-points">0</div>
+        <div class="xsc-label">Points</div>
+        <div class="xsc-sub"><i data-lucide="award"></i> On leaderboard</div>
+      </div>
+    </div>
+
+    <!-- ══ MAIN GRID ══ -->
+    <div class="xgrid">
+
+      <!-- LEFT -->
+      <div class="xleft">
+        <div class="xpanel xu u6">
+          <div class="xpanel-head">
+            <div class="xpanel-hgroup">
+              <div class="xpanel-ico xi-c"><i data-lucide="calendar-days"></i></div>
+              <div>
+                <div class="xpanel-ttl">My Registered Events</div>
+                <div class="xpanel-sub">Your upcoming competitions</div>
+              </div>
+            </div>
+            <a href="events.html" class="xpanel-all">Browse all <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+          </div>
+          <div class="xready" id="xready">
+            <div class="xready-row">
+              <div class="xready-lbl">🎯 Fest Readiness Score</div>
+              <div class="xready-pct" id="xready-pct">0%</div>
+            </div>
+            <div class="xready-track"><div class="xready-fill" id="xready-fill"></div></div>
+          </div>
+          <div class="xpanel-body" id="my-events"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="xright">
+
+        <!-- Countdown -->
+        <div class="xpanel xu u6">
+          <div class="xpanel-head">
+            <div class="xpanel-hgroup">
+              <div class="xpanel-ico xi-p"><i data-lucide="clock"></i></div>
+              <div>
+                <div class="xpanel-ttl">Fest Countdown</div>
+                <div class="xpanel-sub">VAIBHAV 2K26 begins in</div>
+              </div>
+            </div>
+            <div class="xcd-live"><span class="xcd-live-dot"></span>LIVE</div>
+          </div>
+          <div class="xpanel-body">
+            <div class="xcd-title">Time remaining until the fest</div>
+            <div class="xcd-grid">
+              <div class="xcd-seg"><span class="xcd-n" id="cd-days">00</span><span class="xcd-l">Days</span></div>
+              <div class="xcd-seg"><span class="xcd-n" id="cd-hrs">00</span><span class="xcd-l">Hours</span></div>
+              <div class="xcd-seg"><span class="xcd-n" id="cd-min">00</span><span class="xcd-l">Mins</span></div>
+              <div class="xcd-seg"><span class="xcd-n" id="cd-sec">00</span><span class="xcd-l">Secs</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Nav -->
+        <div class="xpanel xu u7">
+          <div class="xpanel-head">
+            <div class="xpanel-hgroup">
+              <div class="xpanel-ico xi-o"><i data-lucide="layout-grid"></i></div>
+              <div>
+                <div class="xpanel-ttl">Quick Access</div>
+                <div class="xpanel-sub">Jump anywhere</div>
+              </div>
+            </div>
+          </div>
+          <div class="xpanel-body">
+            <div class="xqnav">
+              <a href="events.html" class="xqnav-card"><div class="xqnav-ico xqi-c"><i data-lucide="calendar"></i></div><div><div class="xqnav-ttl">Events</div><div class="xqnav-sub">Discover &amp; register</div></div></a>
+              <a href="teams.html"  class="xqnav-card"><div class="xqnav-ico xqi-p"><i data-lucide="users"></i></div><div><div class="xqnav-ttl">My Teams</div><div class="xqnav-sub">Manage squads</div></div></a>
+              <a href="leaderboard.html" class="xqnav-card"><div class="xqnav-ico xqi-pk"><i data-lucide="trophy"></i></div><div><div class="xqnav-ttl">Leaderboard</div><div class="xqnav-sub">Top performers</div></div></a>
+              <a href="profile.html" class="xqnav-card"><div class="xqnav-ico xqi-g"><i data-lucide="user-circle"></i></div><div><div class="xqnav-ttl">Profile</div><div class="xqnav-sub">Your account</div></div></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Announcements -->
+        <div class="xpanel xu u8">
+          <div class="xpanel-head">
+            <div class="xpanel-hgroup">
+              <div class="xpanel-ico xi-pk"><i data-lucide="bell"></i></div>
+              <div>
+                <div class="xpanel-ttl">Announcements</div>
+                <div class="xpanel-sub">Latest from organizers</div>
+              </div>
+            </div>
+            <a href="announcements.html" class="xpanel-all">See all <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+          </div>
+          <div class="xpanel-body" id="recent-announcements"><div class="loading-spinner"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
   </div>
 
   <script>
-    /* ── Helpers ── */
-    function getGreeting() {
+    const getGreeting = () => {
       const h = new Date().getHours();
-      if (h < 5)  return '🌙 Good night';
-      if (h < 12) return '🌅 Good morning';
-      if (h < 17) return '☀️ Good afternoon';
-      if (h < 21) return '🌆 Good evening';
+      if(h<5)  return '🌙 Good night';
+      if(h<12) return '🌅 Good morning';
+      if(h<17) return '☀️ Good afternoon';
+      if(h<21) return '🌆 Good evening';
       return '🌙 Good night';
-    }
-
-    const GRADS = [
-      'linear-gradient(135deg,#00f0ff,#0066ff)',
-      'linear-gradient(135deg,#bd00ff,#7c3aed)',
-      'linear-gradient(135deg,#ff007f,#be185d)',
-      'linear-gradient(135deg,#00ff9d,#059669)',
-      'linear-gradient(135deg,#ffaa00,#d97706)',
-    ];
-    const avatarBg = n => GRADS[(n||'A').charCodeAt(0) % GRADS.length];
-    const initials = n => (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-
-    function countUp(el, end, dur=1300) {
-      if (!el || isNaN(end)) return;
-      let t0 = null;
-      const step = ts => {
-        if (!t0) t0 = ts;
-        const p = Math.min((ts-t0)/dur, 1);
-        const ease = 1-Math.pow(1-p,4);
-        const val = Math.floor(ease*end);
-        el.textContent = val;
-        const ghost = el.closest('.db-stat')?.querySelector('.db-stat-ghost');
-        if (ghost) ghost.textContent = val;
-        if (p<1) requestAnimationFrame(step);
+    };
+    const GRADS=['linear-gradient(135deg,#00f0ff,#0066ff)','linear-gradient(135deg,#bd00ff,#7c3aed)','linear-gradient(135deg,#ff007f,#be185d)','linear-gradient(135deg,#00ff9d,#059669)','linear-gradient(135deg,#ffaa00,#d97706)'];
+    const avBg = n => GRADS[(n||'A').charCodeAt(0)%GRADS.length];
+    const ini  = n => (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    function countUp(el,end,dur=1300){
+      if(!el||isNaN(end))return;
+      let t=null;
+      const step=ts=>{
+        if(!t)t=ts;
+        const p=Math.min((ts-t)/dur,1);
+        el.textContent=Math.floor((1-Math.pow(1-p,4))*end);
+        if(p<1) requestAnimationFrame(step);
       };
       requestAnimationFrame(step);
     }
+    const CAT_CLS  ={technical:'eth-t',cultural:'eth-c',sports:'eth-s',workshop:'eth-w',gaming:'eth-g'};
+    const CAT_ICON ={technical:'💻',cultural:'🎭',sports:'⚽',workshop:'🔧',gaming:'🎮'};
+    const fmtD=d=>d?new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'TBD';
+    const fmtDT=d=>d?new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'TBD';
 
-    const catThumb = {technical:'emi-t',cultural:'emi-c',sports:'emi-s',workshop:'emi-w',gaming:'emi-g'};
-    const catEmoji  = {technical:'💻',cultural:'🎭',sports:'⚽',workshop:'🔧',gaming:'🎮'};
-    const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'TBD';
-    const fmtDT   = d => d ? new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'TBD';
-
-    /* ── Countdown ── */
-    function startCountdown(target) {
-      const pad = n => String(n).padStart(2,'0');
-      function tick() {
-        const diff = new Date(target).getTime() - Date.now();
-        if (diff <= 0) { ['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='00'; }); return; }
-        document.getElementById('cd-days').textContent = pad(Math.floor(diff/86400000));
-        document.getElementById('cd-hrs').textContent  = pad(Math.floor(diff%86400000/3600000));
-        document.getElementById('cd-min').textContent  = pad(Math.floor(diff%3600000/60000));
-        document.getElementById('cd-sec').textContent  = pad(Math.floor(diff%60000/1000));
-      }
+    function startCD(target){
+      const pad=n=>String(n).padStart(2,'0');
+      const tick=()=>{
+        const diff=new Date(target).getTime()-Date.now();
+        if(diff<=0){['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='00'});return;}
+        document.getElementById('cd-days').textContent=pad(Math.floor(diff/86400000));
+        document.getElementById('cd-hrs').textContent=pad(Math.floor(diff%86400000/3600000));
+        document.getElementById('cd-min').textContent=pad(Math.floor(diff%3600000/60000));
+        document.getElementById('cd-sec').textContent=pad(Math.floor(diff%60000/1000));
+      };
       tick(); setInterval(tick,1000);
     }
 
-    /* ── Main ── */
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', async ()=>{
       const user = await requireAuth('participant');
-      if (!user) return;
+      if(!user) return;
 
       renderNavbar('dashboard');
       renderSidebar('participant','overview');
-      if (typeof initParticles==='function') initParticles('particles-canvas',12);
-      if (typeof lucide !== 'undefined') lucide.createIcons();
+      if(typeof initParticles==='function') initParticles('particles-canvas',12);
+      if(typeof lucide!=='undefined') lucide.createIcons();
 
-      /* Banner */
+      // Banner
       document.getElementById('time-greeting').textContent = getGreeting();
-      const first = (user.full_name||'Participant').split(' ')[0];
+      const first=(user.full_name||'Participant').split(' ')[0];
       document.getElementById('user-first-name').textContent = first;
-      if (user.college) document.getElementById('user-college').textContent =
-        user.college + (user.department ? ' · '+user.department : '');
-      const roleChip = document.getElementById('user-role-chip');
-      if (roleChip) roleChip.textContent = (user.role||'participant').charAt(0).toUpperCase()+(user.role||'participant').slice(1);
+      if(user.college) document.getElementById('user-college').textContent = user.college+(user.department?' · '+user.department:'');
+      const roleEl=document.getElementById('user-role-label');
+      if(roleEl) roleEl.textContent=(user.role||'participant').charAt(0).toUpperCase()+(user.role||'participant').slice(1);
+      const av=document.getElementById('dash-avatar');
+      if(user.avatar_url){ av.innerHTML=`<img src="${user.avatar_url}" alt="Avatar">`; av.style.background='transparent'; }
+      else { av.textContent=ini(user.full_name); av.style.background=avBg(user.full_name); }
 
-      const av = document.getElementById('dash-avatar');
-      if (user.avatar_url) {
-        av.innerHTML = `<img src="${user.avatar_url}" alt="Avatar">`;
-        av.style.background = 'transparent';
-      } else {
-        av.textContent = initials(user.full_name);
-        av.style.background = avatarBg(user.full_name);
-      }
+      // Countdown  ← change this date to your real fest date!
+      startCD('2026-09-15T09:00:00');
 
-      /* Countdown — change this date to your actual fest date */
-      startCountdown('2026-09-15T09:00:00');
-
-      /* Stats */
-      let evtCount=0, teamCount=0;
-      try {
-        const [r,t] = await Promise.all([
+      // Stats
+      let evtC=0,teamC=0;
+      try{
+        const[r,t]=await Promise.all([
           supabase.from('registrations').select('id',{count:'exact',head:true}).eq('user_id',user.id),
           supabase.from('team_members').select('id',{count:'exact',head:true}).eq('user_id',user.id),
         ]);
-        evtCount  = r.count||0;
-        teamCount = t.count||0;
-      } catch(e) {}
-
-      const pts = user.points||0;
+        evtC=r.count||0; teamC=t.count||0;
+      }catch(e){}
+      const pts=user.points||0;
       setTimeout(()=>{
-        countUp(document.getElementById('stat-events'),  evtCount, 1200);
-        countUp(document.getElementById('stat-teams'),   teamCount,1200);
-        countUp(document.getElementById('stat-tickets'), evtCount, 1200);
-        countUp(document.getElementById('stat-points'),  pts,      1400);
-      }, 300);
+        countUp(document.getElementById('stat-events'),evtC,1200);
+        countUp(document.getElementById('stat-teams'),teamC,1200);
+        countUp(document.getElementById('stat-tickets'),evtC,1200);
+        countUp(document.getElementById('stat-points'),pts,1400);
+      },300);
 
-      /* Readiness */
-      if (evtCount > 0) {
-        const pct = Math.min(100, Math.round((evtCount/5)*100));
-        const r = document.getElementById('db-readiness');
-        if (r) r.style.display = 'block';
-        document.getElementById('drs-val').textContent = pct+'%';
-        setTimeout(()=>{ const f=document.getElementById('drs-fill'); if(f) f.style.width=pct+'%'; }, 700);
+      // Readiness
+      if(evtC>0){
+        const pct=Math.min(100,Math.round((evtC/5)*100));
+        const r=document.getElementById('xready'); if(r) r.style.display='block';
+        document.getElementById('xready-pct').textContent=pct+'%';
+        setTimeout(()=>{ const f=document.getElementById('xready-fill'); if(f) f.style.width=pct+'%'; },700);
       }
 
-      /* Events */
-      const evDiv = document.getElementById('my-events');
-      try {
-        const { data: regs } = await supabase
-          .from('registrations').select('*,events(*)').eq('user_id',user.id).limit(6);
-        if (!regs||!regs.length) {
-          evDiv.innerHTML = `
-            <div class="db-empty">
-              <span class="db-empty-emoji">📅</span>
-              <h4>No events registered yet</h4>
-              <p>Explore upcoming events and secure your spot in the competition!</p>
-              <a href="events.html" class="db-empty-cta"><i data-lucide="search"></i> Browse Events</a>
-            </div>`;
+      // Events
+      const evDiv=document.getElementById('my-events');
+      try{
+        const{data:regs}=await supabase.from('registrations').select('*,events(*)').eq('user_id',user.id).limit(6);
+        if(!regs||!regs.length){
+          evDiv.innerHTML=`<div class="xempty"><span class="xempty-icon">📅</span><h4>No events registered yet</h4><p>Explore upcoming events and secure your spot!</p><a href="events.html" class="xempty-btn"><i data-lucide="search"></i>Browse Events</a></div>`;
         } else {
-          const statusClass = s => s==='confirmed'?'evb-confirmed':s==='pending'?'evb-pending':'evb-attended';
-          evDiv.innerHTML = `<div class="db-ev-list">${regs.map(r=>{
+          const sc=s=>s==='confirmed'?'xs-confirmed':s==='pending'?'xs-pending':'xs-attended';
+          evDiv.innerHTML=`<div class="xev-list">${regs.map(r=>{
             const ev=r.events||{}; const cat=ev.category||'technical';
-            return `<a href="event-detail.html?id=${r.event_id}" class="db-ev-card">
-              <div class="db-ev-emoji ${catThumb[cat]||'emi-t'}">${catEmoji[cat]||'🎯'}</div>
-              <div class="db-ev-info">
-                <div class="db-ev-name">${ev.title||'Event'}</div>
-                <div class="db-ev-meta-row">
-                  <span>📅 ${fmtDate(ev.event_date)}</span>
-                  <span>📍 ${ev.venue||'TBD'}</span>
-                </div>
+            return `<a href="event-detail.html?id=${r.event_id}" class="xev-item">
+              <div class="xev-thumb ${CAT_CLS[cat]||'eth-t'}">${CAT_ICON[cat]||'🎯'}</div>
+              <div class="xev-info">
+                <div class="xev-name">${ev.title||'Event'}</div>
+                <div class="xev-meta"><span>📅 ${fmtD(ev.event_date)}</span><span>📍 ${ev.venue||'TBD'}</span></div>
               </div>
-              <span class="db-ev-badge ${statusClass(r.status||'confirmed')}">${r.status||'confirmed'}</span>
+              <span class="xev-status ${sc(r.status||'confirmed')}">${r.status||'confirmed'}</span>
             </a>`;
           }).join('')}</div>`;
         }
-      } catch(e) {
-        evDiv.innerHTML = `<div class="db-empty"><p>Could not load events.</p></div>`;
-      }
+      }catch(e){ evDiv.innerHTML=`<div class="xempty"><p>Could not load events.</p></div>`; }
 
-      /* Announcements */
-      const annDiv = document.getElementById('recent-announcements');
-      try {
-        const { data: anns } = await supabase
-          .from('announcements').select('*').order('created_at',{ascending:false}).limit(5);
-        if (!anns||!anns.length) {
-          annDiv.innerHTML = `
-            <div class="db-empty">
-              <span class="db-empty-emoji">📢</span>
-              <h4>No announcements yet</h4>
-              <p>Check back soon for updates.</p>
-            </div>`;
+      // Announcements
+      const annDiv=document.getElementById('recent-announcements');
+      try{
+        const{data:anns}=await supabase.from('announcements').select('*').order('created_at',{ascending:false}).limit(5);
+        if(!anns||!anns.length){
+          annDiv.innerHTML=`<div class="xempty"><span class="xempty-icon">📢</span><h4>No announcements yet</h4><p>Check back soon!</p></div>`;
         } else {
-          annDiv.innerHTML = `<div class="db-ann-list">${anns.map(a=>{
+          annDiv.innerHTML=`<div class="xann-list">${anns.map(a=>{
             const p=a.priority||'normal';
-            const badge = p==='urgent'
-              ? `<span class="ann-badge urgent">🔴 Urgent</span>`
-              : p==='important'
-                ? `<span class="ann-badge important">🟡 Important</span>`
-                : '';
-            return `<div class="db-ann-item ${p}">
-              <div class="ann-row"><div class="ann-title-text">${a.title||'Announcement'}</div>${badge}</div>
-              <div class="ann-content">${a.content||''}</div>
-              <div class="ann-time">${fmtDT(a.created_at)}</div>
-            </div>`;
+            const b=p==='urgent'?`<span class="xann-badge xab-urgent">🔴 Urgent</span>`:p==='important'?`<span class="xann-badge xab-important">🟡 Important</span>`:'';
+            return `<div class="xann-item ${p}"><div class="xann-row"><div class="xann-ttl">${a.title||'Announcement'}</div>${b}</div><div class="xann-body">${a.content||''}</div><div class="xann-time">${fmtDT(a.created_at)}</div></div>`;
           }).join('')}</div>`;
         }
-      } catch(e) {
-        annDiv.innerHTML = `<div class="db-empty"><p>Could not load announcements.</p></div>`;
-      }
+      }catch(e){ annDiv.innerHTML=`<div class="xempty"><p>Could not load.</p></div>`; }
 
-      if (typeof lucide !== 'undefined') lucide.createIcons();
+      if(typeof lucide!=='undefined') lucide.createIcons();
     });
   </script>
 </body>
