@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 @echo off
 title VAIBHAV 2K26 - Local Server
 color 0B
@@ -18,6 +17,7 @@ echo  ------------------------------------------------
 echo   Open in browser:
 echo.
 echo   Homepage:      http://localhost:8000
+echo   Dashboard:     http://localhost:8000/dashboard.html
 echo   Events:        http://localhost:8000/events.html
 echo   Add Events:    http://localhost:8000/add-events.html
 echo   Admin Events:  http://localhost:8000/admin-events.html
@@ -27,39 +27,6 @@ echo.
 echo  Press Ctrl+C to stop the server.
 echo.
 
-start http://localhost:8000
+start http://localhost:8000/dashboard.html
 
 python -m http.server 8000
-=======
-@echo off
-title VAIBHAV 2K26 - Local Server
-color 0B
-echo.
-echo  ================================================
-echo    VAIBHAV 2K26 - College Fest Management Portal
-echo  ================================================
-echo.
-echo  Starting local server...
-echo.
-
-cd /d "%~dp0"
-
-echo  Server root: %cd%
-echo.
-echo  ------------------------------------------------
-echo   Open in browser:
-echo.
-echo   Homepage:      http://localhost:8000
-echo   Events:        http://localhost:8000/events.html
-echo   Add Events:    http://localhost:8000/add-events.html
-echo   Admin Events:  http://localhost:8000/admin-events.html
-echo   Login:         http://localhost:8000/login.html
-echo  ------------------------------------------------
-echo.
-echo  Press Ctrl+C to stop the server.
-echo.
-
-start http://localhost:8000
-
-python -m http.server 8000
->>>>>>> 631e9ae83759db57d7b21f5ae1ee12f9c1f4c636

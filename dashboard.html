@@ -15,674 +15,522 @@
   <script src="js/particles.js" defer></script>
 
   <style>
-    /* =============================================
-       VAIBHAV 2K26 — MISSION CONTROL DASHBOARD
-       ============================================= */
+    /* ==============================================
+       VAIBHAV 2K26 — DASHBOARD REDESIGN
+       ============================================== */
 
-    :root {
-      --cyan: #00d4ff;
-      --purple: #a855f7;
-      --pink: #ec4899;
-      --green: #10b981;
-      --orange: #f59e0b;
-      --red: #ef4444;
-    }
+    .db-page { padding-bottom: 60px; }
 
-    /* ── Layout ── */
-    .db-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      padding-bottom: 48px;
-    }
-
-    /* =============================================
-       HERO BANNER — Glassmorphism mission control
-       ============================================= */
+    /* ── HERO BANNER ── */
     .db-hero {
       position: relative;
-      border-radius: 24px;
-      padding: 0;
+      border-radius: 28px;
+      margin-bottom: 28px;
       overflow: hidden;
-      border: 1px solid rgba(0,212,255,0.18);
-      background: rgba(10,10,25,0.7);
-      backdrop-filter: blur(24px);
-      animation: dbFadeUp 0.5s ease forwards;
+      background: linear-gradient(135deg, #0d0018 0%, #000d1a 50%, #0d0018 100%);
+      border: 1px solid rgba(189,0,255,0.25);
+      box-shadow: 0 0 60px rgba(189,0,255,0.12), 0 0 120px rgba(0,240,255,0.06);
     }
-
-    /* Top gradient stripe */
+    /* Animated top border */
     .db-hero::before {
       content: '';
       position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, #00d4ff, #a855f7, #ec4899, #00d4ff);
-      background-size: 200% 100%;
-      animation: gradientFlow 4s linear infinite;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+      background-size: 300% 100%;
+      animation: borderFlow 3s linear infinite;
+    }
+    @keyframes borderFlow {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 300% 0%; }
     }
 
-    /* Ambient glow */
-    .db-hero-glow {
-      position: absolute; inset: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 55% 70% at 85% 50%, rgba(168,85,247,0.14) 0%, transparent 65%),
-        radial-gradient(ellipse 40% 60% at 15% 40%, rgba(0,212,255,0.09) 0%, transparent 60%),
-        radial-gradient(ellipse 30% 40% at 50% 100%, rgba(236,72,153,0.07) 0%, transparent 70%);
+    /* Big decorative glows inside the hero */
+    .db-hero-glow1 {
+      position: absolute; width: 400px; height: 400px;
+      border-radius: 50%; pointer-events: none;
+      right: -80px; top: -150px;
+      background: radial-gradient(circle, rgba(189,0,255,0.2) 0%, transparent 70%);
+      filter: blur(40px);
+      animation: breathe 5s ease-in-out infinite;
     }
-
-    /* Floating orbs */
-    .db-hero-orb {
-      position: absolute; border-radius: 50%; pointer-events: none;
-      filter: blur(40px); opacity: 0.25;
+    .db-hero-glow2 {
+      position: absolute; width: 300px; height: 300px;
+      border-radius: 50%; pointer-events: none;
+      left: 30%; bottom: -120px;
+      background: radial-gradient(circle, rgba(0,240,255,0.15) 0%, transparent 70%);
+      filter: blur(50px);
+      animation: breathe 7s ease-in-out infinite reverse;
     }
-    .db-hero-orb.o1 {
-      width: 200px; height: 200px; right: 5%; top: -30%;
-      background: radial-gradient(circle, #a855f7, transparent);
-      animation: orbFloat 8s ease-in-out infinite;
-    }
-    .db-hero-orb.o2 {
-      width: 140px; height: 140px; right: 20%; bottom: -20%;
-      background: radial-gradient(circle, #00d4ff, transparent);
-      animation: orbFloat 6s ease-in-out infinite reverse;
-    }
-
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50%       { transform: translate(10px, -15px) scale(1.05); }
-    }
-
-    @keyframes gradientFlow {
-      0%   { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
     }
 
     .db-hero-inner {
       position: relative; z-index: 2;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 32px;
-      padding: 32px 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 32px; padding: 36px 40px; flex-wrap: wrap;
     }
 
     /* Avatar */
-    .db-user-block { display: flex; align-items: center; gap: 22px; }
-
-    .db-avatar-ring {
-      position: relative; flex-shrink: 0;
-      width: 76px; height: 76px;
-    }
-    .db-avatar-ring svg.ring-svg {
-      position: absolute; inset: -6px;
-      width: calc(100% + 12px); height: calc(100% + 12px);
-      animation: spin 8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
+    .db-user-block { display: flex; align-items: center; gap: 24px; }
+    .db-avatar-wrap { position: relative; flex-shrink: 0; }
     .db-avatar {
-      width: 76px; height: 76px; border-radius: 50%;
+      width: 80px; height: 80px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 800;
+      font-family: var(--font-display); font-size: 1.7rem; font-weight: 800;
       color: #fff; overflow: hidden;
-      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      position: relative; z-index: 1;
     }
     .db-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    /* Spinning dashed ring */
+    .db-avatar-ring-svg {
+      position: absolute; inset: -8px;
+      width: calc(100% + 16px); height: calc(100% + 16px);
+      animation: rotateSlow 10s linear infinite;
+    }
+    @keyframes rotateSlow { to { transform: rotate(360deg); } }
+    /* Online badge */
+    .db-online-dot {
+      position: absolute; bottom: 4px; right: 4px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent-green);
+      border: 2px solid #000d1a;
+      box-shadow: 0 0 8px var(--accent-green);
+      z-index: 2;
+    }
 
-    .db-greeting-area {}
-    .db-greeting-tag {
+    .db-user-info {}
+    .db-greeting-chip {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--cyan);
-      margin-bottom: 6px;
+      background: rgba(0,240,255,0.08);
+      border: 1px solid rgba(0,240,255,0.2);
+      border-radius: 50px; padding: 4px 12px;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent-cyan); margin-bottom: 10px;
     }
-    .db-greeting-tag .live-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
-      animation: pulse 1.8s ease-in-out infinite;
+    .db-greeting-chip .blink-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent-cyan);
+      animation: dotBlink 1.5s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,212,255,0.6); }
-      50%       { opacity: 0.6; box-shadow: 0 0 0 5px rgba(0,212,255,0); }
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
     }
-
-    .db-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(1.5rem, 3vw, 2rem);
-      font-weight: 800; line-height: 1.1; margin-bottom: 6px;
+    .db-user-name {
+      font-family: var(--font-heading);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800; line-height: 1.1;
+      margin-bottom: 8px;
     }
-    .db-name .highlight {
-      background: linear-gradient(135deg, #00d4ff, #a855f7);
+    .db-user-name .name-accent {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .db-sub {
-      font-size: 0.875rem; color: rgba(255,255,255,0.45);
-      display: flex; align-items: center; gap: 8px;
+    .db-user-meta {
+      font-size: 0.82rem; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     }
-    .db-sub .sep { opacity: 0.3; }
+    .db-user-meta .meta-dot { color: var(--accent-purple); }
 
-    /* Quick Action Pills */
-    .db-quick-actions {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+    /* Hero Action Buttons */
+    .db-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .db-btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 26px; border-radius: 50px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff; font-size: 0.85rem; font-weight: 700;
+      font-family: var(--font-heading); text-decoration: none;
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,240,255,0.3);
+      transition: all 0.3s;
     }
-    .db-pill-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-
-    .db-pill {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border-radius: 50px;
-      font-size: 0.8rem; font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.04);
-      color: rgba(255,255,255,0.7);
-      text-decoration: none; cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      white-space: nowrap;
-    }
-    .db-pill i { width: 14px; height: 14px; }
-    .db-pill:hover {
-      background: rgba(0,212,255,0.1);
-      border-color: rgba(0,212,255,0.4);
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,212,255,0.2);
-    }
-    .db-pill.accent {
-      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(168,85,247,0.2));
-      border-color: rgba(0,212,255,0.3);
+    .db-btn-primary:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 10px 30px rgba(0,240,255,0.45);
       color: #fff;
     }
-    .db-pill.accent:hover {
-      background: linear-gradient(135deg, rgba(0,212,255,0.35), rgba(168,85,247,0.35));
-      box-shadow: 0 8px 24px rgba(0,212,255,0.3);
+    .db-btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 50px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;
+      font-family: var(--font-heading); text-decoration: none;
+      cursor: pointer; transition: all 0.3s;
     }
+    .db-btn-ghost:hover {
+      background: rgba(189,0,255,0.1);
+      border-color: rgba(189,0,255,0.4);
+      color: #fff; transform: translateY(-2px);
+    }
+    .db-btn-primary i, .db-btn-ghost i { width: 16px; height: 16px; }
 
-    /* =============================================
-       STATS ROW — Animated radial progress cards
-       ============================================= */
-    .db-stats-row {
+    /* ── STATS STRIP ── */
+    .db-stats-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
+      margin-bottom: 28px;
     }
 
-    .db-stat-card {
+    .db-stat {
       position: relative; overflow: hidden;
+      padding: 24px 22px;
       border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(13,13,30,0.65);
-      backdrop-filter: blur(16px);
-      padding: 22px 20px;
-      display: flex; align-items: center; gap: 16px;
-      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      background: linear-gradient(135deg, rgba(15,5,30,0.9), rgba(5,15,30,0.9));
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
       cursor: default;
-      opacity: 0;
-      animation: dbFadeUp 0.5s ease forwards;
     }
-    .db-stat-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(0,212,255,0.25);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.1) inset;
+    .db-stat:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
-
-    /* Color accent bottom glow */
-    .db-stat-card::after {
+    /* Top colored bar */
+    .db-stat::before {
       content: '';
-      position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
-      border-radius: 1px;
-      transition: opacity 0.4s;
-      opacity: 0;
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 20px 20px 0 0;
+      transition: height 0.3s;
     }
-    .db-stat-card:hover::after { opacity: 1; }
-    .dsc-cyan::after  { background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
-    .dsc-purple::after { background: var(--purple); box-shadow: 0 0 12px var(--purple); }
-    .dsc-green::after { background: var(--green); box-shadow: 0 0 12px var(--green); }
-    .dsc-orange::after { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+    .db-stat:hover::before { height: 4px; }
+    .ds-c::before { background: linear-gradient(90deg, var(--accent-cyan), #0066ff); }
+    .ds-p::before { background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink)); }
+    .ds-g::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
+    .ds-o::before { background: linear-gradient(90deg, var(--accent-orange), var(--accent-pink)); }
 
-    /* Subtle shimmer overlay on hover */
-    .db-stat-card::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.4s;
+    /* Large ghost number watermark */
+    .db-stat-ghost {
+      position: absolute; right: 12px; bottom: -8px;
+      font-family: var(--font-display); font-size: 4.5rem; font-weight: 900;
+      opacity: 0.04; line-height: 1; pointer-events: none;
+      transition: opacity 0.3s;
     }
-    .db-stat-card:hover::before { opacity: 1; }
+    .db-stat:hover .db-stat-ghost { opacity: 0.07; }
 
-    /* Radial ring SVG */
-    .dsc-ring-wrap {
-      position: relative; flex-shrink: 0;
-      width: 56px; height: 56px;
-    }
-    .dsc-ring-svg {
-      width: 56px; height: 56px;
-      transform: rotate(-90deg);
-    }
-    .dsc-ring-bg {
-      fill: none;
-      stroke: rgba(255,255,255,0.06);
-      stroke-width: 4;
-    }
-    .dsc-ring-fill {
-      fill: none;
-      stroke-width: 4;
-      stroke-linecap: round;
-      stroke-dasharray: 138; /* 2π * 22 ≈ 138 */
-      stroke-dashoffset: 138;
-      transition: stroke-dashoffset 1.6s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .dsc-ring-icon {
-      position: absolute; inset: 0;
+    .ds-icon-wrap {
+      width: 44px; height: 44px; border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
     }
-    .dsc-ring-icon i { width: 22px; height: 22px; }
-    .dsc-cyan  .dsc-ring-fill { stroke: var(--cyan); }
-    .dsc-purple .dsc-ring-fill { stroke: var(--purple); }
-    .dsc-green .dsc-ring-fill { stroke: var(--green); }
-    .dsc-orange .dsc-ring-fill { stroke: var(--orange); }
-    .dsc-cyan  .dsc-ring-icon { color: var(--cyan); }
-    .dsc-purple .dsc-ring-icon { color: var(--purple); }
-    .dsc-green .dsc-ring-icon { color: var(--green); }
-    .dsc-orange .dsc-ring-icon { color: var(--orange); }
+    .ds-icon-wrap i { width: 22px; height: 22px; }
+    .ds-c .ds-icon-wrap { background: rgba(0,240,255,0.12); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.1); }
+    .ds-p .ds-icon-wrap { background: rgba(189,0,255,0.12); color: var(--accent-purple); box-shadow: 0 0 20px rgba(189,0,255,0.1); }
+    .ds-g .ds-icon-wrap { background: rgba(0,255,157,0.12); color: var(--accent-green); box-shadow: 0 0 20px rgba(0,255,157,0.1); }
+    .ds-o .ds-icon-wrap { background: rgba(255,170,0,0.12); color: var(--accent-orange); box-shadow: 0 0 20px rgba(255,170,0,0.1); }
 
-    .dsc-body { flex: 1; min-width: 0; }
-    .dsc-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem; font-weight: 800;
-      line-height: 1; margin-bottom: 4px;
-      color: #fff;
-      letter-spacing: -1px;
+    .ds-value {
+      font-family: var(--font-display);
+      font-size: 2.4rem; font-weight: 900;
+      line-height: 1; margin-bottom: 6px;
     }
-    .dsc-label {
-      font-size: 0.68rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.5px;
-      color: rgba(255,255,255,0.35);
-    }
-    .dsc-delta {
-      font-size: 0.72rem; color: var(--green);
-      font-weight: 600; margin-top: 4px;
-      display: flex; align-items: center; gap: 3px;
-    }
+    .ds-c .ds-value { color: var(--accent-cyan); text-shadow: 0 0 30px rgba(0,240,255,0.4); }
+    .ds-p .ds-value { color: var(--accent-purple); text-shadow: 0 0 30px rgba(189,0,255,0.4); }
+    .ds-g .ds-value { color: var(--accent-green); text-shadow: 0 0 30px rgba(0,255,157,0.4); }
+    .ds-o .ds-value { color: var(--accent-orange); text-shadow: 0 0 30px rgba(255,170,0,0.4); }
 
-    /* =============================================
-       MAIN GRID
-       ============================================= */
-    .db-main-grid {
+    .ds-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--text-muted);
+    }
+    .ds-sub {
+      font-size: 0.72rem; color: var(--accent-green);
+      margin-top: 6px; font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .ds-sub i { width: 11px; height: 11px; }
+
+    /* ── CONTENT GRID ── */
+    .db-content-grid {
       display: grid;
-      grid-template-columns: 1.7fr 1fr;
+      grid-template-columns: 1.65fr 1fr;
       gap: 20px;
       align-items: start;
     }
+    .db-col-left { display: flex; flex-direction: column; gap: 20px; }
+    .db-col-right { display: flex; flex-direction: column; gap: 20px; }
 
-    .db-left-col { display: flex; flex-direction: column; gap: 20px; }
-    .db-right-col { display: flex; flex-direction: column; gap: 20px; }
-
-    /* ── Generic Panel ── */
+    /* ── PANEL ── */
     .db-panel {
       border-radius: 20px;
+      background: linear-gradient(135deg, rgba(12,8,25,0.95), rgba(5,12,25,0.95));
       border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(13,13,30,0.65);
-      backdrop-filter: blur(16px);
       overflow: hidden;
-      opacity: 0;
-      animation: dbFadeUp 0.5s ease forwards;
     }
-
-    .db-panel-head {
-      padding: 18px 22px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+    .db-panel-header {
+      padding: 20px 24px 0;
       display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0;
     }
-    .db-panel-head-left {
-      display: flex; align-items: center; gap: 12px;
-    }
-    .db-ph-icon {
-      width: 34px; height: 34px; border-radius: 10px;
+    .db-panel-title-group { display: flex; align-items: center; gap: 12px; }
+    .db-panel-icon {
+      width: 36px; height: 36px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
     }
-    .db-ph-icon i { width: 16px; height: 16px; }
-    .phi-cyan   { background: rgba(0,212,255,0.12);  color: var(--cyan); }
-    .phi-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
-    .phi-pink   { background: rgba(236,72,153,0.12); color: var(--pink); }
-    .phi-green  { background: rgba(16,185,129,0.12); color: var(--green); }
-    .phi-orange { background: rgba(245,158,11,0.12); color: var(--orange); }
-
-    .db-panel-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.95rem; font-weight: 700;
-      color: rgba(255,255,255,0.9);
-    }
-    .db-panel-sub {
-      font-size: 0.72rem; color: rgba(255,255,255,0.35);
-      margin-top: 1px;
-    }
-
-    .db-panel-link {
-      font-size: 0.75rem; color: rgba(255,255,255,0.35);
+    .db-panel-icon i { width: 17px; height: 17px; }
+    .pi-cyan   { background: rgba(0,240,255,0.12);  color: var(--accent-cyan); }
+    .pi-purple { background: rgba(189,0,255,0.12);  color: var(--accent-purple); }
+    .pi-pink   { background: rgba(255,0,127,0.12);  color: var(--accent-pink); }
+    .pi-green  { background: rgba(0,255,157,0.12);  color: var(--accent-green); }
+    .pi-orange { background: rgba(255,170,0,0.12);  color: var(--accent-orange); }
+    .db-panel-label { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; }
+    .db-panel-sublabel { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+    .db-panel-viewall {
+      font-size: 0.75rem; color: var(--text-muted);
       text-decoration: none; transition: color 0.3s;
       display: flex; align-items: center; gap: 4px;
     }
-    .db-panel-link:hover { color: var(--cyan); }
+    .db-panel-viewall:hover { color: var(--accent-cyan); }
+    .db-panel-body { padding: 20px 24px; }
 
-    .db-panel-body { padding: 16px 20px; }
-
-    /* =============================================
-       EVENTS LIST
-       ============================================= */
-    .db-ev-list { display: flex; flex-direction: column; gap: 10px; }
-
-    .db-ev-item {
-      display: flex; align-items: center; gap: 14px;
+    /* ── READINESS BAR ── */
+    .db-readiness-strip {
+      display: none;
+      margin: 16px 24px 0;
       padding: 14px 16px;
       border-radius: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      text-decoration: none; color: inherit;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      position: relative; overflow: hidden;
+      background: rgba(0,240,255,0.04);
+      border: 1px solid rgba(0,240,255,0.1);
     }
-    .db-ev-item::before {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-      background: linear-gradient(to bottom, var(--cyan), var(--purple));
-      transform: scaleY(0); transform-origin: top;
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      border-radius: 0 2px 2px 0;
-    }
-    .db-ev-item:hover {
-      background: rgba(0,212,255,0.06);
-      border-color: rgba(0,212,255,0.2);
-      transform: translateX(4px);
-    }
-    .db-ev-item:hover::before { transform: scaleY(1); }
-
-    .db-ev-thumb {
-      width: 46px; height: 46px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; flex-shrink: 0;
-    }
-    .ict { background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(168,85,247,0.2)); }
-    .icc { background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(168,85,247,0.2)); }
-    .ics { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(0,212,255,0.15)); }
-    .icw { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(16,185,129,0.15)); }
-    .icg { background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15)); }
-
-    .db-ev-info { flex: 1; min-width: 0; }
-    .db-ev-name {
-      font-weight: 700; font-size: 0.9rem; margin-bottom: 4px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      color: rgba(255,255,255,0.9);
-    }
-    .db-ev-meta {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      font-size: 0.72rem; color: rgba(255,255,255,0.4);
-    }
-    .db-ev-meta span { display: flex; align-items: center; gap: 3px; }
-
-    .db-ev-status {
-      display: inline-flex; align-items: center;
-      padding: 3px 10px; border-radius: 50px;
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
-      text-transform: uppercase; flex-shrink: 0;
-    }
-    .es-confirmed { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
-    .es-pending   { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.25); }
-    .es-attended  { background: rgba(0,212,255,0.15);  color: var(--cyan);   border: 1px solid rgba(0,212,255,0.25); }
-
-    /* =============================================
-       PROGRESS / READINESS METER
-       ============================================= */
-    .db-readiness {
-      padding: 18px 20px;
-      background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(168,85,247,0.06));
-      border-radius: 14px;
-      border: 1px solid rgba(0,212,255,0.1);
-      margin-bottom: 16px;
-      display: none;
-    }
-    .dr-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px;
-    }
-    .dr-label {
-      font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8);
+    .drs-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .drs-title {
+      font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
       display: flex; align-items: center; gap: 8px;
     }
-    .dr-label .dr-icon { font-size: 1rem; }
-    .dr-pct {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem; color: var(--cyan); font-weight: 700;
+    .drs-val { font-family: var(--font-display); font-size: 0.85rem; color: var(--accent-cyan); font-weight: 800; }
+    .drs-track { height: 7px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: visible; position: relative; }
+    .drs-fill {
+      height: 100%; border-radius: 10px; width: 0;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+      transition: width 1.5s cubic-bezier(0.22,1,0.36,1);
+      position: relative; box-shadow: 0 0 12px rgba(0,240,255,0.4);
     }
-    .dr-bar-bg {
-      height: 6px; border-radius: 3px;
-      background: rgba(255,255,255,0.06); overflow: hidden;
-    }
-    .dr-bar-fill {
-      height: 100%; border-radius: 3px;
-      background: linear-gradient(90deg, var(--cyan), var(--purple));
-      width: 0; transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
-      position: relative;
-    }
-    .dr-bar-fill::after {
+    .drs-fill::after {
       content: '';
-      position: absolute; right: 0; top: 50%;
-      transform: translateY(-50%);
-      width: 10px; height: 10px; border-radius: 50%;
-      background: white; box-shadow: 0 0 8px var(--cyan);
+      position: absolute; right: -5px; top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #fff; box-shadow: 0 0 10px var(--accent-cyan), 0 0 4px var(--accent-purple);
     }
 
-    /* =============================================
-       COUNTDOWN WIDGET
-       ============================================= */
-    .db-countdown-widget {
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(236,72,153,0.06));
-      border-radius: 16px;
-      border: 1px solid rgba(168,85,247,0.15);
-      text-align: center;
+    /* ── EVENT ITEMS ── */
+    .db-ev-list { display: flex; flex-direction: column; gap: 10px; }
+    .db-ev-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      text-decoration: none; color: inherit;
+      transition: all 0.3s;
+      position: relative; overflow: hidden;
     }
-    .dcw-label {
-      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px;
-      color: rgba(255,255,255,0.35); margin-bottom: 14px; font-weight: 700;
+    .db-ev-card::after {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+      border-radius: 14px 0 0 14px;
+      transition: width 0.3s;
     }
-    .dcw-grid {
+    .db-ev-card:hover {
+      background: rgba(0,240,255,0.05);
+      border-color: rgba(0,240,255,0.2);
+      transform: translateX(6px);
+    }
+    .db-ev-card:hover::after { width: 3px; }
+    .db-ev-emoji {
+      width: 48px; height: 48px; border-radius: 13px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .emi-t { background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(189,0,255,0.15)); }
+    .emi-c { background: linear-gradient(135deg, rgba(255,0,127,0.15), rgba(189,0,255,0.15)); }
+    .emi-s { background: linear-gradient(135deg, rgba(0,255,157,0.12), rgba(0,240,255,0.12)); }
+    .emi-w { background: linear-gradient(135deg, rgba(255,170,0,0.12), rgba(0,255,157,0.12)); }
+    .emi-g { background: linear-gradient(135deg, rgba(189,0,255,0.12), rgba(255,0,127,0.12)); }
+    .db-ev-info { flex: 1; min-width: 0; }
+    .db-ev-name {
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: 0.92rem; margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .db-ev-meta-row {
+      display: flex; gap: 12px; font-size: 0.73rem; color: var(--text-muted);
+    }
+    .db-ev-meta-row span { display: flex; align-items: center; gap: 3px; }
+    .db-ev-badge {
+      padding: 4px 10px; border-radius: 50px; font-size: 0.65rem;
+      font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+    }
+    .evb-confirmed { background: rgba(0,255,157,0.12); color: var(--accent-green); border: 1px solid rgba(0,255,157,0.25); }
+    .evb-pending   { background: rgba(255,170,0,0.12);  color: var(--accent-orange); border: 1px solid rgba(255,170,0,0.25); }
+    .evb-attended  { background: rgba(0,240,255,0.12);  color: var(--accent-cyan);   border: 1px solid rgba(0,240,255,0.25); }
+
+    /* ── COUNTDOWN ── */
+    .db-countdown {
+      padding: 4px 0;
+      background: transparent;
+    }
+    .dc-label {
+      text-align: center; font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 2.5px; color: var(--text-muted); margin-bottom: 16px;
+      font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .dc-label::before, .dc-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.08));
+    }
+    .dc-label::after { background: linear-gradient(to left, transparent, rgba(255,255,255,0.08)); }
+    .dc-grid {
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
     }
-    .dcw-seg {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 12px; padding: 10px 6px;
+    .dc-unit {
+      text-align: center;
+      background: rgba(0,240,255,0.04);
+      border: 1px solid rgba(0,240,255,0.1);
+      border-radius: 14px; padding: 14px 6px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s;
     }
-    .dcw-num {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem; font-weight: 800;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+    .dc-unit::before {
+      content: '';
+      position: absolute; top: 0; left: 25%; right: 25%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    }
+    .dc-num {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.8rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; display: block; line-height: 1;
     }
-    .dcw-unit {
-      font-size: 0.55rem; text-transform: uppercase;
-      letter-spacing: 1px; color: rgba(255,255,255,0.3);
-      margin-top: 4px; display: block; font-weight: 700;
+    .dc-lbl {
+      font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--text-muted); margin-top: 6px; display: block; font-weight: 700;
+    }
+    /* LIVE badge */
+    .dc-live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-bottom: 8px;
+      background: rgba(255,51,102,0.12);
+      border: 1px solid rgba(255,51,102,0.25);
+      padding: 4px 12px; border-radius: 50px;
+      font-size: 0.65rem; color: var(--accent-red);
+      font-weight: 800; letter-spacing: 1px;
+    }
+    .dc-live-badge .pulse-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-red);
+      animation: dotBlink 1s ease-in-out infinite;
     }
 
-    /* =============================================
-       ANNOUNCEMENTS
-       ============================================= */
-    .db-ann-list { display: flex; flex-direction: column; gap: 10px; }
-
-    .db-ann-item {
-      position: relative; overflow: hidden;
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.03);
+    /* ── QUICK NAV ── */
+    .db-qnav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .db-qnav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.025);
       border: 1px solid rgba(255,255,255,0.06);
-      border-left: 3px solid rgba(255,255,255,0.1);
+      text-decoration: none; color: inherit;
       transition: all 0.3s;
     }
-    .db-ann-item:hover { transform: translateX(3px); background: rgba(255,255,255,0.05); }
-    .db-ann-item.urgent   { border-left-color: var(--red);    background: linear-gradient(90deg, rgba(239,68,68,0.05),    rgba(255,255,255,0.02)); }
-    .db-ann-item.important { border-left-color: var(--orange); background: linear-gradient(90deg, rgba(245,158,11,0.05), rgba(255,255,255,0.02)); }
-    .db-ann-item.normal   { border-left-color: var(--cyan); }
-
-    .da-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
-    .da-title { font-weight: 700; font-size: 0.875rem; color: rgba(255,255,255,0.9); }
-    .da-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 8px; border-radius: 50px;
-      font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-      flex-shrink: 0;
-    }
-    .da-badge.urgent   { background: rgba(239,68,68,0.15);    color: var(--red);    border: 1px solid rgba(239,68,68,0.3); }
-    .da-badge.important { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.3); }
-    .da-content {
-      font-size: 0.78rem; color: rgba(255,255,255,0.45); line-height: 1.55;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-      margin-bottom: 6px;
-    }
-    .da-time { font-size: 0.68rem; color: rgba(255,255,255,0.25); }
-
-    /* =============================================
-       QUICK ACTIONS GRID
-       ============================================= */
-    .db-qa-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-    }
-    .db-qa-card {
-      display: flex; flex-direction: column; align-items: flex-start;
-      gap: 10px; padding: 16px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      text-decoration: none; color: inherit;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      position: relative; overflow: hidden;
-    }
-    .db-qa-card::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .db-qa-card:hover {
+    .db-qnav-item:hover {
       transform: translateY(-3px);
-      border-color: rgba(0,212,255,0.2);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+      background: rgba(189,0,255,0.07);
+      border-color: rgba(189,0,255,0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
-    .db-qa-card:hover::after { opacity: 1; }
-
-    .qa-icon {
-      width: 38px; height: 38px; border-radius: 10px;
+    .qnav-icon {
+      width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
     }
-    .qa-icon i { width: 18px; height: 18px; }
-    .qa-cyan   { background: rgba(0,212,255,0.12);  color: var(--cyan); }
-    .qa-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
-    .qa-pink   { background: rgba(236,72,153,0.12); color: var(--pink); }
-    .qa-green  { background: rgba(16,185,129,0.12); color: var(--green); }
+    .qnav-icon i { width: 18px; height: 18px; }
+    .qni-c  { background: rgba(0,240,255,0.12);  color: var(--accent-cyan); }
+    .qni-p  { background: rgba(189,0,255,0.12);  color: var(--accent-purple); }
+    .qni-pk { background: rgba(255,0,127,0.12);  color: var(--accent-pink); }
+    .qni-g  { background: rgba(0,255,157,0.12);  color: var(--accent-green); }
+    .qnav-text {}
+    .qnav-label { font-size: 0.83rem; font-weight: 700; color: var(--text-primary); }
+    .qnav-sub   { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
 
-    .qa-label {
-      font-size: 0.82rem; font-weight: 700;
-      color: rgba(255,255,255,0.85);
+    /* ── ANNOUNCEMENTS ── */
+    .db-ann-list { display: flex; flex-direction: column; gap: 10px; }
+    .db-ann-item {
+      padding: 14px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.025);
+      border-left: 3px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s;
     }
-    .qa-desc {
-      font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 2px;
+    .db-ann-item:hover { transform: translateX(4px); background: rgba(255,255,255,0.04); }
+    .db-ann-item.urgent   { border-left-color: var(--accent-red);    background: rgba(255,51,102,0.04); }
+    .db-ann-item.important{ border-left-color: var(--accent-orange);  background: rgba(255,170,0,0.04); }
+    .db-ann-item.normal   { border-left-color: var(--accent-cyan); }
+    .ann-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+    .ann-title-text { font-weight: 700; font-size: 0.87rem; }
+    .ann-badge {
+      padding: 2px 8px; border-radius: 50px; font-size: 0.6rem;
+      font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
     }
+    .ann-badge.urgent   { background: rgba(255,51,102,0.15);  color: var(--accent-red);    border: 1px solid rgba(255,51,102,0.3); }
+    .ann-badge.important{ background: rgba(255,170,0,0.15);  color: var(--accent-orange); border: 1px solid rgba(255,170,0,0.3); }
+    .ann-content { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ann-time { font-size: 0.68rem; color: var(--text-muted); }
 
-    /* =============================================
-       ACTIVITY TIMELINE
-       ============================================= */
-    .db-timeline { position: relative; padding-left: 24px; }
-    .db-timeline::before {
-      content: '';
-      position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px;
-      background: linear-gradient(to bottom, var(--cyan), var(--purple), transparent);
-      border-radius: 2px;
-    }
-    .tl-item {
-      position: relative; margin-bottom: 18px;
-    }
-    .tl-item:last-child { margin-bottom: 0; }
-    .tl-dot {
-      position: absolute; left: -20px; top: 4px;
-      width: 10px; height: 10px; border-radius: 50%;
-      border: 2px solid rgba(0,0,0,0.8);
-    }
-    .tl-dot.dc  { background: var(--cyan);   box-shadow: 0 0 8px var(--cyan); }
-    .tl-dot.dp  { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
-    .tl-dot.dg  { background: var(--green);  box-shadow: 0 0 8px var(--green); }
-    .tl-dot.do  { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
-
-    .tl-text {
-      font-size: 0.8rem; color: rgba(255,255,255,0.75); line-height: 1.45;
-    }
-    .tl-text strong { color: rgba(255,255,255,0.95); }
-    .tl-time {
-      font-size: 0.65rem; color: rgba(255,255,255,0.3);
-      margin-top: 3px; font-weight: 600; letter-spacing: 0.5px;
-    }
-
-    /* =============================================
-       EMPTY STATE
-       ============================================= */
+    /* ── EMPTY STATE ── */
     .db-empty {
-      text-align: center; padding: 44px 20px;
-      color: rgba(255,255,255,0.35);
+      text-align: center; padding: 48px 20px;
+      color: var(--text-muted);
     }
-    .db-empty-icon {
-      font-size: 2.8rem; margin-bottom: 14px; display: block;
-      filter: saturate(0.3);
-    }
-    .db-empty h4 {
-      font-size: 0.95rem; color: rgba(255,255,255,0.6); margin-bottom: 6px;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-    }
-    .db-empty p { font-size: 0.82rem; margin-bottom: 18px; line-height: 1.6; }
-    .db-empty a {
+    .db-empty-emoji { font-size: 3rem; display: block; margin-bottom: 16px; filter: saturate(0.5); }
+    .db-empty h4 { font-family: var(--font-heading); font-size: 1rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .db-empty p  { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.6; }
+    .db-empty-cta {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: 50px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      padding: 10px 22px; border-radius: 50px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       color: #fff; font-size: 0.82rem; font-weight: 700;
       text-decoration: none; transition: all 0.3s;
     }
-    .db-empty a:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,212,255,0.3); }
+    .db-empty-cta i { width: 14px; height: 14px; }
+    .db-empty-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,240,255,0.3); color: #fff; }
 
-    /* =============================================
-       ANIMATIONS
-       ============================================= */
-    @keyframes dbFadeUp {
-      from { opacity: 0; transform: translateY(18px); }
+    /* ── ANIMATIONS ── */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    .anim-slide-up { animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; }
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.12s; }
+    .d3 { animation-delay: 0.19s; }
+    .d4 { animation-delay: 0.26s; }
+    .d5 { animation-delay: 0.33s; }
+    .d6 { animation-delay: 0.40s; }
+    .d7 { animation-delay: 0.47s; }
+    .d8 { animation-delay: 0.54s; }
 
-    /* Staggered delays */
-    .db-hero        { animation-delay: 0s; }
-    .db-stats-row .db-stat-card:nth-child(1) { animation-delay: 0.08s; }
-    .db-stats-row .db-stat-card:nth-child(2) { animation-delay: 0.14s; }
-    .db-stats-row .db-stat-card:nth-child(3) { animation-delay: 0.20s; }
-    .db-stats-row .db-stat-card:nth-child(4) { animation-delay: 0.26s; }
-    .db-panel:nth-of-type(1) { animation-delay: 0.32s; }
-    .db-panel:nth-of-type(2) { animation-delay: 0.38s; }
-    .db-panel:nth-of-type(3) { animation-delay: 0.44s; }
-    .db-panel:nth-of-type(4) { animation-delay: 0.50s; }
-    .db-panel:nth-of-type(5) { animation-delay: 0.56s; }
-
-    /* =============================================
-       RESPONSIVE
-       ============================================= */
+    /* ── RESPONSIVE ── */
     @media (max-width: 1100px) {
-      .db-main-grid { grid-template-columns: 1fr; }
-      .db-right-col { display: grid; grid-template-columns: 1fr 1fr; }
+      .db-content-grid { grid-template-columns: 1fr; }
+      .db-col-right { display: grid; grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 900px) {
-      .db-stats-row { grid-template-columns: repeat(2, 1fr); }
+      .db-stats-strip { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 700px) {
-      .db-right-col { grid-template-columns: 1fr; }
-      .db-hero-inner { grid-template-columns: 1fr; }
-      .db-quick-actions { align-items: flex-start; }
-      .db-pill-row { justify-content: flex-start; }
+      .db-hero-inner { flex-direction: column; align-items: flex-start; }
+      .db-hero-actions { width: 100%; }
+      .db-col-right { grid-template-columns: 1fr; }
     }
     @media (max-width: 520px) {
-      .db-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .db-qa-grid { grid-template-columns: repeat(2, 1fr); }
-      .dsc-value { font-size: 1.6rem; }
+      .db-stats-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .db-hero-inner { padding: 24px 20px; }
+      .db-qnav-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -692,170 +540,124 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <div class="main-content with-sidebar">
-    <div class="db-wrapper">
+    <div class="db-page">
 
-      <!-- ===== HERO BANNER ===== -->
-      <div class="db-hero" style="animation: dbFadeUp 0.5s ease forwards; opacity:0;">
-        <div class="db-hero-glow"></div>
-        <div class="db-hero-orb o1"></div>
-        <div class="db-hero-orb o2"></div>
+      <!-- ════ HERO ════ -->
+      <div class="db-hero anim-slide-up d1">
+        <div class="db-hero-glow1"></div>
+        <div class="db-hero-glow2"></div>
         <div class="db-hero-inner">
 
           <div class="db-user-block">
-            <!-- Avatar with spinning ring -->
-            <div class="db-avatar-ring">
-              <svg class="ring-svg" viewBox="0 0 88 88" fill="none">
+            <div class="db-avatar-wrap">
+              <!-- Spinning SVG ring -->
+              <svg class="db-avatar-ring-svg" viewBox="0 0 96 96" fill="none">
+                <circle cx="48" cy="48" r="44" stroke="url(#rg)" stroke-width="2"
+                  stroke-dasharray="210 65" stroke-linecap="round"/>
                 <defs>
-                  <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%"   stop-color="#00d4ff" stop-opacity="0.8"/>
-                    <stop offset="50%"  stop-color="#a855f7" stop-opacity="0.8"/>
-                    <stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+                  <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="#00f0ff" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="#bd00ff" stop-opacity="0"/>
                   </linearGradient>
                 </defs>
-                <circle cx="44" cy="44" r="40" stroke="url(#ringGrad)" stroke-width="2" stroke-linecap="round"
-                  stroke-dasharray="200 51" />
               </svg>
               <div class="db-avatar" id="dash-avatar">?</div>
+              <div class="db-online-dot"></div>
             </div>
 
-            <div class="db-greeting-area">
-              <div class="db-greeting-tag">
-                <span class="live-dot"></span>
+            <div class="db-user-info">
+              <div class="db-greeting-chip">
+                <span class="blink-dot"></span>
                 <span id="time-greeting">Loading…</span>
               </div>
-              <div class="db-name">
-                Welcome back, <span class="highlight" id="user-first-name">Participant</span>!
+              <div class="db-user-name">
+                Welcome back, <span class="name-accent" id="user-first-name">Participant</span>!
               </div>
-              <div class="db-sub">
+              <div class="db-user-meta">
                 <span id="user-college">VAIBHAV 2K26</span>
-                <span class="sep">·</span>
+                <span class="meta-dot">⬡</span>
                 <span>Mission Control</span>
+                <span class="meta-dot">⬡</span>
+                <span id="user-role-chip">Participant</span>
               </div>
             </div>
           </div>
 
-          <div class="db-quick-actions">
-            <div class="db-pill-row">
-              <a href="events.html" class="db-pill accent">
-                <i data-lucide="search"></i> Browse Events
-              </a>
-              <a href="leaderboard.html" class="db-pill">
-                <i data-lucide="trophy"></i> Rankings
-              </a>
-            </div>
-            <div class="db-pill-row">
-              <a href="tickets.html" class="db-pill">
-                <i data-lucide="ticket"></i> My Tickets
-              </a>
-              <a href="teams.html" class="db-pill">
-                <i data-lucide="users"></i> My Teams
-              </a>
-              <a href="profile.html" class="db-pill">
-                <i data-lucide="user"></i> Profile
-              </a>
-            </div>
+          <div class="db-hero-actions">
+            <a href="events.html" class="db-btn-primary">
+              <i data-lucide="search"></i> Browse Events
+            </a>
+            <a href="tickets.html" class="db-btn-ghost">
+              <i data-lucide="ticket"></i> My Tickets
+            </a>
+            <a href="leaderboard.html" class="db-btn-ghost">
+              <i data-lucide="trophy"></i> Leaderboard
+            </a>
           </div>
 
         </div>
       </div>
 
-      <!-- ===== STATS CARDS ===== -->
-      <div class="db-stats-row">
-
-        <div class="db-stat-card dsc-cyan">
-          <div class="dsc-ring-wrap">
-            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
-              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
-              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-events"/>
-            </svg>
-            <div class="dsc-ring-icon"><i data-lucide="zap"></i></div>
-          </div>
-          <div class="dsc-body">
-            <div class="dsc-value" id="stat-events">—</div>
-            <div class="dsc-label">Events Joined</div>
-            <div class="dsc-delta"><i data-lucide="trending-up" style="width:11px;height:11px"></i> Active</div>
-          </div>
+      <!-- ════ STAT STRIP ════ -->
+      <div class="db-stats-strip">
+        <div class="db-stat ds-c anim-slide-up d2">
+          <div class="db-stat-ghost" id="ghost-events">0</div>
+          <div class="ds-icon-wrap"><i data-lucide="zap"></i></div>
+          <div class="ds-value" id="stat-events">—</div>
+          <div class="ds-label">Events Joined</div>
+          <div class="ds-sub"><i data-lucide="activity"></i> Active participant</div>
         </div>
-
-        <div class="db-stat-card dsc-purple">
-          <div class="dsc-ring-wrap">
-            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
-              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
-              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-teams"/>
-            </svg>
-            <div class="dsc-ring-icon"><i data-lucide="users"></i></div>
-          </div>
-          <div class="dsc-body">
-            <div class="dsc-value" id="stat-teams">—</div>
-            <div class="dsc-label">Teams</div>
-            <div class="dsc-delta" style="color:var(--purple)"><i data-lucide="shield" style="width:11px;height:11px"></i> Member</div>
-          </div>
+        <div class="db-stat ds-p anim-slide-up d3">
+          <div class="db-stat-ghost" id="ghost-teams">0</div>
+          <div class="ds-icon-wrap"><i data-lucide="users"></i></div>
+          <div class="ds-value" id="stat-teams">—</div>
+          <div class="ds-label">Teams</div>
+          <div class="ds-sub" style="color:var(--accent-purple)"><i data-lucide="shield"></i> Squad member</div>
         </div>
-
-        <div class="db-stat-card dsc-green">
-          <div class="dsc-ring-wrap">
-            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
-              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
-              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-tickets"/>
-            </svg>
-            <div class="dsc-ring-icon"><i data-lucide="ticket"></i></div>
-          </div>
-          <div class="dsc-body">
-            <div class="dsc-value" id="stat-tickets">—</div>
-            <div class="dsc-label">Tickets</div>
-            <div class="dsc-delta" style="color:var(--green)"><i data-lucide="check-circle" style="width:11px;height:11px"></i> Valid</div>
-          </div>
+        <div class="db-stat ds-g anim-slide-up d4">
+          <div class="db-stat-ghost" id="ghost-tickets">0</div>
+          <div class="ds-icon-wrap"><i data-lucide="ticket"></i></div>
+          <div class="ds-value" id="stat-tickets">—</div>
+          <div class="ds-label">Tickets</div>
+          <div class="ds-sub"><i data-lucide="check-circle"></i> Confirmed</div>
         </div>
-
-        <div class="db-stat-card dsc-orange">
-          <div class="dsc-ring-wrap">
-            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
-              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
-              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-points"/>
-            </svg>
-            <div class="dsc-ring-icon"><i data-lucide="star"></i></div>
-          </div>
-          <div class="dsc-body">
-            <div class="dsc-value" id="stat-points">—</div>
-            <div class="dsc-label">Points</div>
-            <div class="dsc-delta" style="color:var(--orange)"><i data-lucide="award" style="width:11px;height:11px"></i> Earned</div>
-          </div>
+        <div class="db-stat ds-o anim-slide-up d5">
+          <div class="db-stat-ghost" id="ghost-points">0</div>
+          <div class="ds-icon-wrap"><i data-lucide="star"></i></div>
+          <div class="ds-value" id="stat-points">—</div>
+          <div class="ds-label">Points Earned</div>
+          <div class="ds-sub" style="color:var(--accent-orange)"><i data-lucide="award"></i> On leaderboard</div>
         </div>
-
       </div>
 
-      <!-- ===== MAIN GRID ===== -->
-      <div class="db-main-grid">
+      <!-- ════ CONTENT GRID ════ -->
+      <div class="db-content-grid">
 
         <!-- LEFT COLUMN -->
-        <div class="db-left-col">
+        <div class="db-col-left">
 
-          <!-- My Events Panel -->
-          <div class="db-panel">
-            <div class="db-panel-head">
-              <div class="db-panel-head-left">
-                <div class="db-ph-icon phi-cyan"><i data-lucide="calendar-days"></i></div>
+          <!-- My Events -->
+          <div class="db-panel anim-slide-up d6">
+            <div class="db-panel-header">
+              <div class="db-panel-title-group">
+                <div class="db-panel-icon pi-cyan"><i data-lucide="calendar-days"></i></div>
                 <div>
-                  <div class="db-panel-title">My Registered Events</div>
-                  <div class="db-panel-sub">Your upcoming competitions</div>
+                  <div class="db-panel-label">My Registered Events</div>
+                  <div class="db-panel-sublabel">Your upcoming competitions &amp; workshops</div>
                 </div>
               </div>
-              <a href="events.html" class="db-panel-link">
+              <a href="events.html" class="db-panel-viewall">
                 Browse all <i data-lucide="arrow-right" style="width:12px;height:12px"></i>
               </a>
             </div>
 
-            <!-- Readiness Meter -->
-            <div class="db-panel-body" style="padding-bottom:0;">
-              <div class="db-readiness" id="db-readiness">
-                <div class="dr-head">
-                  <div class="dr-label">
-                    <span class="dr-icon">🎯</span> Fest Readiness Score
-                  </div>
-                  <div class="dr-pct" id="dr-pct">0%</div>
-                </div>
-                <div class="dr-bar-bg"><div class="dr-bar-fill" id="dr-fill"></div></div>
+            <!-- Readiness -->
+            <div class="db-readiness-strip" id="db-readiness">
+              <div class="drs-row">
+                <div class="drs-title">🎯 Fest Readiness Score</div>
+                <div class="drs-val" id="drs-val">0%</div>
               </div>
+              <div class="drs-track"><div class="drs-fill" id="drs-fill"></div></div>
             </div>
 
             <div class="db-panel-body" id="my-events">
@@ -866,76 +668,89 @@
         </div>
 
         <!-- RIGHT COLUMN -->
-        <div class="db-right-col">
+        <div class="db-col-right">
 
-          <!-- Countdown Widget -->
-          <div class="db-panel">
-            <div class="db-panel-head">
-              <div class="db-panel-head-left">
-                <div class="db-ph-icon phi-purple"><i data-lucide="clock"></i></div>
+          <!-- Countdown -->
+          <div class="db-panel anim-slide-up d6">
+            <div class="db-panel-header">
+              <div class="db-panel-title-group">
+                <div class="db-panel-icon pi-purple"><i data-lucide="clock"></i></div>
                 <div>
-                  <div class="db-panel-title">Fest Countdown</div>
-                  <div class="db-panel-sub">VAIBHAV 2K26 starts in</div>
+                  <div class="db-panel-label">Fest Countdown</div>
+                  <div class="db-panel-sublabel">VAIBHAV 2K26 begins in</div>
                 </div>
               </div>
+              <div class="dc-live-badge"><span class="pulse-dot"></span>LIVE</div>
             </div>
             <div class="db-panel-body">
-              <div class="db-countdown-widget">
-                <div class="dcw-label">⚡ Live Countdown</div>
-                <div class="dcw-grid">
-                  <div class="dcw-seg"><span class="dcw-num" id="cd-days">00</span><span class="dcw-unit">Days</span></div>
-                  <div class="dcw-seg"><span class="dcw-num" id="cd-hrs">00</span><span class="dcw-unit">Hours</span></div>
-                  <div class="dcw-seg"><span class="dcw-num" id="cd-min">00</span><span class="dcw-unit">Mins</span></div>
-                  <div class="dcw-seg"><span class="dcw-num" id="cd-sec">00</span><span class="dcw-unit">Secs</span></div>
+              <div class="db-countdown">
+                <div class="dc-label">Time remaining</div>
+                <div class="dc-grid">
+                  <div class="dc-unit"><span class="dc-num" id="cd-days">00</span><span class="dc-lbl">Days</span></div>
+                  <div class="dc-unit"><span class="dc-num" id="cd-hrs">00</span><span class="dc-lbl">Hours</span></div>
+                  <div class="dc-unit"><span class="dc-num" id="cd-min">00</span><span class="dc-lbl">Mins</span></div>
+                  <div class="dc-unit"><span class="dc-num" id="cd-sec">00</span><span class="dc-lbl">Secs</span></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Quick Actions Grid -->
-          <div class="db-panel">
-            <div class="db-panel-head">
-              <div class="db-panel-head-left">
-                <div class="db-ph-icon phi-orange"><i data-lucide="layout-grid"></i></div>
+          <!-- Quick Nav -->
+          <div class="db-panel anim-slide-up d7">
+            <div class="db-panel-header">
+              <div class="db-panel-title-group">
+                <div class="db-panel-icon pi-orange"><i data-lucide="layout-grid"></i></div>
                 <div>
-                  <div class="db-panel-title">Quick Actions</div>
-                  <div class="db-panel-sub">Jump to anywhere</div>
+                  <div class="db-panel-label">Quick Access</div>
+                  <div class="db-panel-sublabel">Jump anywhere instantly</div>
                 </div>
               </div>
             </div>
             <div class="db-panel-body">
-              <div class="db-qa-grid">
-                <a href="events.html" class="db-qa-card">
-                  <div class="qa-icon qa-cyan"><i data-lucide="calendar"></i></div>
-                  <div><div class="qa-label">Browse</div><div class="qa-desc">Discover events</div></div>
+              <div class="db-qnav-grid">
+                <a href="events.html" class="db-qnav-item">
+                  <div class="qnav-icon qni-c"><i data-lucide="calendar"></i></div>
+                  <div class="qnav-text">
+                    <div class="qnav-label">Events</div>
+                    <div class="qnav-sub">Discover &amp; register</div>
+                  </div>
                 </a>
-                <a href="teams.html" class="db-qa-card">
-                  <div class="qa-icon qa-purple"><i data-lucide="users"></i></div>
-                  <div><div class="qa-label">Teams</div><div class="qa-desc">Manage squads</div></div>
+                <a href="teams.html" class="db-qnav-item">
+                  <div class="qnav-icon qni-p"><i data-lucide="users"></i></div>
+                  <div class="qnav-text">
+                    <div class="qnav-label">My Teams</div>
+                    <div class="qnav-sub">Manage squads</div>
+                  </div>
                 </a>
-                <a href="leaderboard.html" class="db-qa-card">
-                  <div class="qa-icon qa-pink"><i data-lucide="trophy"></i></div>
-                  <div><div class="qa-label">Leaderboard</div><div class="qa-desc">Top performers</div></div>
+                <a href="leaderboard.html" class="db-qnav-item">
+                  <div class="qnav-icon qni-pk"><i data-lucide="trophy"></i></div>
+                  <div class="qnav-text">
+                    <div class="qnav-label">Leaderboard</div>
+                    <div class="qnav-sub">Top performers</div>
+                  </div>
                 </a>
-                <a href="profile.html" class="db-qa-card">
-                  <div class="qa-icon qa-green"><i data-lucide="user-circle"></i></div>
-                  <div><div class="qa-label">Profile</div><div class="qa-desc">Your details</div></div>
+                <a href="profile.html" class="db-qnav-item">
+                  <div class="qnav-icon qni-g"><i data-lucide="user-circle"></i></div>
+                  <div class="qnav-text">
+                    <div class="qnav-label">Profile</div>
+                    <div class="qnav-sub">Your account</div>
+                  </div>
                 </a>
               </div>
             </div>
           </div>
 
-          <!-- Announcements Panel -->
-          <div class="db-panel">
-            <div class="db-panel-head">
-              <div class="db-panel-head-left">
-                <div class="db-ph-icon phi-pink"><i data-lucide="bell"></i></div>
+          <!-- Announcements -->
+          <div class="db-panel anim-slide-up d8">
+            <div class="db-panel-header">
+              <div class="db-panel-title-group">
+                <div class="db-panel-icon pi-pink"><i data-lucide="bell"></i></div>
                 <div>
-                  <div class="db-panel-title">Announcements</div>
-                  <div class="db-panel-sub">Latest from organizers</div>
+                  <div class="db-panel-label">Announcements</div>
+                  <div class="db-panel-sublabel">From organizers</div>
                 </div>
               </div>
-              <a href="announcements.html" class="db-panel-link">
+              <a href="announcements.html" class="db-panel-viewall">
                 See all <i data-lucide="arrow-right" style="width:12px;height:12px"></i>
               </a>
             </div>
@@ -946,13 +761,12 @@
 
         </div>
       </div>
+
     </div>
-  </div><!-- /.main-content -->
+  </div>
 
   <script>
-    /* ===========================
-       HELPERS
-    =========================== */
+    /* ── Helpers ── */
     function getGreeting() {
       const h = new Date().getHours();
       if (h < 5)  return '🌙 Good night';
@@ -962,226 +776,169 @@
       return '🌙 Good night';
     }
 
-    const avatarGrads = [
-      'linear-gradient(135deg,#00d4ff,#0066ff)',
-      'linear-gradient(135deg,#a855f7,#7c3aed)',
-      'linear-gradient(135deg,#ec4899,#be185d)',
-      'linear-gradient(135deg,#10b981,#059669)',
-      'linear-gradient(135deg,#f59e0b,#d97706)',
+    const GRADS = [
+      'linear-gradient(135deg,#00f0ff,#0066ff)',
+      'linear-gradient(135deg,#bd00ff,#7c3aed)',
+      'linear-gradient(135deg,#ff007f,#be185d)',
+      'linear-gradient(135deg,#00ff9d,#059669)',
+      'linear-gradient(135deg,#ffaa00,#d97706)',
     ];
-    const getAvatarBg = n => avatarGrads[(n || 'A').charCodeAt(0) % avatarGrads.length];
-    const getInitials = n => (n || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const avatarBg = n => GRADS[(n||'A').charCodeAt(0) % GRADS.length];
+    const initials = n => (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
 
-    function animateCount(el, end, dur = 1400) {
+    function countUp(el, end, dur=1300) {
       if (!el || isNaN(end)) return;
-      let start = null;
+      let t0 = null;
       const step = ts => {
-        if (!start) start = ts;
-        const p = Math.min((ts - start) / dur, 1);
-        const ease = 1 - Math.pow(1 - p, 4);
-        el.textContent = Math.floor(ease * end);
-        if (p < 1) requestAnimationFrame(step);
+        if (!t0) t0 = ts;
+        const p = Math.min((ts-t0)/dur, 1);
+        const ease = 1-Math.pow(1-p,4);
+        const val = Math.floor(ease*end);
+        el.textContent = val;
+        const ghost = el.closest('.db-stat')?.querySelector('.db-stat-ghost');
+        if (ghost) ghost.textContent = val;
+        if (p<1) requestAnimationFrame(step);
       };
       requestAnimationFrame(step);
     }
 
-    // Animate SVG ring
-    function animateRing(id, value, max) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const pct = Math.min(value / max, 1);
-      const circumference = 138; // 2π * r(22)
-      setTimeout(() => {
-        el.style.strokeDashoffset = circumference - pct * circumference;
-      }, 400);
-    }
+    const catThumb = {technical:'emi-t',cultural:'emi-c',sports:'emi-s',workshop:'emi-w',gaming:'emi-g'};
+    const catEmoji  = {technical:'💻',cultural:'🎭',sports:'⚽',workshop:'🔧',gaming:'🎮'};
+    const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'TBD';
+    const fmtDT   = d => d ? new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'TBD';
 
-    const catThumb = { technical: 'ict', cultural: 'icc', sports: 'ics', workshop: 'icw', gaming: 'icg' };
-    const catIcon  = { technical: '💻', cultural: '🎭', sports: '⚽', workshop: '🔧', gaming: '🎮' };
-
-    function getStatusClass(s) {
-      if (s === 'confirmed') return 'es-confirmed';
-      if (s === 'pending')   return 'es-pending';
-      if (s === 'attended')  return 'es-attended';
-      return 'es-confirmed';
-    }
-
-    function formatDate(d) {
-      if (!d) return 'TBD';
-      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-    function formatDateTime(d) {
-      if (!d) return 'TBD';
-      return new Date(d).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    }
-
-    /* ===========================
-       COUNTDOWN TIMER
-    =========================== */
-    function startFestCountdown(targetDate) {
+    /* ── Countdown ── */
+    function startCountdown(target) {
+      const pad = n => String(n).padStart(2,'0');
       function tick() {
-        const now  = Date.now();
-        const dist = new Date(targetDate).getTime() - now;
-        if (dist <= 0) {
-          ['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = '00';
-          });
-          return;
-        }
-        const days = Math.floor(dist / 86400000);
-        const hrs  = Math.floor((dist % 86400000) / 3600000);
-        const mins = Math.floor((dist % 3600000)  / 60000);
-        const secs = Math.floor((dist % 60000)    / 1000);
-        const pad  = n => String(n).padStart(2, '0');
-        document.getElementById('cd-days').textContent = pad(days);
-        document.getElementById('cd-hrs').textContent  = pad(hrs);
-        document.getElementById('cd-min').textContent  = pad(mins);
-        document.getElementById('cd-sec').textContent  = pad(secs);
+        const diff = new Date(target).getTime() - Date.now();
+        if (diff <= 0) { ['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='00'; }); return; }
+        document.getElementById('cd-days').textContent = pad(Math.floor(diff/86400000));
+        document.getElementById('cd-hrs').textContent  = pad(Math.floor(diff%86400000/3600000));
+        document.getElementById('cd-min').textContent  = pad(Math.floor(diff%3600000/60000));
+        document.getElementById('cd-sec').textContent  = pad(Math.floor(diff%60000/1000));
       }
-      tick();
-      setInterval(tick, 1000);
+      tick(); setInterval(tick,1000);
     }
 
-    /* ===========================
-       MAIN INIT
-    =========================== */
+    /* ── Main ── */
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await requireAuth('participant');
       if (!user) return;
 
       renderNavbar('dashboard');
-      renderSidebar('participant', 'overview');
-      if (typeof initParticles === 'function') initParticles('particles-canvas', 12);
+      renderSidebar('participant','overview');
+      if (typeof initParticles==='function') initParticles('particles-canvas',12);
       if (typeof lucide !== 'undefined') lucide.createIcons();
 
-      // ── Greeting & Banner ──
+      /* Banner */
       document.getElementById('time-greeting').textContent = getGreeting();
-      const first = (user.full_name || 'Participant').split(' ')[0];
+      const first = (user.full_name||'Participant').split(' ')[0];
       document.getElementById('user-first-name').textContent = first;
-      if (user.college) {
-        document.getElementById('user-college').textContent =
-          `${user.college}${user.department ? ' · ' + user.department : ''}`;
-      }
+      if (user.college) document.getElementById('user-college').textContent =
+        user.college + (user.department ? ' · '+user.department : '');
+      const roleChip = document.getElementById('user-role-chip');
+      if (roleChip) roleChip.textContent = (user.role||'participant').charAt(0).toUpperCase()+(user.role||'participant').slice(1);
+
       const av = document.getElementById('dash-avatar');
       if (user.avatar_url) {
         av.innerHTML = `<img src="${user.avatar_url}" alt="Avatar">`;
         av.style.background = 'transparent';
       } else {
-        av.textContent = getInitials(user.full_name);
-        av.style.background = getAvatarBg(user.full_name);
+        av.textContent = initials(user.full_name);
+        av.style.background = avatarBg(user.full_name);
       }
 
-      // ── Countdown (set your fest date here!) ──
-      startFestCountdown('2026-09-15T09:00:00');
+      /* Countdown — change this date to your actual fest date */
+      startCountdown('2026-09-15T09:00:00');
 
-      // ── Stats ──
-      let evtCount = 0, teamCount = 0;
+      /* Stats */
+      let evtCount=0, teamCount=0;
       try {
-        const [r, t] = await Promise.all([
-          supabase.from('registrations').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-          supabase.from('team_members').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        const [r,t] = await Promise.all([
+          supabase.from('registrations').select('id',{count:'exact',head:true}).eq('user_id',user.id),
+          supabase.from('team_members').select('id',{count:'exact',head:true}).eq('user_id',user.id),
         ]);
-        evtCount  = r.count  || 0;
-        teamCount = t.count  || 0;
+        evtCount  = r.count||0;
+        teamCount = t.count||0;
       } catch(e) {}
 
-      const pts = user.points || 0;
-      setTimeout(() => {
-        animateCount(document.getElementById('stat-events'),  evtCount,  1200);
-        animateCount(document.getElementById('stat-teams'),   teamCount, 1200);
-        animateCount(document.getElementById('stat-tickets'), evtCount,  1200);
-        animateCount(document.getElementById('stat-points'),  pts,       1400);
-
-        // Animate rings (ring max: events→10, teams→5, tickets→10, points→500)
-        animateRing('ring-events',  evtCount,  10);
-        animateRing('ring-teams',   teamCount, 5);
-        animateRing('ring-tickets', evtCount,  10);
-        animateRing('ring-points',  pts,       500);
+      const pts = user.points||0;
+      setTimeout(()=>{
+        countUp(document.getElementById('stat-events'),  evtCount, 1200);
+        countUp(document.getElementById('stat-teams'),   teamCount,1200);
+        countUp(document.getElementById('stat-tickets'), evtCount, 1200);
+        countUp(document.getElementById('stat-points'),  pts,      1400);
       }, 300);
 
-      // ── Readiness meter ──
+      /* Readiness */
       if (evtCount > 0) {
-        const pct = Math.min(100, Math.round((evtCount / 5) * 100));
+        const pct = Math.min(100, Math.round((evtCount/5)*100));
         const r = document.getElementById('db-readiness');
         if (r) r.style.display = 'block';
-        document.getElementById('dr-pct').textContent = pct + '%';
-        setTimeout(() => {
-          const fill = document.getElementById('dr-fill');
-          if (fill) fill.style.width = pct + '%';
-        }, 600);
+        document.getElementById('drs-val').textContent = pct+'%';
+        setTimeout(()=>{ const f=document.getElementById('drs-fill'); if(f) f.style.width=pct+'%'; }, 700);
       }
 
-      // ── Events ──
+      /* Events */
       const evDiv = document.getElementById('my-events');
       try {
         const { data: regs } = await supabase
-          .from('registrations')
-          .select('*, events(*)')
-          .eq('user_id', user.id)
-          .limit(6);
-
-        if (!regs || !regs.length) {
+          .from('registrations').select('*,events(*)').eq('user_id',user.id).limit(6);
+        if (!regs||!regs.length) {
           evDiv.innerHTML = `
             <div class="db-empty">
-              <span class="db-empty-icon">📅</span>
+              <span class="db-empty-emoji">📅</span>
               <h4>No events registered yet</h4>
               <p>Explore upcoming events and secure your spot in the competition!</p>
-              <a href="events.html"><i data-lucide="search" style="width:14px;height:14px"></i> Browse Events</a>
+              <a href="events.html" class="db-empty-cta"><i data-lucide="search"></i> Browse Events</a>
             </div>`;
         } else {
-          evDiv.innerHTML = `<div class="db-ev-list">${regs.map(r => {
-            const ev  = r.events || {};
-            const cat = ev.category || 'technical';
-            return `
-              <a href="event-detail.html?id=${r.event_id}" class="db-ev-item">
-                <div class="db-ev-thumb ${catThumb[cat] || 'ict'}">${catIcon[cat] || '🎯'}</div>
-                <div class="db-ev-info">
-                  <div class="db-ev-name">${ev.title || 'Event'}</div>
-                  <div class="db-ev-meta">
-                    <span>📅 ${formatDate(ev.event_date)}</span>
-                    <span>📍 ${ev.venue || 'TBD'}</span>
-                  </div>
+          const statusClass = s => s==='confirmed'?'evb-confirmed':s==='pending'?'evb-pending':'evb-attended';
+          evDiv.innerHTML = `<div class="db-ev-list">${regs.map(r=>{
+            const ev=r.events||{}; const cat=ev.category||'technical';
+            return `<a href="event-detail.html?id=${r.event_id}" class="db-ev-card">
+              <div class="db-ev-emoji ${catThumb[cat]||'emi-t'}">${catEmoji[cat]||'🎯'}</div>
+              <div class="db-ev-info">
+                <div class="db-ev-name">${ev.title||'Event'}</div>
+                <div class="db-ev-meta-row">
+                  <span>📅 ${fmtDate(ev.event_date)}</span>
+                  <span>📍 ${ev.venue||'TBD'}</span>
                 </div>
-                <span class="db-ev-status ${getStatusClass(r.status || 'confirmed')}">${r.status || 'confirmed'}</span>
-              </a>`;
+              </div>
+              <span class="db-ev-badge ${statusClass(r.status||'confirmed')}">${r.status||'confirmed'}</span>
+            </a>`;
           }).join('')}</div>`;
         }
       } catch(e) {
         evDiv.innerHTML = `<div class="db-empty"><p>Could not load events.</p></div>`;
       }
 
-      // ── Announcements ──
+      /* Announcements */
       const annDiv = document.getElementById('recent-announcements');
       try {
         const { data: anns } = await supabase
-          .from('announcements').select('*')
-          .order('created_at', { ascending: false }).limit(5);
-
-        if (!anns || !anns.length) {
+          .from('announcements').select('*').order('created_at',{ascending:false}).limit(5);
+        if (!anns||!anns.length) {
           annDiv.innerHTML = `
             <div class="db-empty">
-              <span class="db-empty-icon">📢</span>
+              <span class="db-empty-emoji">📢</span>
               <h4>No announcements yet</h4>
-              <p>Check back soon for updates from organizers.</p>
+              <p>Check back soon for updates.</p>
             </div>`;
         } else {
-          annDiv.innerHTML = `<div class="db-ann-list">${anns.map(a => {
-            const p = a.priority || 'normal';
-            const badge = p === 'urgent'
-              ? `<span class="da-badge urgent">🔴 Urgent</span>`
-              : p === 'important'
-                ? `<span class="da-badge important">🟡 Important</span>`
+          annDiv.innerHTML = `<div class="db-ann-list">${anns.map(a=>{
+            const p=a.priority||'normal';
+            const badge = p==='urgent'
+              ? `<span class="ann-badge urgent">🔴 Urgent</span>`
+              : p==='important'
+                ? `<span class="ann-badge important">🟡 Important</span>`
                 : '';
-            return `
-              <div class="db-ann-item ${p}">
-                <div class="da-row">
-                  <div class="da-title">${a.title || 'Announcement'}</div>
-                  ${badge}
-                </div>
-                <div class="da-content">${a.content || ''}</div>
-                <div class="da-time">${formatDateTime(a.created_at)}</div>
-              </div>`;
+            return `<div class="db-ann-item ${p}">
+              <div class="ann-row"><div class="ann-title-text">${a.title||'Announcement'}</div>${badge}</div>
+              <div class="ann-content">${a.content||''}</div>
+              <div class="ann-time">${fmtDT(a.created_at)}</div>
+            </div>`;
           }).join('')}</div>`;
         }
       } catch(e) {
