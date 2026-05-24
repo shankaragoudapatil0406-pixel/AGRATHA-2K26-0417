@@ -1,10 +1,10 @@
 <<<<<<< HEAD
 @echo off
-title AGRATHA 2K26 - Local Server
+title VAIBHAV 2K26 - Local Server
 color 0B
 echo.
 echo  ================================================
-echo    AGRATHA 2K26 - College Fest Management Portal
+echo    VAIBHAV 2K26 - College Fest Management Portal
 echo  ================================================
 echo.
 echo  Starting local server...
@@ -32,11 +32,11 @@ start http://localhost:8000
 python -m http.server 8000
 =======
 @echo off
-title AGRATHA 2K26 - Local Server
+title VAIBHAV 2K26 - Local Server
 color 0B
 echo.
 echo  ================================================
-echo    AGRATHA 2K26 - College Fest Management Portal
+echo    VAIBHAV 2K26 - College Fest Management Portal
 echo  ================================================
 echo.
 echo  Starting local server...

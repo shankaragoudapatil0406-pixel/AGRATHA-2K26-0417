@@ -799,6 +799,238 @@
       .footer-bottom { flex-direction: column; text-align: center; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ===== MEET THE TEAM SECTION ===== */
+    .team-section {
+      padding: 100px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Tab pills */
+    .team-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+      margin-bottom: 52px;
+      justify-content: center;
+    }
+    .team-tab {
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.3px;
+    }
+    .team-tab:hover {
+      color: var(--text-primary);
+      border-color: rgba(0,212,255,0.3);
+    }
+    .team-tab.active {
+      background: var(--gradient-main);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(0,212,255,0.25);
+    }
+
+    /* Tab panel */
+    .team-panel { display: none; }
+    .team-panel.active { display: block; }
+
+    /* Person cards grid */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .team-grid.sponsors-grid {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+    }
+
+    /* Person card */
+    .person-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 28px 20px 24px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    .person-card.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .person-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--gradient-main);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .person-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(0,212,255,0.25);
+      box-shadow: 0 20px 50px rgba(0,212,255,0.1);
+    }
+    .person-card:hover::before { opacity: 1; }
+
+    /* Photo */
+    .person-photo {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .person-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .person-photo-init {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+    }
+    /* Spinning glow ring */
+    .person-photo::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+      z-index: -1;
+      animation: photoRingSpin 4s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .person-card:hover .person-photo::after { opacity: 1; }
+    @keyframes photoRingSpin { to { transform: rotate(360deg); } }
+
+    .person-name {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .person-role {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .person-dept {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .person-social {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .person-social a {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      font-size: 0.7rem;
+    }
+    .person-social a:hover {
+      background: rgba(0,212,255,0.1);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* Sponsor card */
+    .sponsor-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 28px 16px;
+      text-align: center;
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .sponsor-card.revealed { opacity: 1; transform: translateY(0); }
+    .sponsor-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0,212,255,0.25);
+      box-shadow: 0 16px 40px rgba(0,212,255,0.1);
+    }
+    .sponsor-logo {
+      width: 72px; height: 72px;
+      border-radius: var(--radius-md);
+      margin: 0 auto 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+    }
+    .sponsor-tier {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .tier-title  { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .tier-gold   { background: rgba(251,191,36,0.1);  color: #f59e0b; border: 1px solid rgba(251,191,36,0.2); }
+    .tier-silver { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+    .tier-bronze { background: rgba(217,119,6,0.1);   color: #d97706; border: 1px solid rgba(217,119,6,0.2); }
+    .tier-partner{ background: rgba(139,92,246,0.1);  color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+    .sponsor-name {
+      font-family: var(--font-heading);
+      font-size: 0.95rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+    .sponsor-desc {
+      font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .team-grid { grid-template-columns: repeat(3, 1fr); }
+      .team-grid.sponsors-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .team-section { padding: 60px 20px; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      .team-grid.sponsors-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .team-grid { grid-template-columns: 1fr; }
+      .team-grid.sponsors-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -1024,6 +1256,255 @@
 
   <div class="glow-divider"></div>
 
+  <!-- ===== MEET THE TEAM ===== -->
+  <section class="team-section" id="team" aria-label="Meet the Team">
+    <div class="section-badge" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.2);color:var(--accent-purple)">👥 The People Behind VAIBHAV 2K26</div>
+    <h2 class="section-title">Meet the <span>Dream Team</span></h2>
+    <p class="section-sub">The passionate minds and dedicated souls who make VAIBHAV 2K26 a reality — faculty, students, sponsors, and special guests.</p>
+
+    <!-- Tab pills -->
+    <div class="team-tabs" role="tablist" aria-label="Team categories">
+      <button class="team-tab active" role="tab" aria-selected="true"  aria-controls="panel-faculty"  onclick="switchTab(this,'panel-faculty')">🎓 Faculty Coordinators</button>
+      <button class="team-tab"        role="tab" aria-selected="false" aria-controls="panel-students" onclick="switchTab(this,'panel-students')">⚡ Student Coordinators</button>
+      <button class="team-tab"        role="tab" aria-selected="false" aria-controls="panel-guests"   onclick="switchTab(this,'panel-guests')">🌟 Chief Guests</button>
+      <button class="team-tab"        role="tab" aria-selected="false" aria-controls="panel-sponsors" onclick="switchTab(this,'panel-sponsors')">🤝 Sponsors &amp; Partners</button>
+    </div>
+
+    <!-- ── FACULTY COORDINATORS ── -->
+    <div class="team-panel active" id="panel-faculty" role="tabpanel">
+      <div class="team-grid">
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#7c3aed,#06b6d4)">RK</div>
+          </div>
+          <div class="person-name">Dr. Rajesh Kumar</div>
+          <div class="person-role">Chief Patron</div>
+          <div class="person-dept">Principal &amp; Director<br>VAIBHAV College of Engineering</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Email"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#ec4899,#a855f7)">AS</div>
+          </div>
+          <div class="person-name">Prof. Ananya Sharma</div>
+          <div class="person-role">Faculty Coordinator</div>
+          <div class="person-dept">Head of Department<br>Computer Science &amp; Engineering</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Email"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#10b981,#06b6d4)">MP</div>
+          </div>
+          <div class="person-name">Dr. Mohan Patil</div>
+          <div class="person-role">Technical Coordinator</div>
+          <div class="person-dept">Associate Professor<br>Electronics &amp; Communication</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Email"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">PN</div>
+          </div>
+          <div class="person-name">Prof. Priya Nair</div>
+          <div class="person-role">Cultural Coordinator</div>
+          <div class="person-dept">Assistant Professor<br>Humanities &amp; Fine Arts</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Email"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── STUDENT COORDINATORS ── -->
+    <div class="team-panel" id="panel-students" role="tabpanel">
+      <div class="team-grid">
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#00d4ff,#7c3aed)">ADS</div>
+          </div>
+          <div class="person-name">Aditya Shetty</div>
+          <div class="person-role">Overall Coordinator</div>
+          <div class="person-dept">8th Sem · Computer Science<br>Lead organizer of all departments</div>
+          <div class="person-social">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#ec4899,#f59e0b)">SK</div>
+          </div>
+          <div class="person-name">Sneha Kulkarni</div>
+          <div class="person-role">Cultural Head</div>
+          <div class="person-dept">7th Sem · MBA<br>Dance, Music &amp; Drama events</div>
+          <div class="person-social">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#06b6d4,#10b981)">RM</div>
+          </div>
+          <div class="person-name">Rahul Menon</div>
+          <div class="person-role">Technical Head</div>
+          <div class="person-dept">8th Sem · Information Science<br>Hackathon, Coding &amp; Robotics</div>
+          <div class="person-social">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#a855f7,#ec4899)">PR</div>
+          </div>
+          <div class="person-name">Pooja Reddy</div>
+          <div class="person-role">Sports Head</div>
+          <div class="person-dept">7th Sem · Mechanical Eng.<br>All outdoor &amp; indoor sports</div>
+          <div class="person-social">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#f59e0b,#10b981)">KJ</div>
+          </div>
+          <div class="person-name">Kiran Joshi</div>
+          <div class="person-role">Logistics Head</div>
+          <div class="person-dept">6th Sem · Civil Eng.<br>Venue, transport &amp; operations</div>
+          <div class="person-social">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#7c3aed,#f59e0b)">MR</div>
+          </div>
+          <div class="person-name">Meghana Rao</div>
+          <div class="person-role">Design &amp; Media Head</div>
+          <div class="person-dept">7th Sem · Computer Science<br>Branding, social media &amp; design</div>
+          <div class="person-social">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── CHIEF GUESTS ── -->
+    <div class="team-panel" id="panel-guests" role="tabpanel">
+      <div class="team-grid" style="grid-template-columns:repeat(3,1fr);max-width:780px;margin:0 auto">
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)">VG</div>
+          </div>
+          <div class="person-name">Mr. Vikas Gupta</div>
+          <div class="person-role">Chief Guest · Day 1</div>
+          <div class="person-dept">CEO &amp; Co-Founder<br>TechVision India Pvt. Ltd.</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Globe"><i data-lucide="globe" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#a855f7,#06b6d4)">SP</div>
+          </div>
+          <div class="person-name">Dr. Shalini Patel</div>
+          <div class="person-role">Chief Guest · Day 3</div>
+          <div class="person-dept">Professor &amp; AI Researcher<br>IIT Bengaluru</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Globe"><i data-lucide="globe" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo">
+            <div class="person-photo-init" style="background:linear-gradient(135deg,#10b981,#7c3aed)">AB</div>
+          </div>
+          <div class="person-name">Ar. Arvind Bhat</div>
+          <div class="person-role">Guest of Honour · Day 5</div>
+          <div class="person-dept">Award-Winning Entrepreneur<br>Startup India Mentor</div>
+          <div class="person-social">
+            <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin" style="width:13px;height:13px"></i></a>
+            <a href="#" aria-label="Globe"><i data-lucide="globe" style="width:13px;height:13px"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── SPONSORS ── -->
+    <div class="team-panel" id="panel-sponsors" role="tabpanel">
+      <div class="team-grid sponsors-grid">
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo" style="background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.08));border:1px solid rgba(251,191,36,0.2)">💻</div>
+          <div class="sponsor-tier tier-title">Title Sponsor</div>
+          <div class="sponsor-name">TechCorp Solutions</div>
+          <div class="sponsor-desc">Enterprise software &amp; cloud infrastructure leader</div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo" style="background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(6,182,212,0.06));border:1px solid rgba(0,212,255,0.15)">🚀</div>
+          <div class="sponsor-tier tier-gold">Gold Sponsor</div>
+          <div class="sponsor-name">CodeBase Inc.</div>
+          <div class="sponsor-desc">Developer tools, IDE plugins &amp; DevOps platforms</div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo" style="background:linear-gradient(135deg,rgba(168,85,247,0.12),rgba(124,58,237,0.06));border:1px solid rgba(168,85,247,0.15)">🔬</div>
+          <div class="sponsor-tier tier-silver">Silver Sponsor</div>
+          <div class="sponsor-name">InnovateLabs</div>
+          <div class="sponsor-desc">R&amp;D incubator powering student innovation</div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo" style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.06));border:1px solid rgba(16,185,129,0.15)">🌱</div>
+          <div class="sponsor-tier tier-bronze">Bronze Sponsor</div>
+          <div class="sponsor-name">GreenSpark</div>
+          <div class="sponsor-desc">Sustainable tech startup &amp; green energy solutions</div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo" style="background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(99,102,241,0.06));border:1px solid rgba(139,92,246,0.15)">☁️</div>
+          <div class="sponsor-tier tier-partner">Tech Partner</div>
+          <div class="sponsor-name">CloudNine</div>
+          <div class="sponsor-desc">Providing cloud hosting &amp; infrastructure for the event</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="glow-divider"></div>
+
   <!-- ===== CTA ===== -->
   <section class="cta-section">
     <div class="cta-inner">
@@ -1159,7 +1640,48 @@
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         revealObserver.observe(el);
       });
+
+      // ===== TEAM CARDS REVEAL =====
+      const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, idx) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('revealed');
+            }, idx * 80);
+            cardObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      function observeTeamCards() {
+        document.querySelectorAll('.person-card, .sponsor-card').forEach(el => cardObserver.observe(el));
+      }
+      observeTeamCards();
     });
+
+    // ===== TAB SWITCHER =====
+    function switchTab(btn, panelId) {
+      // Update tab buttons
+      document.querySelectorAll('.team-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      // Update panels
+      document.querySelectorAll('.team-panel').forEach(p => p.classList.remove('active'));
+      const panel = document.getElementById(panelId);
+      if (panel) panel.classList.add('active');
+
+      // Re-trigger card reveal for newly shown cards
+      panel.querySelectorAll('.person-card, .sponsor-card').forEach((el, i) => {
+        el.classList.remove('revealed');
+        setTimeout(() => el.classList.add('revealed'), i * 80 + 50);
+      });
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
   </script>
 </body>
 </html>

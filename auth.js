@@ -1,5 +1,5 @@
 /**
- * AGRATHA 2K26 - Auth Logic
+ * VAIBHAV 2K26 - Auth Logic
  * Login, Register, Forgot Password handlers
  * With comprehensive error handling and diagnostics
  */
@@ -325,7 +325,7 @@ async function handleRegister(e) {
 
     // Handle based on whether session exists
     if (hasSession) {
-      showToast('Account created! Welcome to AGRATHA 2K26! 🎉', 'success');
+      showToast('Account created! Welcome to VAIBHAV 2K26! 🎉', 'success');
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
     } else {
       // Email confirmation required

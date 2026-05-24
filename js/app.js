@@ -1,5 +1,5 @@
 /**
- * AGRATHA 2K26 - Shared Utilities
+ * VAIBHAV 2K26 - Shared Utilities
  * Navigation, toast, auth guards, and common helpers
  */
 
@@ -75,7 +75,7 @@ function _createMobileDrawer(links) {
   drawer.className = 'mobile-nav-drawer';
   drawer.innerHTML = `
     <div class="drawer-top">
-      <span class="navbar-brand" style="font-size:1.1rem">AGRATHA 2K26</span>
+      <span class="navbar-brand" style="font-size:1.1rem">VAIBHAV 2K26</span>
       <button onclick="closeMobileMenu()" class="drawer-close-btn" aria-label="Close">
         <i data-lucide="x" style="width:22px;height:22px"></i>
       </button>
@@ -142,7 +142,7 @@ function renderNavbar(activePage) {
 
     // Navbar only contains brand + desktop links + hamburger button
     nav.innerHTML = `
-      <a href="index.html" class="navbar-brand">AGRATHA 2K26</a>
+      <a href="index.html" class="navbar-brand">VAIBHAV 2K26</a>
       <div class="navbar-links">${authLinks}</div>
       <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" id="mobile-menu-btn">
         <i data-lucide="menu" style="width:24px;height:24px"></i>
@@ -183,7 +183,7 @@ function renderSidebar(role, activePage) {
   const links = (role === 'admin' || role === 'organizer') ? adminLinks : participantLinks;
   sidebar.innerHTML = `
     <div class="sidebar-brand">
-      <span class="navbar-brand" style="font-size:1rem">AGRATHA 2K26</span>
+      <span class="navbar-brand" style="font-size:1rem">VAIBHAV 2K26</span>
     </div>
     <div class="sidebar-section">
       <h4>${(role === 'admin' || role === 'organizer') ? 'Admin Panel' : 'Navigation'}</h4>
@@ -215,7 +215,7 @@ function renderFooter() {
   const footer = document.getElementById('footer');
   if (!footer) return;
   footer.innerHTML = `
-    <p>&copy; 2026 <a href="index.html">AGRATHA 2K26</a> — College Fest Management Portal. All rights reserved.</p>
+    <p>&copy; 2026 <a href="index.html">VAIBHAV 2K26</a> — College Fest Management Portal. All rights reserved.</p>
   `;
 }
 
