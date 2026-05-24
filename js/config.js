@@ -8,8 +8,12 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 // Initialize Supabase client with error handling
 try {
-  if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
-    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  // The CDN exposes the library namespace as window.supabase (with .createClient)
+  // We store it separately so we don't overwrite the namespace before calling createClient
+  const _supabaseLib = window.supabase;
+
+  if (_supabaseLib && typeof _supabaseLib.createClient === 'function') {
+    window.supabase = _supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -17,6 +21,17 @@ try {
       },
     });
     console.log('✅ Supabase client initialized successfully');
+    console.log('📡 URL:', SUPABASE_URL);
+  } else if (typeof createClient === 'function') {
+    // Fallback: some CDN builds expose createClient directly on window
+    window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    });
+    console.log('✅ Supabase client initialized (global createClient)');
     console.log('📡 URL:', SUPABASE_URL);
   } else {
     console.error('❌ Supabase library not loaded. Check CDN script tag.');
