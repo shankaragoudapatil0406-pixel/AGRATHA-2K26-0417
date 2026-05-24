@@ -4,236 +4,685 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — VAIBHAV 2K26</title>
-  <meta name="description" content="Your personal dashboard for VAIBHAV 2K26 college fest.">
+  <meta name="description" content="Your personal mission control for VAIBHAV 2K26 college fest.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/particles.js" defer></script>
-  <style>
-    /* ============================================
-       DASHBOARD PAGE STYLES
-       ============================================ */
 
-    /* Welcome Banner */
-    .dash-welcome-banner {
-      position: relative;
-      border-radius: var(--radius-xl);
-      padding: 36px 40px;
-      margin-bottom: 28px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #0d0d20 0%, #0a1020 100%);
-      border: 1px solid rgba(0,212,255,0.15);
-      animation: fadeInUp 0.5s ease forwards;
+  <style>
+    /* =============================================
+       VAIBHAV 2K26 — MISSION CONTROL DASHBOARD
+       ============================================= */
+
+    :root {
+      --cyan: #00d4ff;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --green: #10b981;
+      --orange: #f59e0b;
+      --red: #ef4444;
     }
-    .dash-welcome-banner::before {
+
+    /* ── Layout ── */
+    .db-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding-bottom: 48px;
+    }
+
+    /* =============================================
+       HERO BANNER — Glassmorphism mission control
+       ============================================= */
+    .db-hero {
+      position: relative;
+      border-radius: 24px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(0,212,255,0.18);
+      background: rgba(10,10,25,0.7);
+      backdrop-filter: blur(24px);
+      animation: dbFadeUp 0.5s ease forwards;
+    }
+
+    /* Top gradient stripe */
+    .db-hero::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #00d4ff, #a855f7, #ec4899, #00d4ff);
+      background-size: 200% 100%;
+      animation: gradientFlow 4s linear infinite;
+    }
+
+    /* Ambient glow */
+    .db-hero-glow {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 70% at 85% 50%, rgba(168,85,247,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 60% at 15% 40%, rgba(0,212,255,0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 40% at 50% 100%, rgba(236,72,153,0.07) 0%, transparent 70%);
+    }
+
+    /* Floating orbs */
+    .db-hero-orb {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      filter: blur(40px); opacity: 0.25;
+    }
+    .db-hero-orb.o1 {
+      width: 200px; height: 200px; right: 5%; top: -30%;
+      background: radial-gradient(circle, #a855f7, transparent);
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+    .db-hero-orb.o2 {
+      width: 140px; height: 140px; right: 20%; bottom: -20%;
+      background: radial-gradient(circle, #00d4ff, transparent);
+      animation: orbFloat 6s ease-in-out infinite reverse;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%       { transform: translate(10px, -15px) scale(1.05); }
+    }
+
+    @keyframes gradientFlow {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .db-hero-inner {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 32px;
+      padding: 32px 36px;
+    }
+
+    /* Avatar */
+    .db-user-block { display: flex; align-items: center; gap: 22px; }
+
+    .db-avatar-ring {
+      position: relative; flex-shrink: 0;
+      width: 76px; height: 76px;
+    }
+    .db-avatar-ring svg.ring-svg {
+      position: absolute; inset: -6px;
+      width: calc(100% + 12px); height: calc(100% + 12px);
+      animation: spin 8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .db-avatar {
+      width: 76px; height: 76px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 800;
+      color: #fff; overflow: hidden;
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+    }
+    .db-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .db-greeting-area {}
+    .db-greeting-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--cyan);
+      margin-bottom: 6px;
+    }
+    .db-greeting-tag .live-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,212,255,0.6); }
+      50%       { opacity: 0.6; box-shadow: 0 0 0 5px rgba(0,212,255,0); }
+    }
+
+    .db-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800; line-height: 1.1; margin-bottom: 6px;
+    }
+    .db-name .highlight {
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .db-sub {
+      font-size: 0.875rem; color: rgba(255,255,255,0.45);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .db-sub .sep { opacity: 0.3; }
+
+    /* Quick Action Pills */
+    .db-quick-actions {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+    }
+    .db-pill-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .db-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.7);
+      text-decoration: none; cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      white-space: nowrap;
+    }
+    .db-pill i { width: 14px; height: 14px; }
+    .db-pill:hover {
+      background: rgba(0,212,255,0.1);
+      border-color: rgba(0,212,255,0.4);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,212,255,0.2);
+    }
+    .db-pill.accent {
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(168,85,247,0.2));
+      border-color: rgba(0,212,255,0.3);
+      color: #fff;
+    }
+    .db-pill.accent:hover {
+      background: linear-gradient(135deg, rgba(0,212,255,0.35), rgba(168,85,247,0.35));
+      box-shadow: 0 8px 24px rgba(0,212,255,0.3);
+    }
+
+    /* =============================================
+       STATS ROW — Animated radial progress cards
+       ============================================= */
+    .db-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .db-stat-card {
+      position: relative; overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(13,13,30,0.65);
+      backdrop-filter: blur(16px);
+      padding: 22px 20px;
+      display: flex; align-items: center; gap: 16px;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      cursor: default;
+      opacity: 0;
+      animation: dbFadeUp 0.5s ease forwards;
+    }
+    .db-stat-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(0,212,255,0.25);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.1) inset;
+    }
+
+    /* Color accent bottom glow */
+    .db-stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
+      border-radius: 1px;
+      transition: opacity 0.4s;
+      opacity: 0;
+    }
+    .db-stat-card:hover::after { opacity: 1; }
+    .dsc-cyan::after  { background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+    .dsc-purple::after { background: var(--purple); box-shadow: 0 0 12px var(--purple); }
+    .dsc-green::after { background: var(--green); box-shadow: 0 0 12px var(--green); }
+    .dsc-orange::after { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+
+    /* Subtle shimmer overlay on hover */
+    .db-stat-card::before {
       content: '';
       position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 60% 80% at 90% 50%, rgba(189,0,255,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 70% at 10% 50%, rgba(0,212,255,0.08) 0%, transparent 60%);
-      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.4s;
     }
-    .dash-welcome-banner::after {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--gradient-main);
-    }
-    .dash-banner-inner {
-      position: relative; z-index: 1;
-      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
-    }
-    .dash-avatar-block { display: flex; align-items: center; gap: 20px; }
-    .dash-avatar {
-      width: 64px; height: 64px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: #fff;
-      flex-shrink: 0; position: relative;
-    }
-    .dash-avatar::after {
-      content: ''; position: absolute; inset: -3px; border-radius: 50%;
-      background: var(--gradient-main); z-index: -1; opacity: 0.7;
-      animation: avatarRing 3s ease-in-out infinite;
-    }
-    @keyframes avatarRing {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.9; transform: scale(1.04); }
-    }
-    .dash-welcome-text {}
-    .dash-time-greeting {
-      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
-      color: var(--accent-cyan); font-weight: 600; margin-bottom: 4px;
-    }
-    .dash-welcome-name {
-      font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800;
-      line-height: 1.1; margin-bottom: 6px;
-    }
-    .dash-welcome-name span { color: var(--accent-cyan); }
-    .dash-welcome-sub { color: var(--text-secondary); font-size: 0.9rem; }
+    .db-stat-card:hover::before { opacity: 1; }
 
-    /* Quick action pills */
-    .dash-quick-pills {
-      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    /* Radial ring SVG */
+    .dsc-ring-wrap {
+      position: relative; flex-shrink: 0;
+      width: 56px; height: 56px;
     }
-    .quick-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 18px; border-radius: 50px;
-      font-size: 0.82rem; font-weight: 600; font-family: var(--font-heading);
-      border: 1px solid var(--border-glass); background: rgba(255,255,255,0.04);
-      color: var(--text-secondary); cursor: pointer; transition: all 0.3s;
-      text-decoration: none;
+    .dsc-ring-svg {
+      width: 56px; height: 56px;
+      transform: rotate(-90deg);
     }
-    .quick-pill i { width: 15px; height: 15px; }
-    .quick-pill:hover { background: rgba(0,212,255,0.1); border-color: var(--accent-cyan); color: var(--text-primary); transform: translateY(-2px); }
-    .quick-pill.primary { background: var(--gradient-main); border-color: transparent; color: #fff; box-shadow: 0 4px 15px rgba(0,212,255,0.25); }
-    .quick-pill.primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,212,255,0.4); }
-
-    /* ===== STATS ROW ===== */
-    .dash-stats-row {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
-      margin-bottom: 28px;
+    .dsc-ring-bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.06);
+      stroke-width: 4;
     }
-    .dstat {
-      background: var(--bg-card); border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg); padding: 20px;
-      position: relative; overflow: hidden;
-      display: flex; align-items: center; gap: 16px;
-      transition: all 0.35s; cursor: default;
-      animation: fadeInUp 0.4s ease forwards; opacity: 0;
+    .dsc-ring-fill {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 138; /* 2π * 22 ≈ 138 */
+      stroke-dashoffset: 138;
+      transition: stroke-dashoffset 1.6s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .dstat:hover {
-      transform: translateY(-4px); border-color: rgba(0,212,255,0.25);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-    }
-    .dstat::before {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-      background: var(--gradient-main); opacity: 0; transition: opacity 0.3s;
-    }
-    .dstat:hover::before { opacity: 1; }
-    .dstat-icon {
-      width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    .dsc-ring-icon {
+      position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
     }
-    .dstat-icon i { width: 22px; height: 22px; }
-    .dstat-icon.c1 { background: rgba(0,212,255,0.12); color: var(--accent-cyan); }
-    .dstat-icon.c2 { background: rgba(168,85,247,0.12); color: var(--accent-purple); }
-    .dstat-icon.c3 { background: rgba(16,185,129,0.12); color: var(--accent-green); }
-    .dstat-icon.c4 { background: rgba(245,158,11,0.12); color: var(--accent-orange); }
-    .dstat-body { flex: 1; min-width: 0; }
-    .dstat-value {
-      font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
-      line-height: 1; margin-bottom: 4px; color: var(--text-primary);
-    }
-    .dstat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .dsc-ring-icon i { width: 22px; height: 22px; }
+    .dsc-cyan  .dsc-ring-fill { stroke: var(--cyan); }
+    .dsc-purple .dsc-ring-fill { stroke: var(--purple); }
+    .dsc-green .dsc-ring-fill { stroke: var(--green); }
+    .dsc-orange .dsc-ring-fill { stroke: var(--orange); }
+    .dsc-cyan  .dsc-ring-icon { color: var(--cyan); }
+    .dsc-purple .dsc-ring-icon { color: var(--purple); }
+    .dsc-green .dsc-ring-icon { color: var(--green); }
+    .dsc-orange .dsc-ring-icon { color: var(--orange); }
 
-    /* ===== MAIN GRID ===== */
-    .dash-grid {
-      display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px;
+    .dsc-body { flex: 1; min-width: 0; }
+    .dsc-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem; font-weight: 800;
+      line-height: 1; margin-bottom: 4px;
+      color: #fff;
+      letter-spacing: -1px;
+    }
+    .dsc-label {
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.35);
+    }
+    .dsc-delta {
+      font-size: 0.72rem; color: var(--green);
+      font-weight: 600; margin-top: 4px;
+      display: flex; align-items: center; gap: 3px;
     }
 
-    /* Panel card */
-    .dash-panel {
-      background: var(--bg-card); border: 1px solid var(--border-glass);
-      border-radius: var(--radius-xl);
+    /* =============================================
+       MAIN GRID
+       ============================================= */
+    .db-main-grid {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .db-left-col { display: flex; flex-direction: column; gap: 20px; }
+    .db-right-col { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Generic Panel ── */
+    .db-panel {
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(13,13,30,0.65);
+      backdrop-filter: blur(16px);
       overflow: hidden;
-      display: flex; flex-direction: column;
-      animation: fadeInUp 0.5s ease forwards; opacity: 0;
+      opacity: 0;
+      animation: dbFadeUp 0.5s ease forwards;
     }
-    .panel-head {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border-glass);
+
+    .db-panel-head {
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .panel-head-left { display: flex; align-items: center; gap: 10px; }
-    .panel-head-icon {
-      width: 32px; height: 32px; border-radius: 10px;
+    .db-panel-head-left {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .db-ph-icon {
+      width: 34px; height: 34px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
     }
-    .panel-head-icon i { width: 16px; height: 16px; }
-    .picon-blue { background: rgba(0,212,255,0.12); color: var(--accent-cyan); }
-    .picon-pink { background: rgba(236,72,153,0.12); color: #ec4899; }
-    .panel-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; }
-    .panel-head a { font-size: 0.78rem; color: var(--text-muted); transition: color 0.3s; }
-    .panel-head a:hover { color: var(--accent-cyan); }
-    .panel-body { padding: 16px; flex: 1; overflow-y: auto; }
+    .db-ph-icon i { width: 16px; height: 16px; }
+    .phi-cyan   { background: rgba(0,212,255,0.12);  color: var(--cyan); }
+    .phi-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
+    .phi-pink   { background: rgba(236,72,153,0.12); color: var(--pink); }
+    .phi-green  { background: rgba(16,185,129,0.12); color: var(--green); }
+    .phi-orange { background: rgba(245,158,11,0.12); color: var(--orange); }
 
-    /* Progress strip */
-    .progress-strip {
-      margin: 0 16px 0;
-      padding: 14px 16px;
-      background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(168,85,247,0.05));
-      border: 1px solid rgba(0,212,255,0.12);
-      border-radius: var(--radius-md);
-      margin-bottom: 12px;
+    .db-panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      color: rgba(255,255,255,0.9);
     }
-    .ps-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .ps-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
-    .ps-val { font-family: var(--font-display); font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700; }
-    .ps-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .ps-fill { height: 100%; background: var(--gradient-main); border-radius: 3px; width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+    .db-panel-sub {
+      font-size: 0.72rem; color: rgba(255,255,255,0.35);
+      margin-top: 1px;
+    }
 
-    /* Event items */
-    .ev-item {
+    .db-panel-link {
+      font-size: 0.75rem; color: rgba(255,255,255,0.35);
+      text-decoration: none; transition: color 0.3s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .db-panel-link:hover { color: var(--cyan); }
+
+    .db-panel-body { padding: 16px 20px; }
+
+    /* =============================================
+       EVENTS LIST
+       ============================================= */
+    .db-ev-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .db-ev-item {
       display: flex; align-items: center; gap: 14px;
-      padding: 14px; border-radius: var(--radius-md);
-      border: 1px solid var(--border-glass);
-      margin-bottom: 10px; transition: all 0.3s;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
       text-decoration: none; color: inherit;
-      background: var(--bg-secondary);
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
       position: relative; overflow: hidden;
     }
-    .ev-item::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: var(--gradient-main); opacity: 0; transition: opacity 0.3s;
+    .db-ev-item::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(to bottom, var(--cyan), var(--purple));
+      transform: scaleY(0); transform-origin: top;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      border-radius: 0 2px 2px 0;
     }
-    .ev-item:hover { border-color: rgba(0,212,255,0.3); transform: translateX(4px); }
-    .ev-item:hover::before { opacity: 1; }
-    .ev-item:last-child { margin-bottom: 0; }
-    .ev-thumb {
+    .db-ev-item:hover {
+      background: rgba(0,212,255,0.06);
+      border-color: rgba(0,212,255,0.2);
+      transform: translateX(4px);
+    }
+    .db-ev-item:hover::before { transform: scaleY(1); }
+
+    .db-ev-thumb {
       width: 46px; height: 46px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.3rem; flex-shrink: 0;
     }
-    .ev-info { flex: 1; min-width: 0; }
-    .ev-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ev-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+    .ict { background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(168,85,247,0.2)); }
+    .icc { background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(168,85,247,0.2)); }
+    .ics { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(0,212,255,0.15)); }
+    .icw { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(16,185,129,0.15)); }
+    .icg { background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15)); }
 
-    /* Announcement items */
-    .ann-item {
-      padding: 14px; border-radius: var(--radius-md);
-      background: var(--bg-secondary); border: 1px solid var(--border-glass);
-      margin-bottom: 10px; position: relative; overflow: hidden;
-      border-left: 3px solid transparent; transition: all 0.3s;
+    .db-ev-info { flex: 1; min-width: 0; }
+    .db-ev-name {
+      font-weight: 700; font-size: 0.9rem; margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: rgba(255,255,255,0.9);
     }
-    .ann-item:last-child { margin-bottom: 0; }
-    .ann-item:hover { transform: translateX(4px); }
-    .ann-item.urgent { border-left-color: #ef4444; background: linear-gradient(90deg, rgba(239,68,68,0.04), var(--bg-secondary)); }
-    .ann-item.important { border-left-color: #f59e0b; background: linear-gradient(90deg, rgba(245,158,11,0.04), var(--bg-secondary)); }
-    .ann-item.normal { border-left-color: var(--accent-cyan); }
-    .ann-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
-    .ann-title-text { font-weight: 700; font-size: 0.88rem; color: var(--text-primary); }
-    .ann-snippet { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .ann-time { font-size: 0.7rem; color: var(--text-muted); }
+    .db-ev-meta {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      font-size: 0.72rem; color: rgba(255,255,255,0.4);
+    }
+    .db-ev-meta span { display: flex; align-items: center; gap: 3px; }
 
-    /* Empty state */
-    .dash-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
-    .dash-empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
-    .dash-empty h4 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 6px; }
-    .dash-empty p { font-size: 0.85rem; margin-bottom: 20px; }
+    .db-ev-status {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
+      text-transform: uppercase; flex-shrink: 0;
+    }
+    .es-confirmed { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+    .es-pending   { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.25); }
+    .es-attended  { background: rgba(0,212,255,0.15);  color: var(--cyan);   border: 1px solid rgba(0,212,255,0.25); }
 
-    /* Responsive */
+    /* =============================================
+       PROGRESS / READINESS METER
+       ============================================= */
+    .db-readiness {
+      padding: 18px 20px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(168,85,247,0.06));
+      border-radius: 14px;
+      border: 1px solid rgba(0,212,255,0.1);
+      margin-bottom: 16px;
+      display: none;
+    }
+    .dr-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .dr-label {
+      font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dr-label .dr-icon { font-size: 1rem; }
+    .dr-pct {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem; color: var(--cyan); font-weight: 700;
+    }
+    .dr-bar-bg {
+      height: 6px; border-radius: 3px;
+      background: rgba(255,255,255,0.06); overflow: hidden;
+    }
+    .dr-bar-fill {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      width: 0; transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+    }
+    .dr-bar-fill::after {
+      content: '';
+      position: absolute; right: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 10px; height: 10px; border-radius: 50%;
+      background: white; box-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* =============================================
+       COUNTDOWN WIDGET
+       ============================================= */
+    .db-countdown-widget {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(236,72,153,0.06));
+      border-radius: 16px;
+      border: 1px solid rgba(168,85,247,0.15);
+      text-align: center;
+    }
+    .dcw-label {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px;
+      color: rgba(255,255,255,0.35); margin-bottom: 14px; font-weight: 700;
+    }
+    .dcw-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    }
+    .dcw-seg {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 10px 6px;
+    }
+    .dcw-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: block; line-height: 1;
+    }
+    .dcw-unit {
+      font-size: 0.55rem; text-transform: uppercase;
+      letter-spacing: 1px; color: rgba(255,255,255,0.3);
+      margin-top: 4px; display: block; font-weight: 700;
+    }
+
+    /* =============================================
+       ANNOUNCEMENTS
+       ============================================= */
+    .db-ann-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .db-ann-item {
+      position: relative; overflow: hidden;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-left: 3px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
+    }
+    .db-ann-item:hover { transform: translateX(3px); background: rgba(255,255,255,0.05); }
+    .db-ann-item.urgent   { border-left-color: var(--red);    background: linear-gradient(90deg, rgba(239,68,68,0.05),    rgba(255,255,255,0.02)); }
+    .db-ann-item.important { border-left-color: var(--orange); background: linear-gradient(90deg, rgba(245,158,11,0.05), rgba(255,255,255,0.02)); }
+    .db-ann-item.normal   { border-left-color: var(--cyan); }
+
+    .da-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+    .da-title { font-weight: 700; font-size: 0.875rem; color: rgba(255,255,255,0.9); }
+    .da-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 50px;
+      font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .da-badge.urgent   { background: rgba(239,68,68,0.15);    color: var(--red);    border: 1px solid rgba(239,68,68,0.3); }
+    .da-badge.important { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.3); }
+    .da-content {
+      font-size: 0.78rem; color: rgba(255,255,255,0.45); line-height: 1.55;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .da-time { font-size: 0.68rem; color: rgba(255,255,255,0.25); }
+
+    /* =============================================
+       QUICK ACTIONS GRID
+       ============================================= */
+    .db-qa-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    }
+    .db-qa-card {
+      display: flex; flex-direction: column; align-items: flex-start;
+      gap: 10px; padding: 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      text-decoration: none; color: inherit;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position: relative; overflow: hidden;
+    }
+    .db-qa-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .db-qa-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0,212,255,0.2);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+    }
+    .db-qa-card:hover::after { opacity: 1; }
+
+    .qa-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .qa-icon i { width: 18px; height: 18px; }
+    .qa-cyan   { background: rgba(0,212,255,0.12);  color: var(--cyan); }
+    .qa-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
+    .qa-pink   { background: rgba(236,72,153,0.12); color: var(--pink); }
+    .qa-green  { background: rgba(16,185,129,0.12); color: var(--green); }
+
+    .qa-label {
+      font-size: 0.82rem; font-weight: 700;
+      color: rgba(255,255,255,0.85);
+    }
+    .qa-desc {
+      font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 2px;
+    }
+
+    /* =============================================
+       ACTIVITY TIMELINE
+       ============================================= */
+    .db-timeline { position: relative; padding-left: 24px; }
+    .db-timeline::before {
+      content: '';
+      position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px;
+      background: linear-gradient(to bottom, var(--cyan), var(--purple), transparent);
+      border-radius: 2px;
+    }
+    .tl-item {
+      position: relative; margin-bottom: 18px;
+    }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-dot {
+      position: absolute; left: -20px; top: 4px;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.8);
+    }
+    .tl-dot.dc  { background: var(--cyan);   box-shadow: 0 0 8px var(--cyan); }
+    .tl-dot.dp  { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+    .tl-dot.dg  { background: var(--green);  box-shadow: 0 0 8px var(--green); }
+    .tl-dot.do  { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+
+    .tl-text {
+      font-size: 0.8rem; color: rgba(255,255,255,0.75); line-height: 1.45;
+    }
+    .tl-text strong { color: rgba(255,255,255,0.95); }
+    .tl-time {
+      font-size: 0.65rem; color: rgba(255,255,255,0.3);
+      margin-top: 3px; font-weight: 600; letter-spacing: 0.5px;
+    }
+
+    /* =============================================
+       EMPTY STATE
+       ============================================= */
+    .db-empty {
+      text-align: center; padding: 44px 20px;
+      color: rgba(255,255,255,0.35);
+    }
+    .db-empty-icon {
+      font-size: 2.8rem; margin-bottom: 14px; display: block;
+      filter: saturate(0.3);
+    }
+    .db-empty h4 {
+      font-size: 0.95rem; color: rgba(255,255,255,0.6); margin-bottom: 6px;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    }
+    .db-empty p { font-size: 0.82rem; margin-bottom: 18px; line-height: 1.6; }
+    .db-empty a {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 50px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #fff; font-size: 0.82rem; font-weight: 700;
+      text-decoration: none; transition: all 0.3s;
+    }
+    .db-empty a:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,212,255,0.3); }
+
+    /* =============================================
+       ANIMATIONS
+       ============================================= */
+    @keyframes dbFadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Staggered delays */
+    .db-hero        { animation-delay: 0s; }
+    .db-stats-row .db-stat-card:nth-child(1) { animation-delay: 0.08s; }
+    .db-stats-row .db-stat-card:nth-child(2) { animation-delay: 0.14s; }
+    .db-stats-row .db-stat-card:nth-child(3) { animation-delay: 0.20s; }
+    .db-stats-row .db-stat-card:nth-child(4) { animation-delay: 0.26s; }
+    .db-panel:nth-of-type(1) { animation-delay: 0.32s; }
+    .db-panel:nth-of-type(2) { animation-delay: 0.38s; }
+    .db-panel:nth-of-type(3) { animation-delay: 0.44s; }
+    .db-panel:nth-of-type(4) { animation-delay: 0.50s; }
+    .db-panel:nth-of-type(5) { animation-delay: 0.56s; }
+
+    /* =============================================
+       RESPONSIVE
+       ============================================= */
     @media (max-width: 1100px) {
-      .dash-grid { grid-template-columns: 1fr; }
-      .dash-stats-row { grid-template-columns: repeat(2, 1fr); }
+      .db-main-grid { grid-template-columns: 1fr; }
+      .db-right-col { display: grid; grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 600px) {
-      .dash-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .dash-welcome-banner { padding: 24px 20px; }
-      .dash-welcome-name { font-size: 1.4rem; }
-      .dash-avatar { width: 52px; height: 52px; font-size: 1.2rem; }
-      .dash-banner-inner { flex-direction: column; align-items: flex-start; }
-      .dstat-value { font-size: 1.5rem; }
+    @media (max-width: 900px) {
+      .db-stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .db-right-col { grid-template-columns: 1fr; }
+      .db-hero-inner { grid-template-columns: 1fr; }
+      .db-quick-actions { align-items: flex-start; }
+      .db-pill-row { justify-content: flex-start; }
+    }
+    @media (max-width: 520px) {
+      .db-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .db-qa-grid { grid-template-columns: repeat(2, 1fr); }
+      .dsc-value { font-size: 1.6rem; }
     }
   </style>
 </head>
@@ -243,113 +692,267 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <div class="main-content with-sidebar">
+    <div class="db-wrapper">
 
-    <!-- ===== WELCOME BANNER ===== -->
-    <div class="dash-welcome-banner">
-      <div class="dash-banner-inner">
-        <div class="dash-avatar-block">
-          <div class="dash-avatar" id="dash-avatar" style="background: linear-gradient(135deg, #00d4ff, #a855f7)">?</div>
-          <div class="dash-welcome-text">
-            <div class="dash-time-greeting" id="time-greeting">Loading...</div>
-            <div class="dash-welcome-name">Welcome back, <span id="user-first-name">Participant</span>!</div>
-            <div class="dash-welcome-sub" id="user-college">Your fest journey starts here 🎉</div>
+      <!-- ===== HERO BANNER ===== -->
+      <div class="db-hero" style="animation: dbFadeUp 0.5s ease forwards; opacity:0;">
+        <div class="db-hero-glow"></div>
+        <div class="db-hero-orb o1"></div>
+        <div class="db-hero-orb o2"></div>
+        <div class="db-hero-inner">
+
+          <div class="db-user-block">
+            <!-- Avatar with spinning ring -->
+            <div class="db-avatar-ring">
+              <svg class="ring-svg" viewBox="0 0 88 88" fill="none">
+                <defs>
+                  <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stop-color="#00d4ff" stop-opacity="0.8"/>
+                    <stop offset="50%"  stop-color="#a855f7" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="44" cy="44" r="40" stroke="url(#ringGrad)" stroke-width="2" stroke-linecap="round"
+                  stroke-dasharray="200 51" />
+              </svg>
+              <div class="db-avatar" id="dash-avatar">?</div>
+            </div>
+
+            <div class="db-greeting-area">
+              <div class="db-greeting-tag">
+                <span class="live-dot"></span>
+                <span id="time-greeting">Loading…</span>
+              </div>
+              <div class="db-name">
+                Welcome back, <span class="highlight" id="user-first-name">Participant</span>!
+              </div>
+              <div class="db-sub">
+                <span id="user-college">VAIBHAV 2K26</span>
+                <span class="sep">·</span>
+                <span>Mission Control</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-quick-actions">
+            <div class="db-pill-row">
+              <a href="events.html" class="db-pill accent">
+                <i data-lucide="search"></i> Browse Events
+              </a>
+              <a href="leaderboard.html" class="db-pill">
+                <i data-lucide="trophy"></i> Rankings
+              </a>
+            </div>
+            <div class="db-pill-row">
+              <a href="tickets.html" class="db-pill">
+                <i data-lucide="ticket"></i> My Tickets
+              </a>
+              <a href="teams.html" class="db-pill">
+                <i data-lucide="users"></i> My Teams
+              </a>
+              <a href="profile.html" class="db-pill">
+                <i data-lucide="user"></i> Profile
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== STATS CARDS ===== -->
+      <div class="db-stats-row">
+
+        <div class="db-stat-card dsc-cyan">
+          <div class="dsc-ring-wrap">
+            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
+              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
+              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-events"/>
+            </svg>
+            <div class="dsc-ring-icon"><i data-lucide="zap"></i></div>
+          </div>
+          <div class="dsc-body">
+            <div class="dsc-value" id="stat-events">—</div>
+            <div class="dsc-label">Events Joined</div>
+            <div class="dsc-delta"><i data-lucide="trending-up" style="width:11px;height:11px"></i> Active</div>
           </div>
         </div>
-        <div class="dash-quick-pills">
-          <a href="events.html" class="quick-pill primary">
-            <i data-lucide="search"></i> Browse Events
-          </a>
-          <a href="tickets.html" class="quick-pill">
-            <i data-lucide="ticket"></i> My Tickets
-          </a>
-          <a href="leaderboard.html" class="quick-pill">
-            <i data-lucide="trophy"></i> Rankings
-          </a>
-          <a href="profile.html" class="quick-pill">
-            <i data-lucide="user"></i> Profile
-          </a>
-        </div>
-      </div>
-    </div>
 
-    <!-- ===== STATS ===== -->
-    <div class="dash-stats-row">
-      <div class="dstat" style="animation-delay:0.05s">
-        <div class="dstat-icon c1"><i data-lucide="zap"></i></div>
-        <div class="dstat-body">
-          <div class="dstat-value" id="stat-events">—</div>
-          <div class="dstat-label">Events Joined</div>
-        </div>
-      </div>
-      <div class="dstat" style="animation-delay:0.1s">
-        <div class="dstat-icon c2"><i data-lucide="users"></i></div>
-        <div class="dstat-body">
-          <div class="dstat-value" id="stat-teams">—</div>
-          <div class="dstat-label">Teams</div>
-        </div>
-      </div>
-      <div class="dstat" style="animation-delay:0.15s">
-        <div class="dstat-icon c3"><i data-lucide="ticket"></i></div>
-        <div class="dstat-body">
-          <div class="dstat-value" id="stat-tickets">—</div>
-          <div class="dstat-label">Tickets</div>
-        </div>
-      </div>
-      <div class="dstat" style="animation-delay:0.2s">
-        <div class="dstat-icon c4"><i data-lucide="star"></i></div>
-        <div class="dstat-body">
-          <div class="dstat-value" id="stat-points">—</div>
-          <div class="dstat-label">Points</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== MAIN GRID ===== -->
-    <div class="dash-grid">
-
-      <!-- LEFT: Events Panel -->
-      <div class="dash-panel" style="animation-delay:0.25s">
-        <div class="panel-head">
-          <div class="panel-head-left">
-            <div class="panel-head-icon picon-blue"><i data-lucide="calendar-days"></i></div>
-            <span class="panel-title">My Registered Events</span>
+        <div class="db-stat-card dsc-purple">
+          <div class="dsc-ring-wrap">
+            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
+              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
+              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-teams"/>
+            </svg>
+            <div class="dsc-ring-icon"><i data-lucide="users"></i></div>
           </div>
-          <a href="events.html">Browse all →</a>
-        </div>
-
-        <!-- Progress strip (hidden until loaded) -->
-        <div class="progress-strip" id="progress-strip" style="display:none; margin-top:16px;">
-          <div class="ps-row">
-            <span class="ps-label">🎯 Fest Readiness</span>
-            <span class="ps-val" id="ps-val">0 / 5</span>
+          <div class="dsc-body">
+            <div class="dsc-value" id="stat-teams">—</div>
+            <div class="dsc-label">Teams</div>
+            <div class="dsc-delta" style="color:var(--purple)"><i data-lucide="shield" style="width:11px;height:11px"></i> Member</div>
           </div>
-          <div class="ps-bar"><div class="ps-fill" id="ps-fill"></div></div>
         </div>
 
-        <div class="panel-body" id="my-events">
-          <div class="loading-spinner"></div>
+        <div class="db-stat-card dsc-green">
+          <div class="dsc-ring-wrap">
+            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
+              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
+              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-tickets"/>
+            </svg>
+            <div class="dsc-ring-icon"><i data-lucide="ticket"></i></div>
+          </div>
+          <div class="dsc-body">
+            <div class="dsc-value" id="stat-tickets">—</div>
+            <div class="dsc-label">Tickets</div>
+            <div class="dsc-delta" style="color:var(--green)"><i data-lucide="check-circle" style="width:11px;height:11px"></i> Valid</div>
+          </div>
         </div>
+
+        <div class="db-stat-card dsc-orange">
+          <div class="dsc-ring-wrap">
+            <svg class="dsc-ring-svg" viewBox="0 0 56 56">
+              <circle class="dsc-ring-bg" cx="28" cy="28" r="22"/>
+              <circle class="dsc-ring-fill" cx="28" cy="28" r="22" id="ring-points"/>
+            </svg>
+            <div class="dsc-ring-icon"><i data-lucide="star"></i></div>
+          </div>
+          <div class="dsc-body">
+            <div class="dsc-value" id="stat-points">—</div>
+            <div class="dsc-label">Points</div>
+            <div class="dsc-delta" style="color:var(--orange)"><i data-lucide="award" style="width:11px;height:11px"></i> Earned</div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- RIGHT: Announcements Panel -->
-      <div class="dash-panel" style="animation-delay:0.35s">
-        <div class="panel-head">
-          <div class="panel-head-left">
-            <div class="panel-head-icon picon-pink"><i data-lucide="bell"></i></div>
-            <span class="panel-title">Announcements</span>
+      <!-- ===== MAIN GRID ===== -->
+      <div class="db-main-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="db-left-col">
+
+          <!-- My Events Panel -->
+          <div class="db-panel">
+            <div class="db-panel-head">
+              <div class="db-panel-head-left">
+                <div class="db-ph-icon phi-cyan"><i data-lucide="calendar-days"></i></div>
+                <div>
+                  <div class="db-panel-title">My Registered Events</div>
+                  <div class="db-panel-sub">Your upcoming competitions</div>
+                </div>
+              </div>
+              <a href="events.html" class="db-panel-link">
+                Browse all <i data-lucide="arrow-right" style="width:12px;height:12px"></i>
+              </a>
+            </div>
+
+            <!-- Readiness Meter -->
+            <div class="db-panel-body" style="padding-bottom:0;">
+              <div class="db-readiness" id="db-readiness">
+                <div class="dr-head">
+                  <div class="dr-label">
+                    <span class="dr-icon">🎯</span> Fest Readiness Score
+                  </div>
+                  <div class="dr-pct" id="dr-pct">0%</div>
+                </div>
+                <div class="dr-bar-bg"><div class="dr-bar-fill" id="dr-fill"></div></div>
+              </div>
+            </div>
+
+            <div class="db-panel-body" id="my-events">
+              <div class="loading-spinner"></div>
+            </div>
           </div>
-          <a href="announcements.html">See all →</a>
+
         </div>
-        <div class="panel-body" id="recent-announcements">
-          <div class="loading-spinner"></div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="db-right-col">
+
+          <!-- Countdown Widget -->
+          <div class="db-panel">
+            <div class="db-panel-head">
+              <div class="db-panel-head-left">
+                <div class="db-ph-icon phi-purple"><i data-lucide="clock"></i></div>
+                <div>
+                  <div class="db-panel-title">Fest Countdown</div>
+                  <div class="db-panel-sub">VAIBHAV 2K26 starts in</div>
+                </div>
+              </div>
+            </div>
+            <div class="db-panel-body">
+              <div class="db-countdown-widget">
+                <div class="dcw-label">⚡ Live Countdown</div>
+                <div class="dcw-grid">
+                  <div class="dcw-seg"><span class="dcw-num" id="cd-days">00</span><span class="dcw-unit">Days</span></div>
+                  <div class="dcw-seg"><span class="dcw-num" id="cd-hrs">00</span><span class="dcw-unit">Hours</span></div>
+                  <div class="dcw-seg"><span class="dcw-num" id="cd-min">00</span><span class="dcw-unit">Mins</span></div>
+                  <div class="dcw-seg"><span class="dcw-num" id="cd-sec">00</span><span class="dcw-unit">Secs</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Grid -->
+          <div class="db-panel">
+            <div class="db-panel-head">
+              <div class="db-panel-head-left">
+                <div class="db-ph-icon phi-orange"><i data-lucide="layout-grid"></i></div>
+                <div>
+                  <div class="db-panel-title">Quick Actions</div>
+                  <div class="db-panel-sub">Jump to anywhere</div>
+                </div>
+              </div>
+            </div>
+            <div class="db-panel-body">
+              <div class="db-qa-grid">
+                <a href="events.html" class="db-qa-card">
+                  <div class="qa-icon qa-cyan"><i data-lucide="calendar"></i></div>
+                  <div><div class="qa-label">Browse</div><div class="qa-desc">Discover events</div></div>
+                </a>
+                <a href="teams.html" class="db-qa-card">
+                  <div class="qa-icon qa-purple"><i data-lucide="users"></i></div>
+                  <div><div class="qa-label">Teams</div><div class="qa-desc">Manage squads</div></div>
+                </a>
+                <a href="leaderboard.html" class="db-qa-card">
+                  <div class="qa-icon qa-pink"><i data-lucide="trophy"></i></div>
+                  <div><div class="qa-label">Leaderboard</div><div class="qa-desc">Top performers</div></div>
+                </a>
+                <a href="profile.html" class="db-qa-card">
+                  <div class="qa-icon qa-green"><i data-lucide="user-circle"></i></div>
+                  <div><div class="qa-label">Profile</div><div class="qa-desc">Your details</div></div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Announcements Panel -->
+          <div class="db-panel">
+            <div class="db-panel-head">
+              <div class="db-panel-head-left">
+                <div class="db-ph-icon phi-pink"><i data-lucide="bell"></i></div>
+                <div>
+                  <div class="db-panel-title">Announcements</div>
+                  <div class="db-panel-sub">Latest from organizers</div>
+                </div>
+              </div>
+              <a href="announcements.html" class="db-panel-link">
+                See all <i data-lucide="arrow-right" style="width:12px;height:12px"></i>
+              </a>
+            </div>
+            <div class="db-panel-body" id="recent-announcements">
+              <div class="loading-spinner"></div>
+            </div>
+          </div>
+
         </div>
       </div>
-
     </div>
   </div><!-- /.main-content -->
 
   <script>
-    /* ===== Helpers ===== */
+    /* ===========================
+       HELPERS
+    =========================== */
     function getGreeting() {
       const h = new Date().getHours();
       if (h < 5)  return '🌙 Good night';
@@ -359,22 +962,18 @@
       return '🌙 Good night';
     }
 
-    const avatarColors = [
+    const avatarGrads = [
       'linear-gradient(135deg,#00d4ff,#0066ff)',
       'linear-gradient(135deg,#a855f7,#7c3aed)',
       'linear-gradient(135deg,#ec4899,#be185d)',
       'linear-gradient(135deg,#10b981,#059669)',
       'linear-gradient(135deg,#f59e0b,#d97706)',
     ];
-    function getAvatarBg(name) {
-      return avatarColors[(name || 'A').charCodeAt(0) % avatarColors.length];
-    }
-    function getInitials(name) {
-      return (name || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-    }
+    const getAvatarBg = n => avatarGrads[(n || 'A').charCodeAt(0) % avatarGrads.length];
+    const getInitials = n => (n || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
 
     function animateCount(el, end, dur = 1400) {
-      if (!el) return;
+      if (!el || isNaN(end)) return;
       let start = null;
       const step = ts => {
         if (!start) start = ts;
@@ -386,64 +985,134 @@
       requestAnimationFrame(step);
     }
 
-    function getCatThumbClass(cat) {
-      const m = { technical: 'ic-1', cultural: 'ic-2', sports: 'ic-3', workshop: 'ic-4', gaming: 'ic-2' };
-      return m[cat] || 'ic-1';
+    // Animate SVG ring
+    function animateRing(id, value, max) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const pct = Math.min(value / max, 1);
+      const circumference = 138; // 2π * r(22)
+      setTimeout(() => {
+        el.style.strokeDashoffset = circumference - pct * circumference;
+      }, 400);
     }
 
-    /* ===== Main Load ===== */
+    const catThumb = { technical: 'ict', cultural: 'icc', sports: 'ics', workshop: 'icw', gaming: 'icg' };
+    const catIcon  = { technical: '💻', cultural: '🎭', sports: '⚽', workshop: '🔧', gaming: '🎮' };
+
+    function getStatusClass(s) {
+      if (s === 'confirmed') return 'es-confirmed';
+      if (s === 'pending')   return 'es-pending';
+      if (s === 'attended')  return 'es-attended';
+      return 'es-confirmed';
+    }
+
+    function formatDate(d) {
+      if (!d) return 'TBD';
+      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function formatDateTime(d) {
+      if (!d) return 'TBD';
+      return new Date(d).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+
+    /* ===========================
+       COUNTDOWN TIMER
+    =========================== */
+    function startFestCountdown(targetDate) {
+      function tick() {
+        const now  = Date.now();
+        const dist = new Date(targetDate).getTime() - now;
+        if (dist <= 0) {
+          ['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '00';
+          });
+          return;
+        }
+        const days = Math.floor(dist / 86400000);
+        const hrs  = Math.floor((dist % 86400000) / 3600000);
+        const mins = Math.floor((dist % 3600000)  / 60000);
+        const secs = Math.floor((dist % 60000)    / 1000);
+        const pad  = n => String(n).padStart(2, '0');
+        document.getElementById('cd-days').textContent = pad(days);
+        document.getElementById('cd-hrs').textContent  = pad(hrs);
+        document.getElementById('cd-min').textContent  = pad(mins);
+        document.getElementById('cd-sec').textContent  = pad(secs);
+      }
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    /* ===========================
+       MAIN INIT
+    =========================== */
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await requireAuth('participant');
       if (!user) return;
 
       renderNavbar('dashboard');
       renderSidebar('participant', 'overview');
-      initParticles('particles-canvas', 12);
+      if (typeof initParticles === 'function') initParticles('particles-canvas', 12);
       if (typeof lucide !== 'undefined') lucide.createIcons();
 
-      /* ── Banner ── */
-      const first = (user.full_name || 'Participant').split(' ')[0];
+      // ── Greeting & Banner ──
       document.getElementById('time-greeting').textContent = getGreeting();
+      const first = (user.full_name || 'Participant').split(' ')[0];
       document.getElementById('user-first-name').textContent = first;
-      if (user.college) document.getElementById('user-college').textContent = `${user.college} · ${user.department || 'VAIBHAV 2K26'}`;
+      if (user.college) {
+        document.getElementById('user-college').textContent =
+          `${user.college}${user.department ? ' · ' + user.department : ''}`;
+      }
       const av = document.getElementById('dash-avatar');
       if (user.avatar_url) {
-        av.innerHTML = `<img src="${user.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="Avatar">`;
+        av.innerHTML = `<img src="${user.avatar_url}" alt="Avatar">`;
         av.style.background = 'transparent';
       } else {
         av.textContent = getInitials(user.full_name);
         av.style.background = getAvatarBg(user.full_name);
       }
 
-      /* ── Stats ── */
+      // ── Countdown (set your fest date here!) ──
+      startFestCountdown('2026-09-15T09:00:00');
+
+      // ── Stats ──
       let evtCount = 0, teamCount = 0;
       try {
         const [r, t] = await Promise.all([
           supabase.from('registrations').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
           supabase.from('team_members').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         ]);
-        evtCount = r.count || 0;
-        teamCount = t.count || 0;
+        evtCount  = r.count  || 0;
+        teamCount = t.count  || 0;
       } catch(e) {}
 
       const pts = user.points || 0;
       setTimeout(() => {
-        animateCount(document.getElementById('stat-events'), evtCount);
-        animateCount(document.getElementById('stat-teams'), teamCount);
-        animateCount(document.getElementById('stat-tickets'), evtCount);
-        animateCount(document.getElementById('stat-points'), pts);
-      }, 200);
+        animateCount(document.getElementById('stat-events'),  evtCount,  1200);
+        animateCount(document.getElementById('stat-teams'),   teamCount, 1200);
+        animateCount(document.getElementById('stat-tickets'), evtCount,  1200);
+        animateCount(document.getElementById('stat-points'),  pts,       1400);
 
-      /* ── Progress strip ── */
+        // Animate rings (ring max: events→10, teams→5, tickets→10, points→500)
+        animateRing('ring-events',  evtCount,  10);
+        animateRing('ring-teams',   teamCount, 5);
+        animateRing('ring-tickets', evtCount,  10);
+        animateRing('ring-points',  pts,       500);
+      }, 300);
+
+      // ── Readiness meter ──
       if (evtCount > 0) {
-        document.getElementById('progress-strip').style.display = 'block';
-        document.getElementById('ps-val').textContent = `${evtCount} / 5`;
+        const pct = Math.min(100, Math.round((evtCount / 5) * 100));
+        const r = document.getElementById('db-readiness');
+        if (r) r.style.display = 'block';
+        document.getElementById('dr-pct').textContent = pct + '%';
         setTimeout(() => {
-          document.getElementById('ps-fill').style.width = Math.min(100, (evtCount / 5) * 100) + '%';
+          const fill = document.getElementById('dr-fill');
+          if (fill) fill.style.width = pct + '%';
         }, 600);
       }
 
-      /* ── Events ── */
+      // ── Events ──
       const evDiv = document.getElementById('my-events');
       try {
         const { data: regs } = await supabase
@@ -454,34 +1123,35 @@
 
         if (!regs || !regs.length) {
           evDiv.innerHTML = `
-            <div class="dash-empty">
-              <div class="dash-empty-icon">📅</div>
-              <h4>No events registered</h4>
-              <p>Explore the events and sign up for ones you love!</p>
-              <a href="events.html" class="btn btn-primary btn-sm">Browse Events</a>
+            <div class="db-empty">
+              <span class="db-empty-icon">📅</span>
+              <h4>No events registered yet</h4>
+              <p>Explore upcoming events and secure your spot in the competition!</p>
+              <a href="events.html"><i data-lucide="search" style="width:14px;height:14px"></i> Browse Events</a>
             </div>`;
         } else {
-          evDiv.innerHTML = regs.map(r => {
-            const ev = r.events || {};
+          evDiv.innerHTML = `<div class="db-ev-list">${regs.map(r => {
+            const ev  = r.events || {};
+            const cat = ev.category || 'technical';
             return `
-              <a href="event-detail.html?id=${r.event_id}" class="ev-item">
-                <div class="ev-thumb ${getCatThumbClass(ev.category)}">${getCategoryIcon(ev.category)}</div>
-                <div class="ev-info">
-                  <div class="ev-name">${ev.title || 'Event'}</div>
-                  <div class="ev-meta">
+              <a href="event-detail.html?id=${r.event_id}" class="db-ev-item">
+                <div class="db-ev-thumb ${catThumb[cat] || 'ict'}">${catIcon[cat] || '🎯'}</div>
+                <div class="db-ev-info">
+                  <div class="db-ev-name">${ev.title || 'Event'}</div>
+                  <div class="db-ev-meta">
                     <span>📅 ${formatDate(ev.event_date)}</span>
                     <span>📍 ${ev.venue || 'TBD'}</span>
                   </div>
                 </div>
-                ${getStatusBadge(r.status || 'confirmed')}
+                <span class="db-ev-status ${getStatusClass(r.status || 'confirmed')}">${r.status || 'confirmed'}</span>
               </a>`;
-          }).join('');
+          }).join('')}</div>`;
         }
       } catch(e) {
-        evDiv.innerHTML = '<div class="dash-empty"><p>Could not load events.</p></div>';
+        evDiv.innerHTML = `<div class="db-empty"><p>Could not load events.</p></div>`;
       }
 
-      /* ── Announcements ── */
+      // ── Announcements ──
       const annDiv = document.getElementById('recent-announcements');
       try {
         const { data: anns } = await supabase
@@ -490,32 +1160,32 @@
 
         if (!anns || !anns.length) {
           annDiv.innerHTML = `
-            <div class="dash-empty">
-              <div class="dash-empty-icon">📢</div>
+            <div class="db-empty">
+              <span class="db-empty-icon">📢</span>
               <h4>No announcements yet</h4>
-              <p>Check back soon for news and updates.</p>
+              <p>Check back soon for updates from organizers.</p>
             </div>`;
         } else {
-          annDiv.innerHTML = anns.map(a => {
+          annDiv.innerHTML = `<div class="db-ann-list">${anns.map(a => {
             const p = a.priority || 'normal';
             const badge = p === 'urgent'
-              ? '<span class="badge badge-red" style="font-size:0.6rem;padding:2px 8px">Urgent</span>'
+              ? `<span class="da-badge urgent">🔴 Urgent</span>`
               : p === 'important'
-                ? '<span class="badge badge-orange" style="font-size:0.6rem;padding:2px 8px">Important</span>'
+                ? `<span class="da-badge important">🟡 Important</span>`
                 : '';
             return `
-              <div class="ann-item ${p}">
-                <div class="ann-row">
-                  <div class="ann-title-text">${a.title || 'Announcement'}</div>
+              <div class="db-ann-item ${p}">
+                <div class="da-row">
+                  <div class="da-title">${a.title || 'Announcement'}</div>
                   ${badge}
                 </div>
-                <div class="ann-snippet">${a.content || ''}</div>
-                <div class="ann-time">${formatDateTime(a.created_at)}</div>
+                <div class="da-content">${a.content || ''}</div>
+                <div class="da-time">${formatDateTime(a.created_at)}</div>
               </div>`;
-          }).join('');
+          }).join('')}</div>`;
         }
       } catch(e) {
-        annDiv.innerHTML = '<div class="dash-empty"><p>Could not load announcements.</p></div>';
+        annDiv.innerHTML = `<div class="db-empty"><p>Could not load announcements.</p></div>`;
       }
 
       if (typeof lucide !== 'undefined') lucide.createIcons();
