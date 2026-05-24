@@ -1,5 +1,5 @@
 /**
- * VAIBHAV 2K26 - Canvas Particle System
+ * AGRATHA 2K26 - Canvas Particle System
  * Floating neon particles with connections
  */
 function initParticles(canvasId, count = 50) {

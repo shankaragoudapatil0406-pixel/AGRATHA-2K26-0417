@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Leaderboard — AGRATHA 2K26</title>
-  <meta name="description" content="Live leaderboard rankings for AGRATHA 2K26 fest participants.">
+  <meta name="description" content="Live leaderboard rankings for AGRATHA 2K26 fest participants. See who's leading across all events in real time.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
@@ -130,7 +130,6 @@
       animation: fadeUp 0.6s ease 0.1s forwards; opacity: 0;
       position: relative;
     }
-    /* Glitch effect on title */
     .lb-title .t-main {
       background: linear-gradient(180deg, #ffffff 0%, #c4b5fd 60%, #7c3aed 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -231,7 +230,6 @@
       max-width: 900px;
       margin: 0 auto 60px;
       padding: 0 40px;
-      animation: fadeUp 0.7s ease 0.2s forwards; opacity: 0;
     }
 
     .podium-label {
@@ -265,7 +263,12 @@
       text-align: center;
       flex: 1;
       max-width: 240px;
+      opacity: 0;
     }
+    .pc.visible { animation: fadeUp 0.7s ease forwards; }
+    .pc-1.visible { animation-delay: 0.15s; }
+    .pc-2.visible { animation-delay: 0s; }
+    .pc-3.visible { animation-delay: 0.3s; }
 
     /* Info above column */
     .pc-info {
@@ -356,11 +359,16 @@
     .pc-3 .pc-score { color: #fcd34d; text-shadow: 0 0 16px rgba(217,119,6,0.5); }
     .pc-score-lbl { font-size: 0.6rem; color: rgba(148,163,184,0.4); letter-spacing: 2px; text-transform: uppercase; }
 
-    /* Physical column */
+    /* Physical column — RISE ANIMATION */
     .pc-column {
       width: 100%; border-radius: 6px 6px 0 0;
       position: relative; overflow: hidden;
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .pc-column.risen { transform: scaleY(1); }
+
     .pc-col-inner {
       width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
@@ -380,7 +388,6 @@
       from { transform: translateY(-20px); }
       to   { transform: translateY(calc(100% + 20px)); }
     }
-    /* Column glow edges */
     .pc-column::after {
       content: '';
       position: absolute;
@@ -418,9 +425,10 @@
     }
     .pc-3 .pc-col-inner { color: rgba(217,119,6,0.4); }
 
-    /* ── SEARCH ── */
-    .lb-search-section {
+    /* ── TOOLBAR (search + filter tabs) ── */
+    .lb-toolbar {
       max-width: 900px; margin: 0 auto 16px; padding: 0 40px;
+      display: flex; flex-direction: column; gap: 12px;
       animation: fadeUp 0.5s ease 0.5s forwards; opacity: 0;
     }
     .lb-search-box {
@@ -446,8 +454,16 @@
       position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
       color: rgba(139,92,246,0.5); width: 18px; height: 18px; pointer-events: none;
     }
+    .lb-search-clear {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; padding: 4px;
+      color: rgba(148,163,184,0.4); display: none; transition: color 0.2s;
+      border-radius: 50%;
+    }
+    .lb-search-clear:hover { color: #e2e8f0; }
+    .lb-search-clear.visible { display: flex; align-items: center; }
     .lb-search-input {
-      width: 100%; padding: 16px 16px 16px 48px;
+      width: 100%; padding: 16px 44px 16px 48px;
       background: transparent; border: none; outline: none;
       color: #e2e8f0; font-family: 'Inter', sans-serif; font-size: 0.9rem;
     }
@@ -459,7 +475,7 @@
     }
     .lb-table-head {
       display: grid;
-      grid-template-columns: 56px 1fr auto;
+      grid-template-columns: 56px 1fr 80px auto;
       gap: 16px;
       padding: 10px 20px;
       font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2.5px;
@@ -468,10 +484,51 @@
       margin-bottom: 8px;
     }
 
+    /* Skeleton rows */
+    .lb-skeleton {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 0 20px;
+      height: 68px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      background: rgba(15,15,30,0.8);
+      border: 1px solid rgba(255,255,255,0.04);
+      overflow: hidden;
+      position: relative;
+    }
+    .lb-skeleton::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.06) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.8s infinite;
+    }
+    @keyframes skeletonShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skel-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(139,92,246,0.08);
+      justify-self: center;
+    }
+    .skel-lines { display: flex; flex-direction: column; gap: 8px; }
+    .skel-line {
+      height: 10px; border-radius: 4px;
+      background: rgba(139,92,246,0.08);
+    }
+    .skel-line.wide { width: 60%; }
+    .skel-line.narrow { width: 35%; }
+    .skel-score-block { width: 40px; height: 20px; border-radius: 4px; background: rgba(139,92,246,0.08); justify-self: end; }
+
     /* Row */
     .lb-row {
       display: grid;
-      grid-template-columns: 56px 1fr auto;
+      grid-template-columns: 56px 1fr 80px auto;
       gap: 16px;
       align-items: center;
       padding: 0 20px;
@@ -601,6 +658,14 @@
     }
     .row-college { font-size: 0.72rem; color: rgba(148,163,184,0.4); margin-top: 2px; }
 
+    /* Highlight for search match */
+    .search-hl {
+      background: rgba(251,191,36,0.25);
+      color: #fbbf24;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
     /* Bar in row */
     .row-bar {
       margin-top: 6px;
@@ -628,6 +693,17 @@
       100% { transform: translateX(300%); }
     }
 
+    /* ── RANK DELTA ── */
+    .row-delta {
+      display: flex; align-items: center; justify-content: flex-end;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.5px;
+      gap: 2px; min-width: 52px;
+    }
+    .delta-up   { color: #10b981; }
+    .delta-down { color: #ef4444; }
+    .delta-same { color: rgba(148,163,184,0.3); font-size: 0.55rem; letter-spacing: 1.5px; }
+    .delta-new  { color: #a78bfa; font-size: 0.55rem; letter-spacing: 1px; }
+
     /* Score cell */
     .row-score { text-align: right; flex-shrink: 0; }
     .row-pts {
@@ -643,25 +719,140 @@
     .me .row-pts { color: #06b6d4; }
     .row-pts-lbl { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(148,163,184,0.3); }
 
-    /* ── EMPTY / LOADING ── */
-    .lb-loading { text-align: center; padding: 60px 20px; }
-    .lb-loading .loading-spinner { margin: 0 auto; }
+    /* ── MY RANK STICKY CARD ── */
+    .my-rank-sticky {
+      position: fixed;
+      bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px);
+      z-index: 500;
+      background: rgba(6,10,25,0.95);
+      border: 1px solid rgba(6,182,212,0.35);
+      border-radius: 10px;
+      padding: 12px 20px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: 0 8px 40px rgba(6,182,212,0.2), 0 0 0 1px rgba(6,182,212,0.1);
+      backdrop-filter: blur(20px);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none; opacity: 0;
+      width: max-content; max-width: calc(100vw - 48px);
+    }
+    .my-rank-sticky.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .my-rank-sticky .mys-rank {
+      font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 900;
+      color: #06b6d4; min-width: 44px; text-align: center;
+    }
+    .my-rank-sticky .mys-name { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
+    .my-rank-sticky .mys-sub  { font-size: 0.65rem; color: rgba(148,163,184,0.5); margin-top: 1px; }
+    .my-rank-sticky .mys-pts  {
+      font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 900;
+      color: #06b6d4; margin-left: auto; padding-left: 16px;
+    }
+    .my-rank-sticky-sep {
+      width: 1px; height: 36px; background: rgba(6,182,212,0.2);
+    }
+    .mys-scroll-btn {
+      background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+      border-radius: 6px; padding: 6px 10px; cursor: pointer;
+      color: #06b6d4; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.5px; transition: all 0.2s; white-space: nowrap;
+    }
+    .mys-scroll-btn:hover { background: rgba(6,182,212,0.2); }
+
+    /* ── LOAD MORE ── */
+    .lb-load-more {
+      text-align: center; padding: 24px 0 0;
+    }
+    .lb-load-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 32px; border-radius: 6px;
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.2);
+      color: #a78bfa; font-family: 'Inter', sans-serif;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .lb-load-btn:hover {
+      background: rgba(139,92,246,0.12);
+      border-color: rgba(139,92,246,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139,92,246,0.15);
+    }
+    .lb-load-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── ERROR STATE ── */
+    .lb-error {
+      text-align: center; padding: 60px 20px;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .lb-error-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.6; }
+    .lb-error-title { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: #ef4444; margin-bottom: 8px; letter-spacing: 1px; }
+    .lb-error-msg { font-size: 0.85rem; color: rgba(148,163,184,0.5); margin-bottom: 20px; }
+    .lb-retry-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; border-radius: 6px;
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+      color: #ef4444; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .lb-retry-btn:hover { background: rgba(239,68,68,0.14); transform: translateY(-1px); }
+
+    /* ── EMPTY SEARCH STATE ── */
+    .lb-no-results {
+      text-align: center; padding: 48px 20px;
+      color: rgba(148,163,184,0.4); font-size: 0.9rem;
+    }
+
+    /* ── CONFETTI CANVAS ── */
+    #confetti-canvas {
+      position: fixed; inset: 0; z-index: 999;
+      pointer-events: none;
+    }
+
+    /* ── REALTIME BADGE ── */
+    .lb-updated-badge {
+      position: fixed; top: 90px; left: 50%; transform: translateX(-50%) translateY(-80px);
+      z-index: 600;
+      background: rgba(16,185,129,0.9); color: #fff;
+      border-radius: 20px; padding: 8px 20px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 1px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .lb-updated-badge.show { transform: translateX(-50%) translateY(0); }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .lb-header { padding: 90px 20px 40px; }
       .lb-bracket { display: none; }
       .podium-wrapper { padding: 0 20px; }
-      .lb-search-section { padding: 0 20px; }
+      .lb-toolbar { padding: 0 20px; }
       .lb-table-section { padding: 0 20px 80px; }
       .lb-stats { margin: 30px 20px; }
       .pc-avatar { width: 56px; height: 56px; font-size: 1.1rem; }
       .pc-score { font-size: 1.4rem; }
       .lb-title { font-size: 2.8rem; }
+      .lb-table-head { grid-template-columns: 44px 1fr auto; }
+      .lb-row { grid-template-columns: 44px 1fr auto; }
+      .row-delta { display: none; }
+      .lb-table-head .th-delta { display: none; }
     }
     @media (max-width: 480px) {
       .row-college { display: none; }
       .lb-table-head span:first-child { display: none; }
+      /* Mobile podium stacks as cards */
+      .podium-flex { flex-direction: column; align-items: center; gap: 16px; }
+      .podium-flex::after { display: none; }
+      .pc { max-width: 300px; width: 100%; }
+      .pc-1 { order: 1; }
+      .pc-2 { order: 2; }
+      .pc-3 { order: 3; }
+      .pc-column { height: 32px !important; }
+      .pc-col-inner { font-size: 1rem; }
+      .my-rank-sticky { padding: 10px 14px; gap: 10px; }
     }
   </style>
 </head>
@@ -670,89 +861,157 @@
   <div class="lb-bg"></div>
   <div class="lb-scanlines"></div>
   <canvas id="particles-canvas"></canvas>
-  <nav class="navbar" id="navbar"></nav>
+  <canvas id="confetti-canvas"></canvas>
+  <nav class="navbar" id="navbar" aria-label="Main navigation"></nav>
+
+  <!-- Realtime update badge -->
+  <div class="lb-updated-badge" id="updated-badge" role="status" aria-live="polite">
+    <span class="lb-live-dot"></span>
+    Rankings updated
+  </div>
 
   <div class="lb-main">
 
     <!-- ── HEADER ── -->
-    <div class="lb-header">
-      <div class="lb-bracket lb-bracket-tl"></div>
-      <div class="lb-bracket lb-bracket-tr"></div>
+    <header class="lb-header" role="banner">
+      <div class="lb-bracket lb-bracket-tl" aria-hidden="true"></div>
+      <div class="lb-bracket lb-bracket-tr" aria-hidden="true"></div>
 
-      <div class="lb-eyebrow">
+      <div class="lb-eyebrow" aria-hidden="true">
         <span class="lb-eyebrow-line"></span>
         AGRATHA 2K26
         <span class="lb-eyebrow-line right"></span>
       </div>
-      <div class="lb-title">
+      <h1 class="lb-title">
         <span class="t-main" data-text="LEADERBOARD">LEADERBOARD</span>
-      </div>
+      </h1>
       <p class="lb-subtitle">Champions of every event, ranked in real time</p>
-      <div class="lb-live">
-        <span class="lb-live-dot"></span>
+      <div class="lb-live" role="status" aria-label="Live rankings active">
+        <span class="lb-live-dot" aria-hidden="true"></span>
         Live Rankings
       </div>
 
-      <div class="lb-bracket lb-bracket-bl"></div>
-      <div class="lb-bracket lb-bracket-br"></div>
-    </div>
+      <div class="lb-bracket lb-bracket-bl" aria-hidden="true"></div>
+      <div class="lb-bracket lb-bracket-br" aria-hidden="true"></div>
+    </header>
 
     <!-- ── STATS ── -->
-    <div class="lb-stats" id="lb-stats">
+    <div class="lb-stats" id="lb-stats" role="region" aria-label="Leaderboard statistics">
       <div class="lb-stat">
-        <div class="lb-stat-n" id="s-total">–</div>
+        <div class="lb-stat-n" id="s-total" aria-label="Total participants">–</div>
         <div class="lb-stat-l">Participants</div>
       </div>
       <div class="lb-stat">
-        <div class="lb-stat-n" id="s-top">–</div>
+        <div class="lb-stat-n" id="s-top" aria-label="Top score">–</div>
         <div class="lb-stat-l">Top Score</div>
       </div>
       <div class="lb-stat">
-        <div class="lb-stat-n" id="s-avg">–</div>
+        <div class="lb-stat-n" id="s-avg" aria-label="Average points">–</div>
         <div class="lb-stat-l">Avg Points</div>
       </div>
     </div>
 
     <!-- ── PODIUM ── -->
-    <div class="podium-wrapper">
+    <section class="podium-wrapper" aria-label="Top 3 Champions">
       <div class="podium-label">— Hall of Champions —</div>
-      <div class="podium-flex" id="podium">
-        <div class="lb-loading"><div class="loading-spinner"></div></div>
+      <div class="podium-flex" id="podium" role="list">
+        <!-- Skeleton -->
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px">
+          <div class="loading-spinner" role="status" aria-label="Loading podium"></div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ── SEARCH ── -->
-    <div class="lb-search-section">
+    <!-- ── TOOLBAR ── -->
+    <div class="lb-toolbar">
       <div class="lb-search-box">
-        <i data-lucide="search" class="lb-search-icon"></i>
-        <input type="text" class="lb-search-input" id="lb-search"
+        <i data-lucide="search" class="lb-search-icon" aria-hidden="true"></i>
+        <input
+          type="search"
+          class="lb-search-input"
+          id="lb-search"
           placeholder="Search participant or college…"
-          oninput="filterLeaderboard()">
+          aria-label="Search participants"
+          autocomplete="off"
+        >
+        <button class="lb-search-clear" id="lb-search-clear" aria-label="Clear search" title="Clear">
+          <i data-lucide="x" style="width:14px;height:14px"></i>
+        </button>
       </div>
     </div>
 
     <!-- ── TABLE ── -->
-    <div class="lb-table-section">
-      <div class="lb-table-head">
+    <main class="lb-table-section" role="main">
+      <div class="lb-table-head" role="row" aria-label="Table headers">
         <span>Rank</span>
         <span>Participant</span>
+        <span class="th-delta" style="text-align:right">Trend</span>
         <span>Score</span>
       </div>
-      <div id="lb-rows">
-        <div class="lb-loading"><div class="loading-spinner"></div></div>
+      <div id="lb-rows" role="list" aria-label="Leaderboard rankings">
+        <!-- Skeleton rows -->
+        <div id="lb-skeleton">
+          ${[...Array(8)].map(() => `
+            <div class="lb-skeleton" role="presentation" aria-hidden="true">
+              <div class="skel-circle"></div>
+              <div class="skel-lines">
+                <div class="skel-line wide"></div>
+                <div class="skel-line narrow"></div>
+              </div>
+              <div class="skel-score-block"></div>
+            </div>
+          `).join('')}
+        </div>
       </div>
-    </div>
+      <div class="lb-load-more" id="lb-load-more" style="display:none">
+        <button class="lb-load-btn" id="lb-load-btn" aria-label="Load more participants">
+          <i data-lucide="chevrons-down" style="width:16px;height:16px"></i>
+          Load More
+        </button>
+      </div>
+    </main>
 
   </div><!-- /lb-main -->
+
+  <!-- ── MY RANK STICKY ── -->
+  <div class="my-rank-sticky" id="my-rank-sticky" role="complementary" aria-label="Your rank">
+    <div>
+      <div class="mys-rank" id="mys-rank">#–</div>
+    </div>
+    <div class="my-rank-sticky-sep" aria-hidden="true"></div>
+    <div>
+      <div class="mys-name" id="mys-name">You</div>
+      <div class="mys-sub" id="mys-college"></div>
+    </div>
+    <div class="mys-pts" id="mys-pts">–</div>
+    <button class="mys-scroll-btn" id="mys-scroll" aria-label="Scroll to your rank">↑ Find Me</button>
+  </div>
 
   <footer class="footer" id="footer"></footer>
 
   <script>
-    let allUsers = [];
-    let currentUserId = null;
-    let maxPts = 1;
+    /* =====================================================
+       AGRATHA 2K26 — LEADERBOARD SCRIPT
+       Features: realtime, skeleton, delta badges, my-rank
+       sticky, confetti, debounced search w/ highlight,
+       error state, load more, accessible markup
+    ===================================================== */
 
-    /* ---- Counter animation ---- */
+    const PAGE_SIZE   = 50;   // rows per page
+    let allUsers      = [];   // full sorted array
+    let prevRankMap   = {};   // id → previous rank (from localStorage)
+    let currentUserId = null;
+    let maxPts        = 1;
+    let visibleCount  = PAGE_SIZE;
+    let searchDebounce= null;
+    let myRowEl       = null; // reference to the user's own row
+    let confettiFired = false;
+
+    /* ── Helpers ── */
+    function getInit(n) {
+      return (n || 'A').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    }
+
     function animCount(el, target) {
       if (!el) return;
       const dur = 1400, t0 = performance.now();
@@ -764,49 +1023,190 @@
       })(t0);
     }
 
-    function getInit(n) {
-      return (n || 'A').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    /* ── Persist & load previous ranks ── */
+    function loadPrevRanks() {
+      try { return JSON.parse(localStorage.getItem('lb_prev_ranks') || '{}'); } catch { return {}; }
+    }
+    function savePrevRanks(users) {
+      const map = {};
+      users.forEach((u, i) => { map[u.id] = i + 1; });
+      try { localStorage.setItem('lb_prev_ranks', JSON.stringify(map)); } catch {}
     }
 
-    /* ---- Init ---- */
+    /* ── Delta badge HTML ── */
+    function getDeltaHtml(userId, currentRank) {
+      const prev = prevRankMap[userId];
+      if (prev === undefined) return `<span class="row-delta delta-new" aria-label="New entry">NEW</span>`;
+      const diff = prev - currentRank;
+      if (diff === 0) return `<span class="row-delta delta-same" aria-label="No change">—</span>`;
+      if (diff > 0)   return `<span class="row-delta delta-up" aria-label="Moved up ${diff} spots">▲${diff}</span>`;
+      return              `<span class="row-delta delta-down" aria-label="Moved down ${Math.abs(diff)} spots">▼${Math.abs(diff)}</span>`;
+    }
+
+    /* ── Search highlight ── */
+    function highlight(text, query) {
+      if (!query) return escHtml(text);
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return escHtml(text);
+      return escHtml(text.slice(0, idx))
+        + `<mark class="search-hl">${escHtml(text.slice(idx, idx + query.length))}</mark>`
+        + escHtml(text.slice(idx + query.length));
+    }
+    function escHtml(s) {
+      return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Confetti ── */
+    function fireConfetti() {
+      if (confettiFired) return;
+      confettiFired = true;
+      const canvas = document.getElementById('confetti-canvas');
+      if (!canvas) return;
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      const pieces = [];
+      const COLORS = ['#fbbf24','#a78bfa','#06b6d4','#10b981','#f472b6'];
+      for (let i = 0; i < 140; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          w: Math.random() * 10 + 4,
+          h: Math.random() * 6 + 3,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          rot: Math.random() * Math.PI * 2,
+          vx: (Math.random() - 0.5) * 3,
+          vy: Math.random() * 4 + 2,
+          vr: (Math.random() - 0.5) * 0.2,
+          alpha: 1,
+        });
+      }
+      let frames = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x  += p.vx; p.y += p.vy; p.rot += p.vr;
+          if (frames > 80) p.alpha -= 0.012;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+        });
+        frames++;
+        if (frames < 160) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    }
+
+    /* ── Skeleton ── */
+    function showSkeleton() {
+      const sk = document.getElementById('lb-skeleton');
+      if (sk) sk.innerHTML = Array(8).fill(0).map(() => `
+        <div class="lb-skeleton" role="presentation" aria-hidden="true">
+          <div class="skel-circle"></div>
+          <div class="skel-lines">
+            <div class="skel-line wide"></div>
+            <div class="skel-line narrow"></div>
+          </div>
+          <div class="skel-score-block"></div>
+        </div>
+      `).join('');
+    }
+
+    /* ── Init ── */
     document.addEventListener('DOMContentLoaded', async () => {
       renderNavbar('leaderboard');
       renderFooter();
       initParticles('particles-canvas', 20);
       if (typeof lucide !== 'undefined') lucide.createIcons();
 
+      prevRankMap = loadPrevRanks();
+
+      // Auth
       try {
         const s = await supabase.auth.getSession();
         currentUserId = s?.data?.session?.user?.id || null;
       } catch(e) {}
 
+      await loadLeaderboard();
+      setupSearch();
+      setupLoadMore();
+      setupRealtimeSubscription();
+      setupScrollSpy();
+    });
+
+    /* ── Load data ── */
+    async function loadLeaderboard() {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('users')
           .select('id, full_name, college, points, avatar_url')
           .order('points', { ascending: false })
-          .limit(100);
+          .limit(500);
+
+        if (error) throw error;
+
         allUsers = data || [];
-      } catch(e) { allUsers = []; }
+        maxPts   = Math.max(allUsers[0]?.points || 1, 1);
 
-      maxPts = Math.max(allUsers[0]?.points || 1, 1);
+        // Animate stats
+        if (allUsers.length) {
+          const avg = Math.round(allUsers.reduce((s, u) => s + (u.points||0), 0) / allUsers.length);
+          setTimeout(() => {
+            animCount(document.getElementById('s-total'), allUsers.length);
+            animCount(document.getElementById('s-top'),   allUsers[0]?.points || 0);
+            animCount(document.getElementById('s-avg'),   avg);
+          }, 300);
+        }
 
-      // Animate stats
-      if (allUsers.length) {
-        const avg = Math.round(allUsers.reduce((s, u) => s + (u.points || 0), 0) / allUsers.length);
-        setTimeout(() => {
-          animCount(document.getElementById('s-total'), allUsers.length);
-          animCount(document.getElementById('s-top'), allUsers[0]?.points || 0);
-          animCount(document.getElementById('s-avg'), avg);
-        }, 300);
+        renderPodium(allUsers.slice(0, 3));
+        renderRows(allUsers.slice(0, visibleCount), '');
+        updateMyRankSticky();
+        savePrevRanks(allUsers);
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+      } catch(err) {
+        showError(err?.message || 'Failed to connect to the database.');
       }
+    }
 
-      renderPodium(allUsers.slice(0, 3));
-      renderRows(allUsers);
+    /* ── Error state ── */
+    function showError(msg) {
+      const rowsEl = document.getElementById('lb-rows');
+      const sk = document.getElementById('lb-skeleton');
+      if (sk) sk.innerHTML = '';
+      if (rowsEl) rowsEl.innerHTML = `
+        <div class="lb-error" role="alert">
+          <div class="lb-error-icon">⚠️</div>
+          <div class="lb-error-title">Connection Error</div>
+          <div class="lb-error-msg">${escHtml(msg)}</div>
+          <button class="lb-retry-btn" onclick="retryLoad()">
+            <i data-lucide="refresh-cw" style="width:14px;height:14px"></i>
+            Try Again
+          </button>
+        </div>
+      `;
+      const podium = document.getElementById('podium');
+      if (podium) podium.innerHTML = `
+        <div style="text-align:center;color:rgba(148,163,184,0.3);padding:40px;flex:1;font-size:0.85rem">
+          Could not load rankings
+        </div>`;
       if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
+    }
 
-    /* ---- Podium ---- */
+    async function retryLoad() {
+      showSkeleton();
+      visibleCount = PAGE_SIZE;
+      confettiFired = false;
+      await loadLeaderboard();
+    }
+
+    /* ── Podium ── */
     function renderPodium(top3) {
       const el = document.getElementById('podium');
       if (!top3?.length) {
@@ -817,97 +1217,284 @@
       const cls     = ['pc-1','pc-2','pc-3'];
       const labels  = ['1ST','2ND','3RD'];
       const heights = [120, 80, 50];
-      const delays  = [0.15, 0, 0.3];
 
       el.innerHTML = top3.slice(0,3).map((u, i) => `
-        <div class="pc ${cls[i]}" style="animation:fadeUp 0.7s ease ${delays[i]}s both;">
+        <div class="pc ${cls[i]}" role="listitem" aria-label="Rank ${i+1}: ${u.full_name || 'Anonymous'}">
           <div class="pc-info">
-            <span class="pc-medal">${medals[i]}</span>
-            <div class="pc-avatar">
-              ${u.avatar_url ? `<img src="${u.avatar_url}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : getInit(u.full_name)}
+            <span class="pc-medal" aria-hidden="true">${medals[i]}</span>
+            <div class="pc-avatar" aria-hidden="true">
+              ${u.avatar_url
+                ? `<img src="${escHtml(u.avatar_url)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+                : getInit(u.full_name)}
             </div>
-            <div class="pc-name">${u.full_name || 'Anonymous'}</div>
-            <div class="pc-college">${u.college || 'AGRATHA'}</div>
-            <span class="pc-score" data-target="${u.points||0}">0</span>
+            <div class="pc-name">${escHtml(u.full_name || 'Anonymous')}</div>
+            <div class="pc-college">${escHtml(u.college || 'AGRATHA')}</div>
+            <span class="pc-score" data-target="${u.points||0}" aria-label="${u.points||0} points">0</span>
             <div class="pc-score-lbl">points</div>
           </div>
-          <div class="pc-column" style="height:${heights[i]}px;">
+          <div class="pc-column" style="height:${heights[i]}px;" aria-hidden="true">
             <div class="pc-col-inner">${labels[i]}</div>
           </div>
         </div>
       `).join('');
 
-      setTimeout(() => {
-        document.querySelectorAll('.pc-score[data-target]').forEach(e => {
-          animCount(e, parseInt(e.dataset.target));
-        });
-      }, 500);
+      // Trigger animations after paint
+      requestAnimationFrame(() => {
+        // Fade in cards
+        document.querySelectorAll('.pc').forEach(c => c.classList.add('visible'));
+        // Rise columns with stagger
+        setTimeout(() => {
+          document.querySelectorAll('.pc-column').forEach((col, i) => {
+            setTimeout(() => col.classList.add('risen'), i * 120);
+          });
+        }, 200);
+        // Animate scores
+        setTimeout(() => {
+          document.querySelectorAll('.pc-score[data-target]').forEach(e => {
+            animCount(e, parseInt(e.dataset.target));
+          });
+          // Confetti for winner
+          if (top3[0]?.points > 0) setTimeout(fireConfetti, 600);
+        }, 500);
+      });
     }
 
-    /* ---- Rows ---- */
-    function renderRows(users) {
-      const el = document.getElementById('lb-rows');
+    /* ── Rows ── */
+    function renderRows(users, query) {
+      const rowsEl = document.getElementById('lb-rows');
+      const sk = document.getElementById('lb-skeleton');
+      if (sk) { sk.innerHTML = ''; sk.style.display = 'none'; }
+
       if (!users?.length) {
-        el.innerHTML = `<div style="text-align:center;padding:60px;color:rgba(148,163,184,0.4);">No participants yet.</div>`;
+        const isSearch = query && query.trim().length > 0;
+        rowsEl.innerHTML = isSearch
+          ? `<div class="lb-no-results" role="status">No participants match "<strong>${escHtml(query)}</strong>"</div>`
+          : `<div style="text-align:center;padding:60px;color:rgba(148,163,184,0.4);">No participants yet — be the first to compete!</div>`;
         return;
       }
+
+      // For search results, recalculate maxPts from visible set
+      const localMax = Math.max(...users.map(u => u.points || 0), 1);
+
       const medals = ['🥇','🥈','🥉'];
       const rcls   = ['r1','r2','r3'];
 
-      el.innerHTML = users.map((u, i) => {
-        const isMe = u.id === currentUserId;
-        const pct  = Math.round(((u.points||0) / maxPts) * 100);
+      rowsEl.innerHTML = users.map((u, i) => {
+        // Global rank is the original index in allUsers
+        const globalRank = allUsers.findIndex(x => x.id === u.id) + 1;
+        const isMe  = u.id === currentUserId;
+        const pct   = Math.round(((u.points||0) / localMax) * 100);
         const delay = Math.min(i * 0.035, 0.7);
+        const rowId = `row-${u.id}`;
         return `
-          <div class="lb-row ${i < 3 ? rcls[i] : ''} ${isMe ? 'me' : ''}"
-               style="animation-delay:${delay}s">
+          <div class="lb-row ${globalRank <= 3 ? rcls[globalRank-1] : ''} ${isMe ? 'me' : ''}"
+               id="${rowId}"
+               style="animation-delay:${delay}s"
+               role="listitem"
+               aria-label="Rank ${globalRank}: ${u.full_name || 'Anonymous'}, ${u.points||0} points${isMe?' (You)':''}">
             <div class="row-rank">
-              ${i < 3
-                ? `<span class="rank-medal">${medals[i]}</span>`
-                : `<span>#${i+1}</span>`}
+              ${globalRank <= 3
+                ? `<span class="rank-medal" aria-hidden="true">${medals[globalRank-1]}</span>`
+                : `<span>#${globalRank}</span>`}
             </div>
             <div class="row-user">
-              <div class="row-avatar">
-                ${u.avatar_url ? `<img src="${u.avatar_url}" alt="" style="width:100%;height:100%;border-radius:6px;object-fit:cover;">` : getInit(u.full_name)}
+              <div class="row-avatar" aria-hidden="true">
+                ${u.avatar_url
+                  ? `<img src="${escHtml(u.avatar_url)}" alt="" style="width:100%;height:100%;border-radius:6px;object-fit:cover;">`
+                  : getInit(u.full_name)}
               </div>
               <div class="row-info">
                 <div class="row-name">
-                  ${u.full_name || 'Anonymous'}
-                  ${isMe ? '<span class="you-tag">You</span>' : ''}
+                  ${highlight(u.full_name || 'Anonymous', query)}
+                  ${isMe ? '<span class="you-tag" aria-label="This is you">You</span>' : ''}
                 </div>
-                <div class="row-college">${u.college || '—'}</div>
-                <div class="row-bar">
+                <div class="row-college">${highlight(u.college || '—', query)}</div>
+                <div class="row-bar" aria-hidden="true">
                   <div class="row-bar-fill" style="width:0" data-pct="${pct}"></div>
                 </div>
               </div>
             </div>
+            <div class="row-delta-cell">
+              ${getDeltaHtml(u.id, globalRank)}
+            </div>
             <div class="row-score">
-              <div class="row-pts" data-score="${u.points||0}">0</div>
-              <div class="row-pts-lbl">pts</div>
+              <div class="row-pts" data-score="${u.points||0}" aria-label="${u.points||0} points">0</div>
+              <div class="row-pts-lbl" aria-hidden="true">pts</div>
             </div>
           </div>
         `;
       }).join('');
 
-      // Animate
+      // Animate scores and bars
       requestAnimationFrame(() => {
         setTimeout(() => {
-          el.querySelectorAll('.row-pts[data-score]').forEach(e => animCount(e, parseInt(e.dataset.score)));
-          el.querySelectorAll('.row-bar-fill[data-pct]').forEach(e => {
+          rowsEl.querySelectorAll('.row-pts[data-score]').forEach(e => animCount(e, parseInt(e.dataset.score)));
+          rowsEl.querySelectorAll('.row-bar-fill[data-pct]').forEach(e => {
             e.style.width = e.dataset.pct + '%';
           });
         }, 200);
       });
+
+      // Cache user's row element
+      if (currentUserId) {
+        myRowEl = document.getElementById(`row-${currentUserId}`);
+      }
+
+      updateLoadMoreBtn(users.length);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    /* ---- Filter ---- */
-    function filterLeaderboard() {
-      const q = document.getElementById('lb-search').value.toLowerCase();
-      const filtered = allUsers.filter(u =>
-        (u.full_name||'').toLowerCase().includes(q) ||
-        (u.college||'').toLowerCase().includes(q)
-      );
-      renderRows(filtered);
+    /* ── Search (debounced, with highlight & correct maxPts) ── */
+    function setupSearch() {
+      const input  = document.getElementById('lb-search');
+      const clearBtn = document.getElementById('lb-search-clear');
+
+      input.addEventListener('input', () => {
+        clearTimeout(searchDebounce);
+        const q = input.value;
+        clearBtn.classList.toggle('visible', q.length > 0);
+        searchDebounce = setTimeout(() => {
+          filterLeaderboard(q);
+        }, 220);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        input.value = '';
+        clearBtn.classList.remove('visible');
+        input.focus();
+        filterLeaderboard('');
+      });
+    }
+
+    function filterLeaderboard(query) {
+      const q = (query || '').toLowerCase().trim();
+      const filtered = q
+        ? allUsers.filter(u =>
+            (u.full_name||'').toLowerCase().includes(q) ||
+            (u.college||'').toLowerCase().includes(q)
+          )
+        : allUsers;
+
+      visibleCount = PAGE_SIZE;
+      renderRows(filtered.slice(0, visibleCount), query);
+    }
+
+    /* ── Load More ── */
+    function setupLoadMore() {
+      const btn = document.getElementById('lb-load-btn');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const q = document.getElementById('lb-search').value.toLowerCase().trim();
+        const filtered = q
+          ? allUsers.filter(u =>
+              (u.full_name||'').toLowerCase().includes(q) ||
+              (u.college||'').toLowerCase().includes(q))
+          : allUsers;
+        visibleCount += PAGE_SIZE;
+        renderRows(filtered.slice(0, visibleCount), q);
+      });
+    }
+
+    function updateLoadMoreBtn(shownCount) {
+      const q = document.getElementById('lb-search')?.value.toLowerCase().trim() || '';
+      const total = q
+        ? allUsers.filter(u =>
+            (u.full_name||'').toLowerCase().includes(q) ||
+            (u.college||'').toLowerCase().includes(q)).length
+        : allUsers.length;
+      const wrap = document.getElementById('lb-load-more');
+      const btn  = document.getElementById('lb-load-btn');
+      if (!wrap || !btn) return;
+      if (shownCount < total) {
+        wrap.style.display = 'block';
+        btn.textContent = `Load More (${total - shownCount} remaining)`;
+        btn.disabled = false;
+        // Re-add icon
+        btn.innerHTML = `<i data-lucide="chevrons-down" style="width:16px;height:16px"></i> Load More (${total - shownCount} remaining)`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    /* ── My Rank Sticky ── */
+    function updateMyRankSticky() {
+      if (!currentUserId) return;
+      const idx = allUsers.findIndex(u => u.id === currentUserId);
+      if (idx === -1) return;
+      const u = allUsers[idx];
+      const rank = idx + 1;
+      document.getElementById('mys-rank').textContent = `#${rank}`;
+      document.getElementById('mys-name').textContent  = u.full_name || 'You';
+      document.getElementById('mys-college').textContent = u.college || '';
+      document.getElementById('mys-pts').textContent   = `${u.points||0} pts`;
+
+      document.getElementById('mys-scroll').addEventListener('click', () => {
+        const rowEl = document.getElementById(`row-${currentUserId}`);
+        if (rowEl) {
+          rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          rowEl.style.outline = '2px solid rgba(6,182,212,0.6)';
+          setTimeout(() => { rowEl.style.outline = ''; }, 1500);
+        }
+      });
+    }
+
+    /* ── Scroll spy — show sticky card when user's row scrolls out of view ── */
+    function setupScrollSpy() {
+      if (!currentUserId) return;
+      const stickyEl = document.getElementById('my-rank-sticky');
+      if (!stickyEl) return;
+
+      let observer;
+      // Wait until rows are rendered
+      const tryObserve = () => {
+        const rowEl = document.getElementById(`row-${currentUserId}`);
+        if (!rowEl) return;
+        if (observer) observer.disconnect();
+        observer = new IntersectionObserver(entries => {
+          const visible = entries[0].isIntersecting;
+          stickyEl.classList.toggle('show', !visible);
+        }, { rootMargin: '-80px 0px -20px 0px', threshold: 0 });
+        observer.observe(rowEl);
+      };
+
+      // Poll briefly until row exists
+      let tries = 0;
+      const poll = setInterval(() => {
+        tryObserve();
+        if (document.getElementById(`row-${currentUserId}`) || ++tries > 30) clearInterval(poll);
+      }, 300);
+    }
+
+    /* ── Realtime subscription ── */
+    function setupRealtimeSubscription() {
+      if (!window.supabase) return;
+      try {
+        supabase
+          .channel('leaderboard-points')
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'users',
+            filter: 'points=gte.0'
+          }, async () => {
+            // Save current ranks before reload
+            savePrevRanks(allUsers);
+            prevRankMap = loadPrevRanks();
+            // Reload data
+            await loadLeaderboard();
+            // Show update badge
+            showUpdatedBadge();
+          })
+          .subscribe();
+      } catch(e) {}
+    }
+
+    function showUpdatedBadge() {
+      const badge = document.getElementById('updated-badge');
+      if (!badge) return;
+      badge.classList.add('show');
+      setTimeout(() => badge.classList.remove('show'), 2500);
     }
   </script>
 </body>
