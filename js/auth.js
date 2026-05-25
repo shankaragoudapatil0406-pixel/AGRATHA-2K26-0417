@@ -2,7 +2,101 @@
  * VAIBHAV 2K26 - Auth Logic
  * Login, Register, Forgot Password handlers
  * With comprehensive error handling and diagnostics
+ * Includes Google OAuth (Sign in with Google) support
  */
+
+// ===== GOOGLE OAUTH LOGIN =====
+async function handleGoogleLogin() {
+  if (!window.supabase || !window.supabase.auth) {
+    showAuthError('Supabase not connected', 'Check browser console for details.');
+    return;
+  }
+
+  // Determine the redirect URL (works on localhost and deployed)
+  const redirectTo = window.location.origin + '/dashboard.html';
+
+  console.log('🔐 Starting Google OAuth flow...');
+  console.log('   Redirect URL:', redirectTo);
+
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    if (error) {
+      console.error('❌ Google OAuth error:', error);
+      showAuthError('Google sign-in failed', error.message);
+    }
+    // On success, Supabase redirects the browser to Google — no further code runs here.
+  } catch (err) {
+    console.error('❌ Google OAuth exception:', err);
+    showAuthError('Google sign-in failed', err.message);
+  }
+}
+
+// ===== OAUTH CALLBACK HANDLER =====
+// Call this on DOMContentLoaded on any page that could receive the OAuth redirect.
+// Supabase puts the session tokens in the URL hash after Google redirects back.
+async function handleOAuthCallback() {
+  if (!window.supabase || !window.supabase.auth) return;
+
+  try {
+    // getSession() will automatically exchange the hash tokens for a session
+    const { data: { session }, error } = await supabase.auth.getSession();
+
+    if (error) {
+      console.warn('⚠️ OAuth callback session error:', error.message);
+      return;
+    }
+
+    if (!session || !session.user) return; // No OAuth redirect happened
+
+    const user = session.user;
+    console.log('✅ OAuth session detected for:', user.email);
+
+    // Auto-provision user profile if missing
+    try {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile) {
+        const autoRole = user.email && user.email.toLowerCase() === 'chetankenchappanavar803@gmail.com'
+          ? 'admin'
+          : 'participant';
+
+        const fullName =
+          user.user_metadata?.full_name ||
+          user.user_metadata?.name ||
+          user.email?.split('@')[0] ||
+          'User';
+
+        await supabase.from('users').upsert({
+          id: user.id,
+          email: user.email,
+          full_name: fullName,
+          role: autoRole,
+          avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+        });
+
+        console.log('✅ OAuth user profile auto-created:', fullName, '(', autoRole, ')');
+      }
+    } catch (profileErr) {
+      console.warn('⚠️ OAuth profile upsert failed (non-critical):', profileErr.message);
+    }
+  } catch (err) {
+    console.warn('⚠️ handleOAuthCallback error:', err.message);
+  }
+}
 
 // ===== ERROR DISPLAY HELPER =====
 function showAuthError(message, details) {
