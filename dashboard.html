@@ -48,7 +48,7 @@
     /* ══════════════════════════════════════
        HERO BANNER
     ══════════════════════════════════════ */
-    .hero {
+    .db-hero {
       position: relative;
       border-radius: 28px;
       overflow: hidden;
@@ -59,7 +59,7 @@
     }
 
     /* Animated mesh background */
-    .hero-mesh {
+    .db-hero-mesh {
       position: absolute; inset: 0; z-index: 0;
       background-image:
         radial-gradient(ellipse 60% 80% at 80% 50%, rgba(189,0,255,0.12) 0%, transparent 60%),
@@ -70,7 +70,7 @@
     }
 
     /* Top flowing border */
-    .hero::before {
+    .db-hero::before {
       content: '';
       position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 2;
       background: linear-gradient(90deg, transparent, #00f0ff, #bd00ff, #ff007f, #00f0ff, transparent);
@@ -79,14 +79,14 @@
     }
     @keyframes flowBorder { to { background-position: -400% 0; } }
 
-    .hero-inner {
+    .db-hero-inner {
       position: relative; z-index: 1;
       display: flex; align-items: center; justify-content: space-between;
       gap: 24px; padding: 36px 40px; flex-wrap: wrap;
     }
 
     /* Avatar */
-    .hero-user { display: flex; align-items: center; gap: 24px; }
+    .db-hero-user { display: flex; align-items: center; gap: 24px; }
 
     .av-shell {
       position: relative; flex-shrink: 0;
@@ -118,25 +118,25 @@
     @keyframes pulse { 0%,100%{box-shadow:0 0 12px var(--g);} 50%{box-shadow:0 0 24px var(--g), 0 0 40px rgba(0,255,157,0.4);} }
 
     /* User text */
-    .hero-tag {
+    .db-hero-tag {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 4px 14px; border-radius: 50px;
       background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.2);
       font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 2px; color: var(--c); margin-bottom: 10px;
     }
-    .hero-tag-dot {
+    .db-hero-tag-dot {
       width: 5px; height: 5px; border-radius: 50%;
       background: var(--c); animation: dotBlink 1.5s ease-in-out infinite;
     }
     @keyframes dotBlink { 0%,100%{opacity:1;} 50%{opacity:0.1;} }
 
-    .hero-name {
+    .db-hero-name {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.7rem, 3vw, 2.4rem);
       font-weight: 900; line-height: 1.1; margin-bottom: 10px;
     }
-    .hero-name-grd {
+    .db-hero-name-grd {
       background: linear-gradient(135deg, #00f0ff 0%, #bd00ff 60%, #ff007f 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; background-size: 200% 100%;
@@ -144,12 +144,12 @@
     }
     @keyframes gradShift { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
 
-    .hero-meta {
+    .db-hero-meta {
       display: flex; align-items: center; gap: 10px;
       font-size: 0.78rem; color: rgba(255,255,255,0.35); flex-wrap: wrap;
     }
-    .hero-meta-sep { color: rgba(189,0,255,0.5); font-size: 0.5rem; }
-    .hero-role-badge {
+    .db-hero-meta-sep { color: rgba(189,0,255,0.5); font-size: 0.5rem; }
+    .db-hero-role-badge {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 2px 10px; border-radius: 50px;
       background: rgba(0,255,157,0.1); border: 1px solid rgba(0,255,157,0.25);
@@ -157,7 +157,7 @@
     }
 
     /* Hero buttons */
-    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .db-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .hbtn {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 12px 22px; border-radius: 50px; font-size: 0.82rem;
@@ -178,7 +178,7 @@
     .hbtn-ghost:hover { background: rgba(189,0,255,0.1); border-color: rgba(189,0,255,0.4); color: #fff; transform: translateY(-2px); }
 
     /* Hero bottom strip — points bar */
-    .hero-strip {
+    .db-hero-strip {
       position: relative; z-index: 1;
       display: flex; align-items: center; gap: 16px;
       padding: 14px 40px;
@@ -571,8 +571,8 @@
     }
     @media(max-width:900px)  { .stats-row { grid-template-columns: repeat(2,1fr); } }
     @media(max-width:700px)  {
-      .hero-inner { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
-      .hero-strip { padding: 14px 20px; }
+      .db-hero-inner { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+      .db-hero-strip { padding: 14px 20px; }
       .strip-pts { margin-left: 0; width: 100%; }
       .col-r { grid-template-columns: 1fr; }
     }
@@ -591,11 +591,11 @@
   <div class="db">
 
     <!-- ══ HERO ══ -->
-    <div class="hero su d1">
-      <div class="hero-mesh"></div>
-      <div class="hero-inner">
+    <div class="db-hero su d1">
+      <div class="db-hero-mesh"></div>
+      <div class="db-hero-inner">
         <!-- User Info -->
-        <div class="hero-user">
+        <div class="db-hero-user">
           <div class="av-shell">
             <svg class="av-ring" viewBox="0 0 104 104" fill="none">
               <defs>
@@ -612,14 +612,14 @@
             <div class="av-online"></div>
           </div>
           <div>
-            <div class="hero-tag"><span class="hero-tag-dot"></span><span id="time-greeting">Loading…</span></div>
-            <div class="hero-name">Hey, <span class="hero-name-grd" id="user-first-name">Champion</span>! 👋</div>
-            <div class="hero-meta">
+            <div class="db-hero-tag"><span class="db-hero-tag-dot"></span><span id="time-greeting">Loading…</span></div>
+            <div class="db-hero-name">Hey, <span class="db-hero-name-grd" id="user-first-name">Champion</span>! 👋</div>
+            <div class="db-hero-meta">
               <span id="user-college">AGRATHA 2K26</span>
-              <span class="hero-meta-sep">◆</span>
+              <span class="db-hero-meta-sep">◆</span>
               <span>Mission Control</span>
-              <span class="hero-meta-sep">◆</span>
-              <span class="hero-role-badge">
+              <span class="db-hero-meta-sep">◆</span>
+              <span class="db-hero-role-badge">
                 <i data-lucide="shield-check" style="width:10px;height:10px"></i>
                 <span id="user-role-label">Participant</span>
               </span>
@@ -627,14 +627,14 @@
           </div>
         </div>
         <!-- Actions -->
-        <div class="hero-actions">
+        <div class="db-hero-actions">
           <a href="events.html" class="hbtn hbtn-primary"><i data-lucide="search"></i>Browse Events</a>
           <a href="tickets.html" class="hbtn hbtn-ghost"><i data-lucide="ticket"></i>My Tickets</a>
           <a href="leaderboard.html" class="hbtn hbtn-ghost"><i data-lucide="trophy"></i>Rankings</a>
         </div>
       </div>
       <!-- Bottom strip -->
-      <div class="hero-strip">
+      <div class="db-hero-strip">
         <div class="strip-item"><i data-lucide="map-pin" style="width:13px;height:13px;opacity:0.4"></i><strong id="strip-college">AGRATHA 2K26</strong></div>
         <div class="strip-sep"></div>
         <div class="strip-item"><i data-lucide="calendar" style="width:13px;height:13px;opacity:0.4"></i>Fest: <strong>Sep 15, 2026</strong></div>
