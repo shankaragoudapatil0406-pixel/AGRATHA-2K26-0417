@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — VAIBHAV 2K26</title>
-  <meta name="description" content="Participant Mission Control — VAIBHAV 2K26">
+  <title>Dashboard — AGRATHA 2K26</title>
+  <meta name="description" content="Participant Mission Control — AGRATHA 2K26">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
@@ -16,494 +16,570 @@
   <script src="js/particles.js" defer></script>
 
   <style>
+    /* ═══════════════════════════════════════════════
+       AGRATHA 2K26 — ADVANCED DASHBOARD v4
+       Glassmorphism · Neon · Micro-animations
+    ═══════════════════════════════════════════════ */
 
-    /* ===================================================
-       VAIBHAV 2K26 — COMPLETELY NEW DASHBOARD v3
-       Visually distinct: vivid cards, neon typography,
-       festival countdown hero, animated grid BG
-    =================================================== */
-
-    /* ── Page wrapper ── */
-    .xdb { display:flex; flex-direction:column; gap:24px; padding-bottom:60px; }
-
-    /* ══════════════════════════════════════════
-       HERO — Big festival-style banner
-    ══════════════════════════════════════════ */
-    .xhero {
-      border-radius:24px;
-      padding:40px 44px;
-      position:relative;
-      overflow:hidden;
-      /* Vivid gradient bg — completely different from old */
-      background: linear-gradient(125deg, #0a0025 0%, #1a0040 40%, #001a35 100%);
-      border:1px solid rgba(189,0,255,0.3);
-      box-shadow: 0 0 80px rgba(189,0,255,0.15), 0 0 0 1px rgba(0,240,255,0.05) inset;
+    :root {
+      --c: #00f0ff;
+      --p: #bd00ff;
+      --g: #00ff9d;
+      --pk: #ff007f;
+      --o: #ffaa00;
+      --bg: #06060f;
+      --bg2: #0a0a18;
+      --glass: rgba(255,255,255,0.03);
+      --glass-b: rgba(255,255,255,0.07);
+      --rad: 20px;
     }
 
-    /* Dot grid overlay */
-    .xhero::after {
-      content:'';
-      position:absolute; inset:0;
-      background-image: radial-gradient(rgba(189,0,255,0.18) 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events:none;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { background: var(--bg); font-family: 'Inter', sans-serif; color: #fff; overflow-x: hidden; }
+
+    canvas#particles-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+    .main-content.with-sidebar { position: relative; z-index: 1; }
+
+    /* ── Dashboard wrapper ── */
+    .db { display: flex; flex-direction: column; gap: 20px; padding-bottom: 80px; }
+
+    /* ══════════════════════════════════════
+       HERO BANNER
+    ══════════════════════════════════════ */
+    .hero {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      padding: 0;
+      background: linear-gradient(135deg, #06001a 0%, #0a0028 40%, #00091a 100%);
+      border: 1px solid rgba(189,0,255,0.2);
+      box-shadow: 0 0 120px rgba(189,0,255,0.08), 0 0 60px rgba(0,240,255,0.05);
     }
 
-    /* Big cyan glow bottom-right */
-    .xhero-glow {
-      position:absolute; width:500px; height:500px; border-radius:50%;
-      right:-100px; bottom:-200px; pointer-events:none;
-      background:radial-gradient(circle, rgba(0,240,255,0.14) 0%, transparent 65%);
-      filter:blur(30px);
-      animation:glowPulse 5s ease-in-out infinite;
-    }
-    .xhero-glow2 {
-      position:absolute; width:350px; height:350px; border-radius:50%;
-      left:-60px; top:-100px; pointer-events:none;
-      background:radial-gradient(circle, rgba(189,0,255,0.18) 0%, transparent 65%);
-      filter:blur(40px);
-      animation:glowPulse 7s ease-in-out infinite reverse;
-    }
-    @keyframes glowPulse {
-      0%,100%{ transform:scale(1); opacity:0.8; }
-      50%    { transform:scale(1.2); opacity:1; }
+    /* Animated mesh background */
+    .hero-mesh {
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(189,0,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 10% 60%, rgba(0,240,255,0.08) 0%, transparent 55%),
+        linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+      background-size: auto, auto, 32px 32px, 32px 32px;
     }
 
-    /* Flowing top border */
-    .xhero::before {
-      content:'';
-      position:absolute; top:0; left:0; right:0; height:4px;
-      background:linear-gradient(90deg,#00f0ff,#bd00ff,#ff007f,#00f0ff);
-      background-size:300% 100%;
-      animation:flowBorder 2.5s linear infinite;
+    /* Top flowing border */
+    .hero::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 2;
+      background: linear-gradient(90deg, transparent, #00f0ff, #bd00ff, #ff007f, #00f0ff, transparent);
+      background-size: 400% 100%;
+      animation: flowBorder 3s linear infinite;
     }
-    @keyframes flowBorder { to { background-position:300% 0; } }
+    @keyframes flowBorder { to { background-position: -400% 0; } }
 
-    .xhero-inner {
-      position:relative; z-index:2;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:32px; flex-wrap:wrap;
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; padding: 36px 40px; flex-wrap: wrap;
     }
 
-    /* Avatar section */
-    .xuser { display:flex; align-items:center; gap:22px; }
-    .xav-shell {
-      position:relative; width:84px; height:84px; flex-shrink:0;
+    /* Avatar */
+    .hero-user { display: flex; align-items: center; gap: 24px; }
+
+    .av-shell {
+      position: relative; flex-shrink: 0;
+      width: 88px; height: 88px;
     }
-    .xav {
-      width:84px; height:84px; border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Orbitron',sans-serif; font-size:1.75rem; font-weight:900;
-      color:#fff; overflow:hidden;
-      background:linear-gradient(135deg,#00f0ff,#bd00ff);
-      position:relative; z-index:1;
+    .av {
+      width: 88px; height: 88px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900;
+      color: #fff; overflow: hidden;
+      background: linear-gradient(135deg, #00f0ff, #bd00ff);
+      position: relative; z-index: 1;
+      box-shadow: 0 0 0 3px rgba(0,240,255,0.3), 0 0 30px rgba(0,240,255,0.2);
     }
-    .xav img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-    /* Spinning ring */
-    .xav-svg {
-      position:absolute; inset:-9px;
-      width:calc(100% + 18px); height:calc(100% + 18px);
-      animation:spinRing 8s linear infinite;
+    .av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .av-ring {
+      position: absolute; inset: -8px;
+      width: calc(100% + 16px); height: calc(100% + 16px);
+      animation: spinRing 10s linear infinite;
     }
-    @keyframes spinRing{ to{ transform:rotate(360deg); } }
-    /* Online indicator */
-    .xav-online {
-      position:absolute; right:2px; bottom:2px; z-index:3;
-      width:16px; height:16px; border-radius:50%;
-      background:#00ff9d; border:3px solid #0a0025;
-      box-shadow:0 0 10px #00ff9d;
+    @keyframes spinRing { to { transform: rotate(360deg); } }
+    .av-online {
+      position: absolute; right: 3px; bottom: 3px; z-index: 3;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--g); border: 3px solid #06001a;
+      box-shadow: 0 0 12px var(--g);
+      animation: pulse 2s ease-in-out infinite;
     }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 12px var(--g);} 50%{box-shadow:0 0 24px var(--g), 0 0 40px rgba(0,255,157,0.4);} }
 
     /* User text */
-    .xgreeting {
-      display:inline-flex; align-items:center; gap:7px;
-      padding:4px 14px; border-radius:50px;
-      background:rgba(0,240,255,0.08); border:1px solid rgba(0,240,255,0.2);
-      font-size:0.68rem; font-weight:800; letter-spacing:2px;
-      text-transform:uppercase; color:#00f0ff; margin-bottom:10px;
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 14px; border-radius: 50px;
+      background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.2);
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--c); margin-bottom: 10px;
     }
-    .xgreeting .dot {
-      width:5px; height:5px; border-radius:50%;
-      background:#00f0ff; animation:dotPulse 1.5s ease-in-out infinite;
+    .hero-tag-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--c); animation: dotBlink 1.5s ease-in-out infinite;
     }
-    @keyframes dotPulse{ 0%,100%{opacity:1;} 50%{opacity:0.15;} }
+    @keyframes dotBlink { 0%,100%{opacity:1;} 50%{opacity:0.1;} }
 
-    .xname {
-      font-family:'Space Grotesk',sans-serif;
-      font-size:clamp(1.8rem,3.5vw,2.5rem);
-      font-weight:900; line-height:1.05; margin-bottom:10px;
+    .hero-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      font-weight: 900; line-height: 1.1; margin-bottom: 10px;
     }
-    .xname-accent {
-      background:linear-gradient(135deg,#00f0ff,#bd00ff);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      background-clip:text;
+    .hero-name-grd {
+      background: linear-gradient(135deg, #00f0ff 0%, #bd00ff 60%, #ff007f 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; background-size: 200% 100%;
+      animation: gradShift 4s ease infinite;
     }
-    .xmeta {
-      display:flex; align-items:center; gap:8px;
-      font-size:0.8rem; color:rgba(255,255,255,0.45); flex-wrap:wrap;
+    @keyframes gradShift { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+
+    .hero-meta {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.78rem; color: rgba(255,255,255,0.35); flex-wrap: wrap;
     }
-    .xmeta-sep{ color:rgba(189,0,255,0.6); font-size:0.6rem; }
+    .hero-meta-sep { color: rgba(189,0,255,0.5); font-size: 0.5rem; }
+    .hero-role-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px 10px; border-radius: 50px;
+      background: rgba(0,255,157,0.1); border: 1px solid rgba(0,255,157,0.25);
+      color: var(--g); font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    }
 
     /* Hero buttons */
-    .xbtns { display:flex; gap:10px; flex-wrap:wrap; }
-    .xbtn-main {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:14px 28px; border-radius:50px;
-      background:linear-gradient(135deg,#00f0ff,#bd00ff);
-      color:#fff; font-size:0.87rem; font-weight:800;
-      font-family:'Space Grotesk',sans-serif;
-      text-decoration:none; border:none; cursor:pointer;
-      box-shadow:0 6px 30px rgba(0,240,255,0.35);
-      transition:all 0.3s; white-space:nowrap;
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .hbtn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 50px; font-size: 0.82rem;
+      font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all 0.3s; white-space: nowrap;
     }
-    .xbtn-main:hover { transform:translateY(-3px) scale(1.04); box-shadow:0 12px 40px rgba(0,240,255,0.5); color:#fff; }
-    .xbtn-out {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:13px 22px; border-radius:50px;
-      background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
-      color:rgba(255,255,255,0.7); font-size:0.85rem; font-weight:700;
-      font-family:'Space Grotesk',sans-serif;
-      text-decoration:none; cursor:pointer; transition:all 0.3s; white-space:nowrap;
+    .hbtn i { width: 15px; height: 15px; }
+    .hbtn-primary {
+      background: linear-gradient(135deg, #00f0ff, #bd00ff);
+      color: #fff; box-shadow: 0 4px 24px rgba(0,240,255,0.3);
     }
-    .xbtn-out:hover { background:rgba(189,0,255,0.12); border-color:rgba(189,0,255,0.5); color:#fff; transform:translateY(-2px); }
-    .xbtn-main i, .xbtn-out i { width:16px; height:16px; }
+    .hbtn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 40px rgba(0,240,255,0.5); color: #fff; }
+    .hbtn-ghost {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+    }
+    .hbtn-ghost:hover { background: rgba(189,0,255,0.1); border-color: rgba(189,0,255,0.4); color: #fff; transform: translateY(-2px); }
 
-    /* ══════════════════════════════════════════
-       STAT CARDS — SOLID vivid backgrounds
-    ══════════════════════════════════════════ */
-    .xstats {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
+    /* Hero bottom strip — points bar */
+    .hero-strip {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 40px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.2);
+      flex-wrap: wrap;
     }
-    .xsc {
-      border-radius:20px;
-      padding:26px 22px 22px;
-      position:relative; overflow:hidden;
-      transition:transform 0.3s, box-shadow 0.3s;
-      cursor:default;
+    .strip-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+    .strip-item strong { color: rgba(255,255,255,0.8); font-weight: 700; }
+    .strip-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .strip-pts {
+      margin-left: auto; display: flex; align-items: center; gap: 12px;
     }
-    .xsc:hover { transform:translateY(-6px); }
+    .pts-label { font-size: 0.7rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+    .pts-track {
+      width: 160px; height: 6px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); overflow: hidden;
+    }
+    .pts-fill {
+      height: 100%; border-radius: 10px; width: 0%;
+      background: linear-gradient(90deg, var(--c), var(--p));
+      transition: width 1.8s cubic-bezier(0.22,1,0.36,1);
+      box-shadow: 0 0 12px rgba(0,240,255,0.5);
+    }
+    .pts-val { font-family: 'Orbitron',sans-serif; font-size: 0.8rem; font-weight: 900; color: var(--c); }
 
-    /* Color themes — solid vivid backgrounds */
-    .xsc-1 {
-      background:linear-gradient(135deg,#001e2b,#003340);
-      border:1px solid rgba(0,240,255,0.3);
-      box-shadow:0 8px 32px rgba(0,240,255,0.1);
-    }
-    .xsc-1:hover { box-shadow:0 16px 48px rgba(0,240,255,0.25); }
-    .xsc-2 {
-      background:linear-gradient(135deg,#1a0030,#2d0055);
-      border:1px solid rgba(189,0,255,0.3);
-      box-shadow:0 8px 32px rgba(189,0,255,0.1);
-    }
-    .xsc-2:hover { box-shadow:0 16px 48px rgba(189,0,255,0.25); }
-    .xsc-3 {
-      background:linear-gradient(135deg,#001a15,#003325);
-      border:1px solid rgba(0,255,157,0.3);
-      box-shadow:0 8px 32px rgba(0,255,157,0.1);
-    }
-    .xsc-3:hover { box-shadow:0 16px 48px rgba(0,255,157,0.25); }
-    .xsc-4 {
-      background:linear-gradient(135deg,#1a1000,#332000);
-      border:1px solid rgba(255,170,0,0.3);
-      box-shadow:0 8px 32px rgba(255,170,0,0.1);
-    }
-    .xsc-4:hover { box-shadow:0 16px 48px rgba(255,170,0,0.25); }
+    /* ══════════════════════════════════════
+       STAT CARDS
+    ══════════════════════════════════════ */
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
 
-    /* Large background icon */
-    .xsc-bg-icon {
-      position:absolute; right:-10px; bottom:-15px;
-      font-size:6rem; opacity:0.05; line-height:1;
-      pointer-events:none; transition:opacity 0.3s;
+    .sc {
+      border-radius: 20px; padding: 24px 22px 20px;
+      position: relative; overflow: hidden;
+      cursor: default; transition: transform 0.3s, box-shadow 0.3s;
     }
-    .xsc:hover .xsc-bg-icon { opacity:0.1; }
+    .sc:hover { transform: translateY(-6px); }
 
-    /* Icon badge */
-    .xsc-icon {
-      width:46px; height:46px; border-radius:14px;
-      display:flex; align-items:center; justify-content:center;
-      margin-bottom:16px;
-    }
-    .xsc-icon i { width:22px; height:22px; }
-    .xsc-1 .xsc-icon { background:rgba(0,240,255,0.15); color:#00f0ff; box-shadow:0 0 20px rgba(0,240,255,0.2); }
-    .xsc-2 .xsc-icon { background:rgba(189,0,255,0.15); color:#bd00ff; box-shadow:0 0 20px rgba(189,0,255,0.2); }
-    .xsc-3 .xsc-icon { background:rgba(0,255,157,0.15); color:#00ff9d; box-shadow:0 0 20px rgba(0,255,157,0.2); }
-    .xsc-4 .xsc-icon { background:rgba(255,170,0,0.15); color:#ffaa00; box-shadow:0 0 20px rgba(255,170,0,0.2); }
+    .sc-1 { background: linear-gradient(140deg,#001e2e,#002e42); border: 1px solid rgba(0,240,255,0.25); box-shadow: 0 6px 30px rgba(0,240,255,0.08); }
+    .sc-2 { background: linear-gradient(140deg,#160028,#260048); border: 1px solid rgba(189,0,255,0.25); box-shadow: 0 6px 30px rgba(189,0,255,0.08); }
+    .sc-3 { background: linear-gradient(140deg,#001a14,#002e22); border: 1px solid rgba(0,255,157,0.25); box-shadow: 0 6px 30px rgba(0,255,157,0.08); }
+    .sc-4 { background: linear-gradient(140deg,#1a1000,#2e1c00); border: 1px solid rgba(255,170,0,0.25); box-shadow: 0 6px 30px rgba(255,170,0,0.08); }
 
-    /* Number */
-    .xsc-num {
-      font-family:'Orbitron',sans-serif;
-      font-size:2.6rem; font-weight:900; line-height:1; margin-bottom:6px;
-      letter-spacing:-1px;
-    }
-    .xsc-1 .xsc-num { color:#00f0ff; text-shadow:0 0 30px rgba(0,240,255,0.6); }
-    .xsc-2 .xsc-num { color:#bd00ff; text-shadow:0 0 30px rgba(189,0,255,0.6); }
-    .xsc-3 .xsc-num { color:#00ff9d; text-shadow:0 0 30px rgba(0,255,157,0.6); }
-    .xsc-4 .xsc-num { color:#ffaa00; text-shadow:0 0 30px rgba(255,170,0,0.6); }
+    .sc-1:hover { box-shadow: 0 16px 50px rgba(0,240,255,0.2); }
+    .sc-2:hover { box-shadow: 0 16px 50px rgba(189,0,255,0.2); }
+    .sc-3:hover { box-shadow: 0 16px 50px rgba(0,255,157,0.2); }
+    .sc-4:hover { box-shadow: 0 16px 50px rgba(255,170,0,0.2); }
 
-    .xsc-label {
-      font-size:0.7rem; font-weight:800; text-transform:uppercase;
-      letter-spacing:2px; color:rgba(255,255,255,0.35);
+    .sc-glow {
+      position: absolute; width: 180px; height: 180px; border-radius: 50%;
+      right: -50px; top: -50px; pointer-events: none; filter: blur(40px); opacity: 0.3;
     }
-    .xsc-sub {
-      font-size:0.72rem; margin-top:8px; font-weight:600;
-      display:flex; align-items:center; gap:5px;
-    }
-    .xsc-1 .xsc-sub { color:rgba(0,240,255,0.7); }
-    .xsc-2 .xsc-sub { color:rgba(189,0,255,0.7); }
-    .xsc-3 .xsc-sub { color:rgba(0,255,157,0.7); }
-    .xsc-4 .xsc-sub { color:rgba(255,170,0,0.7); }
-    .xsc-sub i { width:12px; height:12px; }
+    .sc-1 .sc-glow { background: var(--c); }
+    .sc-2 .sc-glow { background: var(--p); }
+    .sc-3 .sc-glow { background: var(--g); }
+    .sc-4 .sc-glow { background: var(--o); }
 
-    /* ══════════════════════════════════════════
-       MAIN CONTENT GRID
-    ══════════════════════════════════════════ */
-    .xgrid {
-      display:grid;
-      grid-template-columns:1.6fr 1fr;
-      gap:20px;
-      align-items:start;
+    .sc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .sc-ico {
+      width: 44px; height: 44px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
     }
-    .xleft  { display:flex; flex-direction:column; gap:20px; }
-    .xright { display:flex; flex-direction:column; gap:20px; }
+    .sc-ico i { width: 20px; height: 20px; }
+    .sc-1 .sc-ico { background: rgba(0,240,255,0.15); color: var(--c); box-shadow: 0 0 20px rgba(0,240,255,0.2); }
+    .sc-2 .sc-ico { background: rgba(189,0,255,0.15); color: var(--p); box-shadow: 0 0 20px rgba(189,0,255,0.2); }
+    .sc-3 .sc-ico { background: rgba(0,255,157,0.15); color: var(--g); box-shadow: 0 0 20px rgba(0,255,157,0.2); }
+    .sc-4 .sc-ico { background: rgba(255,170,0,0.15); color: var(--o); box-shadow: 0 0 20px rgba(255,170,0,0.2); }
 
-    /* ── Panel ── */
-    .xpanel {
-      border-radius:20px;
-      background:linear-gradient(160deg,rgba(14,8,28,0.98),rgba(6,14,28,0.98));
-      border:1px solid rgba(255,255,255,0.07);
-      overflow:hidden;
+    /* Mini sparkline */
+    .sc-spark { display: flex; align-items: flex-end; gap: 3px; height: 30px; }
+    .spark-bar {
+      width: 4px; border-radius: 2px; opacity: 0.35;
+      transition: height 1s cubic-bezier(0.22,1,0.36,1), opacity 0.3s;
     }
-    .xpanel-head {
-      padding:20px 24px;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .xpanel-hgroup { display:flex; align-items:center; gap:12px; }
-    .xpanel-ico {
-      width:36px; height:36px; border-radius:11px;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .xpanel-ico i { width:17px; height:17px; }
-    .xi-c  { background:rgba(0,240,255,0.12);  color:#00f0ff; }
-    .xi-p  { background:rgba(189,0,255,0.12);  color:#bd00ff; }
-    .xi-pk { background:rgba(255,0,127,0.12);  color:#ff007f; }
-    .xi-g  { background:rgba(0,255,157,0.12);  color:#00ff9d; }
-    .xi-o  { background:rgba(255,170,0,0.12);  color:#ffaa00; }
-    .xpanel-ttl { font-family:'Space Grotesk',sans-serif; font-size:0.95rem; font-weight:700; }
-    .xpanel-sub { font-size:0.7rem; color:rgba(255,255,255,0.3); margin-top:1px; }
-    .xpanel-all {
-      font-size:0.75rem; color:rgba(255,255,255,0.3);
-      text-decoration:none; display:flex; align-items:center; gap:4px; transition:color 0.3s;
-    }
-    .xpanel-all:hover { color:#00f0ff; }
-    .xpanel-body { padding:20px 24px; }
+    .sc:hover .spark-bar { opacity: 0.7; }
+    .sc-1 .spark-bar { background: var(--c); }
+    .sc-2 .spark-bar { background: var(--p); }
+    .sc-3 .spark-bar { background: var(--g); }
+    .sc-4 .spark-bar { background: var(--o); }
 
-    /* ── Readiness bar ── */
-    .xready {
-      display:none; margin:0 24px 0;
-      padding:14px 18px; border-radius:14px;
-      background:rgba(0,240,255,0.04);
-      border:1px solid rgba(0,240,255,0.12);
-      margin-top:16px;
+    .sc-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem; font-weight: 900; line-height: 1; margin-bottom: 4px;
     }
-    .xready-row {
-      display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;
-    }
-    .xready-lbl {
-      font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.7);
-      display:flex; align-items:center; gap:8px;
-    }
-    .xready-pct { font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#00f0ff; font-weight:900; }
-    .xready-track {
-      height:8px; background:rgba(255,255,255,0.06);
-      border-radius:10px; overflow:hidden;
-    }
-    .xready-fill {
-      height:100%; width:0; border-radius:10px;
-      background:linear-gradient(90deg,#00f0ff,#bd00ff);
-      transition:width 1.5s cubic-bezier(0.22,1,0.36,1);
-      box-shadow:0 0 14px rgba(0,240,255,0.5);
-    }
+    .sc-1 .sc-num { color: var(--c); text-shadow: 0 0 30px rgba(0,240,255,0.5); }
+    .sc-2 .sc-num { color: var(--p); text-shadow: 0 0 30px rgba(189,0,255,0.5); }
+    .sc-3 .sc-num { color: var(--g); text-shadow: 0 0 30px rgba(0,255,157,0.5); }
+    .sc-4 .sc-num { color: var(--o); text-shadow: 0 0 30px rgba(255,170,0,0.5); }
 
-    /* ── Event items ── */
-    .xev-list { display:flex; flex-direction:column; gap:10px; }
-    .xev-item {
-      display:flex; align-items:center; gap:14px;
-      padding:14px 16px; border-radius:14px;
-      background:rgba(255,255,255,0.025);
-      border:1px solid rgba(255,255,255,0.06);
-      text-decoration:none; color:inherit;
-      transition:all 0.3s; position:relative; overflow:hidden;
+    .sc-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.3); margin-bottom: 12px; }
+    .sc-trend {
+      font-size: 0.7rem; font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+      padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);
     }
-    /* Left glow bar */
-    .xev-item::before {
-      content:''; position:absolute;
-      left:0; top:0; bottom:0; width:3px;
-      background:linear-gradient(180deg,#00f0ff,#bd00ff);
-      transform:scaleY(0); transform-origin:top;
-      transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      border-radius:0 2px 2px 0;
-    }
-    .xev-item:hover { background:rgba(0,240,255,0.05); border-color:rgba(0,240,255,0.2); transform:translateX(6px); }
-    .xev-item:hover::before { transform:scaleY(1); }
+    .sc-trend i { width: 12px; height: 12px; }
+    .sc-1 .sc-trend { color: var(--c); }
+    .sc-2 .sc-trend { color: var(--p); }
+    .sc-3 .sc-trend { color: var(--g); }
+    .sc-4 .sc-trend { color: var(--o); }
 
-    .xev-thumb {
-      width:50px; height:50px; border-radius:14px;
-      display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0;
-    }
-    .eth-t{ background:linear-gradient(135deg,rgba(0,240,255,0.15),rgba(189,0,255,0.15)); }
-    .eth-c{ background:linear-gradient(135deg,rgba(255,0,127,0.15),rgba(189,0,255,0.15)); }
-    .eth-s{ background:linear-gradient(135deg,rgba(0,255,157,0.15),rgba(0,240,255,0.12)); }
-    .eth-w{ background:linear-gradient(135deg,rgba(255,170,0,0.12),rgba(0,255,157,0.12)); }
-    .eth-g{ background:linear-gradient(135deg,rgba(189,0,255,0.15),rgba(255,0,127,0.15)); }
+    /* ══════════════════════════════════════
+       MAIN GRID
+    ══════════════════════════════════════ */
+    .grid-main { display: grid; grid-template-columns: 1.65fr 1fr; gap: 18px; align-items: start; }
+    .col-l { display: flex; flex-direction: column; gap: 18px; }
+    .col-r { display: flex; flex-direction: column; gap: 18px; }
 
-    .xev-info { flex:1; min-width:0; }
-    .xev-name {
-      font-family:'Space Grotesk',sans-serif; font-weight:800;
-      font-size:0.9rem; margin-bottom:4px;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    /* ── Glass Panel ── */
+    .panel {
+      border-radius: 22px;
+      background: linear-gradient(160deg, rgba(12,8,26,0.97), rgba(6,10,24,0.97));
+      border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
     }
-    .xev-meta { font-size:0.72rem; color:rgba(255,255,255,0.35); display:flex; gap:12px; flex-wrap:wrap; }
-    .xev-meta span { display:flex; align-items:center; gap:3px; }
-    .xev-status {
-      padding:4px 12px; border-radius:50px; flex-shrink:0;
-      font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;
+    .panel-head {
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .xs-confirmed { background:rgba(0,255,157,0.12); color:#00ff9d; border:1px solid rgba(0,255,157,0.25); }
-    .xs-pending   { background:rgba(255,170,0,0.12);  color:#ffaa00; border:1px solid rgba(255,170,0,0.25); }
-    .xs-attended  { background:rgba(0,240,255,0.12);  color:#00f0ff; border:1px solid rgba(0,240,255,0.25); }
+    .panel-hgrp { display: flex; align-items: center; gap: 12px; }
+    .panel-ico {
+      width: 36px; height: 36px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .panel-ico i { width: 16px; height: 16px; }
+    .pi-c  { background: rgba(0,240,255,0.12); color: var(--c); }
+    .pi-p  { background: rgba(189,0,255,0.12); color: var(--p); }
+    .pi-g  { background: rgba(0,255,157,0.12); color: var(--g); }
+    .pi-pk { background: rgba(255,0,127,0.12); color: var(--pk); }
+    .pi-o  { background: rgba(255,170,0,0.12); color: var(--o); }
+    .panel-ttl { font-family: 'Space Grotesk', sans-serif; font-size: 0.92rem; font-weight: 700; }
+    .panel-sub { font-size: 0.68rem; color: rgba(255,255,255,0.28); margin-top: 1px; }
+    .panel-link {
+      font-size: 0.72rem; color: rgba(255,255,255,0.28);
+      text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.3s;
+    }
+    .panel-link:hover { color: var(--c); }
+    .panel-link i { width: 11px; height: 11px; }
+    .panel-body { padding: 18px 22px; }
 
-    /* ── Countdown ── */
-    .xcd-wrap {}
-    .xcd-title {
-      text-align:center; font-size:0.62rem;
-      text-transform:uppercase; letter-spacing:3px;
-      color:rgba(255,255,255,0.25); margin-bottom:16px; font-weight:700;
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 4px;
+      padding: 4px; border-radius: 12px;
+      background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06);
     }
-    .xcd-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-    .xcd-seg {
-      background:linear-gradient(135deg,rgba(0,240,255,0.05),rgba(189,0,255,0.05));
-      border:1px solid rgba(0,240,255,0.15);
-      border-radius:14px; padding:14px 4px; text-align:center;
-      position:relative; overflow:hidden;
+    .tab {
+      padding: 6px 14px; border-radius: 9px; border: none;
+      background: transparent; color: rgba(255,255,255,0.35);
+      font-size: 0.74rem; font-weight: 600; cursor: pointer; transition: all 0.3s;
     }
-    .xcd-seg::before {
-      content:''; position:absolute;
-      top:0; left:20%; right:20%; height:1px;
-      background:linear-gradient(90deg,transparent,rgba(0,240,255,0.5),transparent);
-    }
-    .xcd-n {
-      font-family:'Orbitron',sans-serif; font-size:1.9rem; font-weight:900;
-      background:linear-gradient(135deg,#00f0ff,#bd00ff);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      background-clip:text; display:block; line-height:1;
-    }
-    .xcd-l {
-      font-size:0.52rem; text-transform:uppercase; letter-spacing:1.5px;
-      color:rgba(255,255,255,0.25); display:block; margin-top:6px; font-weight:700;
-    }
-    /* Live badge on countdown header */
-    .xcd-live {
-      display:inline-flex; align-items:center; gap:5px;
-      background:rgba(255,51,102,0.12); border:1px solid rgba(255,51,102,0.3);
-      color:#ff3366; padding:3px 10px; border-radius:50px;
-      font-size:0.6rem; font-weight:900; letter-spacing:1px;
-    }
-    .xcd-live-dot {
-      width:6px; height:6px; border-radius:50%;
-      background:#ff3366; animation:dotPulse 1s ease-in-out infinite;
-    }
+    .tab.active { background: rgba(0,240,255,0.12); color: var(--c); box-shadow: 0 0 16px rgba(0,240,255,0.15); }
 
-    /* ── Quick Nav ── */
-    .xqnav { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .xqnav-card {
-      display:flex; align-items:center; gap:12px;
-      padding:14px; border-radius:14px;
-      background:rgba(255,255,255,0.025);
-      border:1px solid rgba(255,255,255,0.06);
-      text-decoration:none; color:inherit; transition:all 0.3s;
+    /* ── Event Items ── */
+    .ev-list { display: flex; flex-direction: column; gap: 9px; }
+    .ev-item {
+      display: flex; align-items: center; gap: 13px;
+      padding: 13px 15px; border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      text-decoration: none; color: inherit;
+      transition: all 0.3s; position: relative; overflow: hidden;
     }
-    .xqnav-card:hover { transform:translateY(-3px); background:rgba(189,0,255,0.08); border-color:rgba(189,0,255,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
-    .xqnav-ico {
-      width:40px; height:40px; border-radius:12px;
-      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    .ev-item::before {
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--c), var(--p));
+      transform: scaleY(0); transform-origin: top;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
     }
-    .xqnav-ico i { width:18px; height:18px; }
-    .xqi-c  { background:rgba(0,240,255,0.12);  color:#00f0ff; }
-    .xqi-p  { background:rgba(189,0,255,0.12);  color:#bd00ff; }
-    .xqi-pk { background:rgba(255,0,127,0.12);  color:#ff007f; }
-    .xqi-g  { background:rgba(0,255,157,0.12);  color:#00ff9d; }
-    .xqnav-ttl { font-size:0.82rem; font-weight:700; }
-    .xqnav-sub { font-size:0.67rem; color:rgba(255,255,255,0.3); margin-top:1px; }
+    .ev-item:hover { background: rgba(0,240,255,0.04); border-color: rgba(0,240,255,0.18); transform: translateX(5px); }
+    .ev-item:hover::before { transform: scaleY(1); }
 
-    /* ── Announcements ── */
-    .xann-list { display:flex; flex-direction:column; gap:10px; }
-    .xann-item {
-      padding:14px 16px; border-radius:14px;
-      background:rgba(255,255,255,0.02);
-      border-left:3px solid rgba(255,255,255,0.1);
-      border-top:1px solid rgba(255,255,255,0.05);
-      border-right:1px solid rgba(255,255,255,0.05);
-      border-bottom:1px solid rgba(255,255,255,0.05);
-      transition:all 0.3s;
+    .ev-thumb {
+      width: 48px; height: 48px; border-radius: 13px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
     }
-    .xann-item:hover { transform:translateX(4px); background:rgba(255,255,255,0.04); }
-    .xann-item.urgent    { border-left-color:#ff3366; background:rgba(255,51,102,0.04); }
-    .xann-item.important { border-left-color:#ffaa00; background:rgba(255,170,0,0.04); }
-    .xann-item.normal    { border-left-color:#00f0ff; }
-    .xann-row { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:5px; }
-    .xann-ttl { font-weight:700; font-size:0.87rem; }
-    .xann-badge {
-      padding:2px 8px; border-radius:50px; flex-shrink:0;
-      font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;
+    .et-t { background: linear-gradient(135deg,rgba(0,240,255,0.15),rgba(189,0,255,0.12)); }
+    .et-c { background: linear-gradient(135deg,rgba(255,0,127,0.15),rgba(189,0,255,0.12)); }
+    .et-s { background: linear-gradient(135deg,rgba(0,255,157,0.15),rgba(0,240,255,0.1)); }
+    .et-w { background: linear-gradient(135deg,rgba(255,170,0,0.12),rgba(0,255,157,0.1)); }
+    .et-g { background: linear-gradient(135deg,rgba(189,0,255,0.15),rgba(255,0,127,0.12)); }
+
+    .ev-info { flex: 1; min-width: 0; }
+    .ev-name { font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ev-meta { font-size: 0.7rem; color: rgba(255,255,255,0.32); display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .ev-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .ev-status {
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .xab-urgent   { background:rgba(255,51,102,0.15);  color:#ff3366; border:1px solid rgba(255,51,102,0.3); }
-    .xab-important{ background:rgba(255,170,0,0.15);   color:#ffaa00; border:1px solid rgba(255,170,0,0.3); }
-    .xann-body { font-size:0.78rem; color:rgba(255,255,255,0.45); line-height:1.55; margin-bottom:6px;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .xann-time { font-size:0.67rem; color:rgba(255,255,255,0.2); }
+    .es-confirmed { background: rgba(0,255,157,0.1); color: var(--g); border: 1px solid rgba(0,255,157,0.22); }
+    .es-pending   { background: rgba(255,170,0,0.1); color: var(--o); border: 1px solid rgba(255,170,0,0.22); }
+    .es-attended  { background: rgba(0,240,255,0.1); color: var(--c); border: 1px solid rgba(0,240,255,0.22); }
+    .ev-arrow { color: rgba(255,255,255,0.15); transition: color 0.3s; }
+    .ev-item:hover .ev-arrow { color: var(--c); }
+    .ev-arrow i { width: 14px; height: 14px; }
 
     /* ── Empty state ── */
-    .xempty { text-align:center; padding:48px 20px; }
-    .xempty-icon { font-size:3.5rem; display:block; margin-bottom:16px; }
-    .xempty h4 { font-family:'Space Grotesk',sans-serif; font-size:1rem; color:rgba(255,255,255,0.6); margin-bottom:8px; font-weight:700; }
-    .xempty p  { font-size:0.82rem; color:rgba(255,255,255,0.3); margin-bottom:20px; line-height:1.6; }
-    .xempty-btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:11px 24px; border-radius:50px;
-      background:linear-gradient(135deg,#00f0ff,#bd00ff);
-      color:#fff; font-size:0.82rem; font-weight:800; text-decoration:none; transition:all 0.3s;
+    .empty { text-align: center; padding: 48px 20px; }
+    .empty-icon { font-size: 3.2rem; display: block; margin-bottom: 14px; }
+    .empty h4 { font-size: 0.95rem; color: rgba(255,255,255,0.55); margin-bottom: 8px; font-weight: 700; }
+    .empty p { font-size: 0.8rem; color: rgba(255,255,255,0.28); margin-bottom: 20px; line-height: 1.6; }
+    .empty-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 22px; border-radius: 50px;
+      background: linear-gradient(135deg, var(--c), var(--p));
+      color: #fff; font-size: 0.8rem; font-weight: 800; text-decoration: none; transition: all 0.3s;
     }
-    .xempty-btn i { width:14px; height:14px; }
-    .xempty-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,240,255,0.35); color:#fff; }
+    .empty-btn i { width: 13px; height: 13px; }
+    .empty-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,240,255,0.35); color: #fff; }
 
-    /* ══════════════════════════════════════════
-       ANIMATIONS — staggered slide-up
-    ══════════════════════════════════════════ */
-    @keyframes xup {
-      from { opacity:0; transform:translateY(28px); }
-      to   { opacity:1; transform:translateY(0); }
+    /* ── Readiness Bar ── */
+    .readiness {
+      display: none;
+      padding: 16px 18px; border-radius: 14px;
+      background: rgba(0,240,255,0.04);
+      border: 1px solid rgba(0,240,255,0.1); margin-bottom: 14px;
     }
-    .xu { animation:xup 0.55s cubic-bezier(0.22,1,0.36,1) forwards; opacity:0; }
-    .u1{ animation-delay:0.04s; }
-    .u2{ animation-delay:0.10s; }
-    .u3{ animation-delay:0.16s; }
-    .u4{ animation-delay:0.22s; }
-    .u5{ animation-delay:0.28s; }
-    .u6{ animation-delay:0.34s; }
-    .u7{ animation-delay:0.40s; }
-    .u8{ animation-delay:0.46s; }
-    .u9{ animation-delay:0.52s; }
+    .rdy-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .rdy-lbl { font-size: 0.76rem; font-weight: 700; color: rgba(255,255,255,0.65); display: flex; align-items: center; gap: 7px; }
+    .rdy-pct { font-family: 'Orbitron',sans-serif; font-size: 0.88rem; color: var(--c); font-weight: 900; }
+    .rdy-track { height: 7px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+    .rdy-fill {
+      height: 100%; width: 0%; border-radius: 10px;
+      background: linear-gradient(90deg, var(--c), var(--p));
+      transition: width 1.8s cubic-bezier(0.22,1,0.36,1);
+      box-shadow: 0 0 14px rgba(0,240,255,0.45);
+    }
 
-    /* ══════════════════════════════════════════
+    /* ══════════════════════════════════════
+       COUNTDOWN TIMER
+    ══════════════════════════════════════ */
+    .cd-wrap {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(6,0,20,0.95), rgba(0,8,24,0.95));
+      border-radius: 16px; border: 1px solid rgba(189,0,255,0.15);
+    }
+    .cd-label {
+      text-align: center; font-size: 0.6rem;
+      text-transform: uppercase; letter-spacing: 3px;
+      color: rgba(255,255,255,0.22); margin-bottom: 18px; font-weight: 700;
+    }
+    .cd-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .cd-seg {
+      position: relative; text-align: center;
+      padding: 16px 8px; border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,240,255,0.12);
+      overflow: hidden;
+    }
+    .cd-seg::before {
+      content: ''; position: absolute;
+      top: 0; left: 15%; right: 15%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,240,255,0.6), transparent);
+    }
+    .cd-seg::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 15%; right: 15%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(189,0,255,0.4), transparent);
+    }
+    .cd-n {
+      font-family: 'Orbitron',sans-serif; font-size: 2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--c), var(--p));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: block; line-height: 1;
+      filter: drop-shadow(0 0 8px rgba(0,240,255,0.4));
+    }
+    .cd-l {
+      font-size: 0.5rem; text-transform: uppercase; letter-spacing: 2px;
+      color: rgba(255,255,255,0.22); display: block; margin-top: 7px; font-weight: 700;
+    }
+    .cd-live-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,51,102,0.1); border: 1px solid rgba(255,51,102,0.25);
+      color: #ff3366; padding: 3px 10px; border-radius: 50px;
+      font-size: 0.58rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .cd-live-dot { width: 5px; height: 5px; border-radius: 50%; background: #ff3366; animation: dotBlink 1s ease-in-out infinite; }
+
+    /* ══════════════════════════════════════
+       QUICK NAV GRID
+    ══════════════════════════════════════ */
+    .qnav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .qcard {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px; border-radius: 15px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      text-decoration: none; color: inherit; transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .qcard::before {
+      content: ''; position: absolute;
+      inset: 0; opacity: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(189,0,255,0.12) 0%, transparent 70%);
+      transition: opacity 0.3s;
+    }
+    .qcard:hover::before { opacity: 1; }
+    .qcard:hover { transform: translateY(-4px); border-color: rgba(189,0,255,0.25); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .qico { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .qico i { width: 17px; height: 17px; }
+    .qci-c  { background: rgba(0,240,255,0.12);  color: var(--c); }
+    .qci-p  { background: rgba(189,0,255,0.12);  color: var(--p); }
+    .qci-pk { background: rgba(255,0,127,0.12);  color: var(--pk); }
+    .qci-g  { background: rgba(0,255,157,0.12);  color: var(--g); }
+    .qttl { font-size: 0.82rem; font-weight: 700; }
+    .qsub { font-size: 0.65rem; color: rgba(255,255,255,0.28); margin-top: 1px; }
+
+    /* ══════════════════════════════════════
+       ANNOUNCEMENTS
+    ══════════════════════════════════════ */
+    .ann-list { display: flex; flex-direction: column; gap: 9px; }
+    .ann-item {
+      padding: 13px 15px; border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      border-left: 3px solid rgba(255,255,255,0.08);
+      border-top: 1px solid rgba(255,255,255,0.04);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: all 0.3s; cursor: default;
+    }
+    .ann-item:hover { transform: translateX(4px); background: rgba(255,255,255,0.035); }
+    .ann-item.urgent    { border-left-color: #ff3366; background: rgba(255,51,102,0.04); }
+    .ann-item.important { border-left-color: var(--o); background: rgba(255,170,0,0.04); }
+    .ann-item.normal    { border-left-color: var(--c); }
+    .ann-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+    .ann-ttl { font-weight: 700; font-size: 0.84rem; }
+    .ann-badge {
+      padding: 2px 8px; border-radius: 50px; flex-shrink: 0;
+      font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .ab-urgent    { background: rgba(255,51,102,0.12); color: #ff3366; border: 1px solid rgba(255,51,102,0.3); }
+    .ab-important { background: rgba(255,170,0,0.12);  color: var(--o); border: 1px solid rgba(255,170,0,0.3); }
+    .ann-body { font-size: 0.76rem; color: rgba(255,255,255,0.38); line-height: 1.55; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ann-time { font-size: 0.64rem; color: rgba(255,255,255,0.18); }
+
+    /* ══════════════════════════════════════
+       ACTIVITY FEED (new section)
+    ══════════════════════════════════════ */
+    .act-list { display: flex; flex-direction: column; }
+    .act-item {
+      display: flex; align-items: flex-start; gap: 13px;
+      padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      position: relative;
+    }
+    .act-item:last-child { border-bottom: none; }
+    .act-dot {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; margin-top: 2px;
+    }
+    .act-dot-c { background: rgba(0,240,255,0.12); }
+    .act-dot-p { background: rgba(189,0,255,0.12); }
+    .act-dot-g { background: rgba(0,255,157,0.12); }
+    .act-dot-o { background: rgba(255,170,0,0.12); }
+    .act-text { flex: 1; }
+    .act-ttl { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.75); line-height: 1.4; }
+    .act-ttl strong { color: #fff; }
+    .act-time { font-size: 0.65rem; color: rgba(255,255,255,0.22); margin-top: 3px; }
+
+    /* ══════════════════════════════════════
+       SCROLL-IN ANIMATIONS
+    ══════════════════════════════════════ */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .su { animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; }
+    .d1 { animation-delay: 0.04s; }
+    .d2 { animation-delay: 0.10s; }
+    .d3 { animation-delay: 0.16s; }
+    .d4 { animation-delay: 0.22s; }
+    .d5 { animation-delay: 0.28s; }
+    .d6 { animation-delay: 0.34s; }
+    .d7 { animation-delay: 0.40s; }
+    .d8 { animation-delay: 0.46s; }
+    .d9 { animation-delay: 0.52s; }
+
+    /* ══════════════════════════════════════
        RESPONSIVE
-    ══════════════════════════════════════════ */
-    @media(max-width:1100px){ .xgrid{grid-template-columns:1fr;} .xright{display:grid;grid-template-columns:1fr 1fr;} }
-    @media(max-width:900px) { .xstats{grid-template-columns:repeat(2,1fr);} }
-    @media(max-width:700px) { .xhero{padding:24px 20px;} .xhero-inner{flex-direction:column;align-items:flex-start;} .xright{grid-template-columns:1fr;} }
-    @media(max-width:520px) { .xstats{grid-template-columns:1fr 1fr;gap:10px;} .xqnav{grid-template-columns:1fr 1fr;} }
+    ══════════════════════════════════════ */
+    @media(max-width:1100px) {
+      .grid-main { grid-template-columns: 1fr; }
+      .col-r { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media(max-width:900px)  { .stats-row { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:700px)  {
+      .hero-inner { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+      .hero-strip { padding: 14px 20px; }
+      .strip-pts { margin-left: 0; width: 100%; }
+      .col-r { grid-template-columns: 1fr; }
+    }
+    @media(max-width:520px) {
+      .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .qnav { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -512,171 +588,288 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <div class="main-content with-sidebar">
-  <div class="xdb">
+  <div class="db">
 
     <!-- ══ HERO ══ -->
-    <div class="xhero xu u1">
-      <div class="xhero-glow"></div>
-      <div class="xhero-glow2"></div>
-      <div class="xhero-inner">
-
-        <div class="xuser">
-          <div class="xav-shell">
-            <svg class="xav-svg" viewBox="0 0 102 102" fill="none">
+    <div class="hero su d1">
+      <div class="hero-mesh"></div>
+      <div class="hero-inner">
+        <!-- User Info -->
+        <div class="hero-user">
+          <div class="av-shell">
+            <svg class="av-ring" viewBox="0 0 104 104" fill="none">
               <defs>
-                <linearGradient id="xrg" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%"   stop-color="#00f0ff" stop-opacity="0.9"/>
-                  <stop offset="60%"  stop-color="#bd00ff" stop-opacity="0.5"/>
+                <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#00f0ff" stop-opacity="1"/>
+                  <stop offset="50%"  stop-color="#bd00ff" stop-opacity="0.6"/>
                   <stop offset="100%" stop-color="#ff007f" stop-opacity="0"/>
                 </linearGradient>
               </defs>
-              <circle cx="51" cy="51" r="47" stroke="url(#xrg)" stroke-width="2.5"
-                stroke-dasharray="225 70" stroke-linecap="round"/>
+              <circle cx="52" cy="52" r="48" stroke="url(#rg)" stroke-width="2.5"
+                stroke-dasharray="220 80" stroke-linecap="round"/>
             </svg>
-            <div class="xav" id="dash-avatar">?</div>
-            <div class="xav-online"></div>
+            <div class="av" id="dash-avatar">?</div>
+            <div class="av-online"></div>
           </div>
-
           <div>
-            <div class="xgreeting"><span class="dot"></span><span id="time-greeting">Loading…</span></div>
-            <div class="xname">Hey, <span class="xname-accent" id="user-first-name">Participant</span>! 👋</div>
-            <div class="xmeta">
-              <span id="user-college">VAIBHAV 2K26</span>
-              <span class="xmeta-sep">◆</span>
+            <div class="hero-tag"><span class="hero-tag-dot"></span><span id="time-greeting">Loading…</span></div>
+            <div class="hero-name">Hey, <span class="hero-name-grd" id="user-first-name">Champion</span>! 👋</div>
+            <div class="hero-meta">
+              <span id="user-college">AGRATHA 2K26</span>
+              <span class="hero-meta-sep">◆</span>
               <span>Mission Control</span>
-              <span class="xmeta-sep">◆</span>
-              <span id="user-role-label">Participant</span>
+              <span class="hero-meta-sep">◆</span>
+              <span class="hero-role-badge">
+                <i data-lucide="shield-check" style="width:10px;height:10px"></i>
+                <span id="user-role-label">Participant</span>
+              </span>
             </div>
           </div>
         </div>
-
-        <div class="xbtns">
-          <a href="events.html" class="xbtn-main"><i data-lucide="search"></i>Browse Events</a>
-          <a href="tickets.html" class="xbtn-out"><i data-lucide="ticket"></i>Tickets</a>
-          <a href="leaderboard.html" class="xbtn-out"><i data-lucide="trophy"></i>Rankings</a>
+        <!-- Actions -->
+        <div class="hero-actions">
+          <a href="events.html" class="hbtn hbtn-primary"><i data-lucide="search"></i>Browse Events</a>
+          <a href="tickets.html" class="hbtn hbtn-ghost"><i data-lucide="ticket"></i>My Tickets</a>
+          <a href="leaderboard.html" class="hbtn hbtn-ghost"><i data-lucide="trophy"></i>Rankings</a>
+        </div>
+      </div>
+      <!-- Bottom strip -->
+      <div class="hero-strip">
+        <div class="strip-item"><i data-lucide="map-pin" style="width:13px;height:13px;opacity:0.4"></i><strong id="strip-college">AGRATHA 2K26</strong></div>
+        <div class="strip-sep"></div>
+        <div class="strip-item"><i data-lucide="calendar" style="width:13px;height:13px;opacity:0.4"></i>Fest: <strong>Sep 15, 2026</strong></div>
+        <div class="strip-sep"></div>
+        <div class="strip-item"><i data-lucide="mail" style="width:13px;height:13px;opacity:0.4"></i><strong id="strip-email">—</strong></div>
+        <div class="strip-pts">
+          <span class="pts-label">Fest Score</span>
+          <div class="pts-track"><div class="pts-fill" id="pts-fill"></div></div>
+          <span class="pts-val" id="pts-val">0</span>
         </div>
       </div>
     </div>
 
-    <!-- ══ STATS ══ -->
-    <div class="xstats">
-      <div class="xsc xsc-1 xu u2">
-        <div class="xsc-bg-icon">⚡</div>
-        <div class="xsc-icon"><i data-lucide="zap"></i></div>
-        <div class="xsc-num" id="stat-events">0</div>
-        <div class="xsc-label">Events Joined</div>
-        <div class="xsc-sub"><i data-lucide="activity"></i> Active participant</div>
+    <!-- ══ STAT CARDS ══ -->
+    <div class="stats-row">
+      <div class="sc sc-1 su d2">
+        <div class="sc-glow"></div>
+        <div class="sc-top">
+          <div class="sc-ico"><i data-lucide="zap"></i></div>
+          <div class="sc-spark" id="spark-events">
+            <div class="spark-bar" style="height:40%"></div>
+            <div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar" style="height:45%"></div>
+            <div class="spark-bar" style="height:80%"></div>
+            <div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar" id="spark-ev-last" style="height:100%"></div>
+          </div>
+        </div>
+        <div class="sc-num" id="stat-events">0</div>
+        <div class="sc-label">Events Joined</div>
+        <div class="sc-trend"><i data-lucide="activity"></i>Active participant</div>
       </div>
-      <div class="xsc xsc-2 xu u3">
-        <div class="xsc-bg-icon">👥</div>
-        <div class="xsc-icon"><i data-lucide="users"></i></div>
-        <div class="xsc-num" id="stat-teams">0</div>
-        <div class="xsc-label">Teams</div>
-        <div class="xsc-sub"><i data-lucide="shield"></i> Squad member</div>
+      <div class="sc sc-2 su d3">
+        <div class="sc-glow"></div>
+        <div class="sc-top">
+          <div class="sc-ico"><i data-lucide="users"></i></div>
+          <div class="sc-spark">
+            <div class="spark-bar" style="height:30%"></div>
+            <div class="spark-bar" style="height:50%"></div>
+            <div class="spark-bar" style="height:70%"></div>
+            <div class="spark-bar" style="height:40%"></div>
+            <div class="spark-bar" style="height:90%"></div>
+            <div class="spark-bar" style="height:65%"></div>
+          </div>
+        </div>
+        <div class="sc-num" id="stat-teams">0</div>
+        <div class="sc-label">Teams</div>
+        <div class="sc-trend"><i data-lucide="shield"></i>Squad member</div>
       </div>
-      <div class="xsc xsc-3 xu u4">
-        <div class="xsc-bg-icon">🎟</div>
-        <div class="xsc-icon"><i data-lucide="ticket"></i></div>
-        <div class="xsc-num" id="stat-tickets">0</div>
-        <div class="xsc-label">Tickets</div>
-        <div class="xsc-sub"><i data-lucide="check-circle"></i> Confirmed</div>
+      <div class="sc sc-3 su d4">
+        <div class="sc-glow"></div>
+        <div class="sc-top">
+          <div class="sc-ico"><i data-lucide="ticket"></i></div>
+          <div class="sc-spark">
+            <div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar" style="height:35%"></div>
+            <div class="spark-bar" style="height:75%"></div>
+            <div class="spark-bar" style="height:50%"></div>
+            <div class="spark-bar" style="height:85%"></div>
+            <div class="spark-bar" style="height:100%"></div>
+          </div>
+        </div>
+        <div class="sc-num" id="stat-tickets">0</div>
+        <div class="sc-label">Tickets</div>
+        <div class="sc-trend"><i data-lucide="check-circle"></i>Confirmed</div>
       </div>
-      <div class="xsc xsc-4 xu u5">
-        <div class="xsc-bg-icon">⭐</div>
-        <div class="xsc-icon"><i data-lucide="star"></i></div>
-        <div class="xsc-num" id="stat-points">0</div>
-        <div class="xsc-label">Points</div>
-        <div class="xsc-sub"><i data-lucide="award"></i> On leaderboard</div>
+      <div class="sc sc-4 su d5">
+        <div class="sc-glow"></div>
+        <div class="sc-top">
+          <div class="sc-ico"><i data-lucide="star"></i></div>
+          <div class="sc-spark">
+            <div class="spark-bar" style="height:20%"></div>
+            <div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar" style="height:40%"></div>
+            <div class="spark-bar" style="height:80%"></div>
+            <div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar" style="height:100%"></div>
+          </div>
+        </div>
+        <div class="sc-num" id="stat-points">0</div>
+        <div class="sc-label">Points</div>
+        <div class="sc-trend"><i data-lucide="award"></i>On leaderboard</div>
       </div>
     </div>
 
     <!-- ══ MAIN GRID ══ -->
-    <div class="xgrid">
+    <div class="grid-main">
 
-      <!-- LEFT -->
-      <div class="xleft">
-        <div class="xpanel xu u6">
-          <div class="xpanel-head">
-            <div class="xpanel-hgroup">
-              <div class="xpanel-ico xi-c"><i data-lucide="calendar-days"></i></div>
+      <!-- LEFT COLUMN -->
+      <div class="col-l">
+
+        <!-- My Events (tabbed) -->
+        <div class="panel su d6">
+          <div class="panel-head">
+            <div class="panel-hgrp">
+              <div class="panel-ico pi-c"><i data-lucide="calendar-days"></i></div>
               <div>
-                <div class="xpanel-ttl">My Registered Events</div>
-                <div class="xpanel-sub">Your upcoming competitions</div>
+                <div class="panel-ttl">My Events</div>
+                <div class="panel-sub">Your upcoming competitions</div>
               </div>
             </div>
-            <a href="events.html" class="xpanel-all">Browse all <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
-          </div>
-          <div class="xready" id="xready">
-            <div class="xready-row">
-              <div class="xready-lbl">🎯 Fest Readiness Score</div>
-              <div class="xready-pct" id="xready-pct">0%</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="tabs">
+                <button class="tab active" onclick="switchTab('registered',this)">Registered</button>
+                <button class="tab" onclick="switchTab('upcoming',this)">Upcoming</button>
+              </div>
+              <a href="events.html" class="panel-link">All <i data-lucide="arrow-right"></i></a>
             </div>
-            <div class="xready-track"><div class="xready-fill" id="xready-fill"></div></div>
           </div>
-          <div class="xpanel-body" id="my-events"><div class="loading-spinner"></div></div>
+          <div class="panel-body">
+            <div class="readiness" id="readiness">
+              <div class="rdy-top">
+                <div class="rdy-lbl">🎯 Fest Readiness Score</div>
+                <div class="rdy-pct" id="rdy-pct">0%</div>
+              </div>
+              <div class="rdy-track"><div class="rdy-fill" id="rdy-fill"></div></div>
+            </div>
+            <div class="ev-list" id="my-events"><div class="loading-spinner"></div></div>
+          </div>
         </div>
+
+        <!-- Recent Activity -->
+        <div class="panel su d7">
+          <div class="panel-head">
+            <div class="panel-hgrp">
+              <div class="panel-ico pi-g"><i data-lucide="activity"></i></div>
+              <div>
+                <div class="panel-ttl">Recent Activity</div>
+                <div class="panel-sub">Your latest actions</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="act-list" id="activity-feed">
+              <div class="act-item">
+                <div class="act-dot act-dot-c">🎯</div>
+                <div class="act-text">
+                  <div class="act-ttl">Welcome to <strong>AGRATHA 2K26</strong>! Your dashboard is ready.</div>
+                  <div class="act-time">Just now</div>
+                </div>
+              </div>
+              <div class="act-item">
+                <div class="act-dot act-dot-p">📣</div>
+                <div class="act-text">
+                  <div class="act-ttl">Check the <strong>Announcements</strong> for latest fest updates</div>
+                  <div class="act-time">Always live</div>
+                </div>
+              </div>
+              <div class="act-item">
+                <div class="act-dot act-dot-g">🏆</div>
+                <div class="act-text">
+                  <div class="act-ttl">Visit the <strong>Leaderboard</strong> to track your rank</div>
+                  <div class="act-time">Updated live</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- RIGHT -->
-      <div class="xright">
+      <!-- RIGHT COLUMN -->
+      <div class="col-r">
 
         <!-- Countdown -->
-        <div class="xpanel xu u6">
-          <div class="xpanel-head">
-            <div class="xpanel-hgroup">
-              <div class="xpanel-ico xi-p"><i data-lucide="clock"></i></div>
+        <div class="panel su d6">
+          <div class="panel-head">
+            <div class="panel-hgrp">
+              <div class="panel-ico pi-p"><i data-lucide="clock"></i></div>
               <div>
-                <div class="xpanel-ttl">Fest Countdown</div>
-                <div class="xpanel-sub">VAIBHAV 2K26 begins in</div>
+                <div class="panel-ttl">Fest Countdown</div>
+                <div class="panel-sub">AGRATHA 2K26 begins in</div>
               </div>
             </div>
-            <div class="xcd-live"><span class="xcd-live-dot"></span>LIVE</div>
+            <div class="cd-live-badge"><span class="cd-live-dot"></span>LIVE</div>
           </div>
-          <div class="xpanel-body">
-            <div class="xcd-title">Time remaining until the fest</div>
-            <div class="xcd-grid">
-              <div class="xcd-seg"><span class="xcd-n" id="cd-days">00</span><span class="xcd-l">Days</span></div>
-              <div class="xcd-seg"><span class="xcd-n" id="cd-hrs">00</span><span class="xcd-l">Hours</span></div>
-              <div class="xcd-seg"><span class="xcd-n" id="cd-min">00</span><span class="xcd-l">Mins</span></div>
-              <div class="xcd-seg"><span class="xcd-n" id="cd-sec">00</span><span class="xcd-l">Secs</span></div>
+          <div class="panel-body">
+            <div class="cd-wrap">
+              <div class="cd-label">Time remaining until the fest</div>
+              <div class="cd-grid">
+                <div class="cd-seg"><span class="cd-n" id="cd-days">00</span><span class="cd-l">Days</span></div>
+                <div class="cd-seg"><span class="cd-n" id="cd-hrs">00</span><span class="cd-l">Hours</span></div>
+                <div class="cd-seg"><span class="cd-n" id="cd-min">00</span><span class="cd-l">Mins</span></div>
+                <div class="cd-seg"><span class="cd-n" id="cd-sec">00</span><span class="cd-l">Secs</span></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Quick Nav -->
-        <div class="xpanel xu u7">
-          <div class="xpanel-head">
-            <div class="xpanel-hgroup">
-              <div class="xpanel-ico xi-o"><i data-lucide="layout-grid"></i></div>
+        <!-- Quick Access -->
+        <div class="panel su d7">
+          <div class="panel-head">
+            <div class="panel-hgrp">
+              <div class="panel-ico pi-o"><i data-lucide="layout-grid"></i></div>
               <div>
-                <div class="xpanel-ttl">Quick Access</div>
-                <div class="xpanel-sub">Jump anywhere</div>
+                <div class="panel-ttl">Quick Access</div>
+                <div class="panel-sub">Jump anywhere fast</div>
               </div>
             </div>
           </div>
-          <div class="xpanel-body">
-            <div class="xqnav">
-              <a href="events.html" class="xqnav-card"><div class="xqnav-ico xqi-c"><i data-lucide="calendar"></i></div><div><div class="xqnav-ttl">Events</div><div class="xqnav-sub">Discover &amp; register</div></div></a>
-              <a href="teams.html"  class="xqnav-card"><div class="xqnav-ico xqi-p"><i data-lucide="users"></i></div><div><div class="xqnav-ttl">My Teams</div><div class="xqnav-sub">Manage squads</div></div></a>
-              <a href="leaderboard.html" class="xqnav-card"><div class="xqnav-ico xqi-pk"><i data-lucide="trophy"></i></div><div><div class="xqnav-ttl">Leaderboard</div><div class="xqnav-sub">Top performers</div></div></a>
-              <a href="profile.html" class="xqnav-card"><div class="xqnav-ico xqi-g"><i data-lucide="user-circle"></i></div><div><div class="xqnav-ttl">Profile</div><div class="xqnav-sub">Your account</div></div></a>
+          <div class="panel-body">
+            <div class="qnav">
+              <a href="events.html" class="qcard">
+                <div class="qico qci-c"><i data-lucide="calendar"></i></div>
+                <div><div class="qttl">Events</div><div class="qsub">Discover &amp; register</div></div>
+              </a>
+              <a href="teams.html" class="qcard">
+                <div class="qico qci-p"><i data-lucide="users"></i></div>
+                <div><div class="qttl">My Teams</div><div class="qsub">Manage squads</div></div>
+              </a>
+              <a href="leaderboard.html" class="qcard">
+                <div class="qico qci-pk"><i data-lucide="trophy"></i></div>
+                <div><div class="qttl">Leaderboard</div><div class="qsub">Top performers</div></div>
+              </a>
+              <a href="profile.html" class="qcard">
+                <div class="qico qci-g"><i data-lucide="user-circle"></i></div>
+                <div><div class="qttl">Profile</div><div class="qsub">Your account</div></div>
+              </a>
             </div>
           </div>
         </div>
 
         <!-- Announcements -->
-        <div class="xpanel xu u8">
-          <div class="xpanel-head">
-            <div class="xpanel-hgroup">
-              <div class="xpanel-ico xi-pk"><i data-lucide="bell"></i></div>
+        <div class="panel su d8">
+          <div class="panel-head">
+            <div class="panel-hgrp">
+              <div class="panel-ico pi-pk"><i data-lucide="bell"></i></div>
               <div>
-                <div class="xpanel-ttl">Announcements</div>
-                <div class="xpanel-sub">Latest from organizers</div>
+                <div class="panel-ttl">Announcements</div>
+                <div class="panel-sub">From organizers</div>
               </div>
             </div>
-            <a href="announcements.html" class="xpanel-all">See all <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+            <a href="announcements.html" class="panel-link">See all <i data-lucide="arrow-right"></i></a>
           </div>
-          <div class="xpanel-body" id="recent-announcements"><div class="loading-spinner"></div></div>
+          <div class="panel-body" id="recent-announcements"><div class="loading-spinner"></div></div>
         </div>
 
       </div>
@@ -686,137 +879,187 @@
   </div>
 
   <script>
+    /* ─── Helpers ─── */
     const getGreeting = () => {
       const h = new Date().getHours();
-      if(h<5)  return '🌙 Good night';
-      if(h<12) return '🌅 Good morning';
-      if(h<17) return '☀️ Good afternoon';
-      if(h<21) return '🌆 Good evening';
-      return '🌙 Good night';
+      if(h < 5)  return '🌙 Good Night';
+      if(h < 12) return '🌅 Good Morning';
+      if(h < 17) return '☀️ Good Afternoon';
+      if(h < 21) return '🌆 Good Evening';
+      return '🌙 Good Night';
     };
-    const GRADS=['linear-gradient(135deg,#00f0ff,#0066ff)','linear-gradient(135deg,#bd00ff,#7c3aed)','linear-gradient(135deg,#ff007f,#be185d)','linear-gradient(135deg,#00ff9d,#059669)','linear-gradient(135deg,#ffaa00,#d97706)'];
-    const avBg = n => GRADS[(n||'A').charCodeAt(0)%GRADS.length];
+    const GRADS = ['linear-gradient(135deg,#00f0ff,#0066ff)','linear-gradient(135deg,#bd00ff,#7c3aed)','linear-gradient(135deg,#ff007f,#be185d)','linear-gradient(135deg,#00ff9d,#059669)','linear-gradient(135deg,#ffaa00,#d97706)'];
+    const avBg = n => GRADS[(n||'A').charCodeAt(0) % GRADS.length];
     const ini  = n => (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    function countUp(el,end,dur=1300){
-      if(!el||isNaN(end))return;
-      let t=null;
-      const step=ts=>{
-        if(!t)t=ts;
-        const p=Math.min((ts-t)/dur,1);
-        el.textContent=Math.floor((1-Math.pow(1-p,4))*end);
-        if(p<1) requestAnimationFrame(step);
+
+    function countUp(el, end, dur=1300) {
+      if(!el || isNaN(end)) return;
+      let t = null;
+      const step = ts => {
+        if(!t) t = ts;
+        const p = Math.min((ts-t)/dur, 1);
+        el.textContent = Math.floor((1-Math.pow(1-p,4))*end);
+        if(p < 1) requestAnimationFrame(step);
       };
       requestAnimationFrame(step);
     }
-    const CAT_CLS  ={technical:'eth-t',cultural:'eth-c',sports:'eth-s',workshop:'eth-w',gaming:'eth-g'};
-    const CAT_ICON ={technical:'💻',cultural:'🎭',sports:'⚽',workshop:'🔧',gaming:'🎮'};
-    const fmtD=d=>d?new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'TBD';
-    const fmtDT=d=>d?new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'TBD';
 
-    function startCD(target){
-      const pad=n=>String(n).padStart(2,'0');
-      const tick=()=>{
-        const diff=new Date(target).getTime()-Date.now();
-        if(diff<=0){['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='00'});return;}
-        document.getElementById('cd-days').textContent=pad(Math.floor(diff/86400000));
-        document.getElementById('cd-hrs').textContent=pad(Math.floor(diff%86400000/3600000));
-        document.getElementById('cd-min').textContent=pad(Math.floor(diff%3600000/60000));
-        document.getElementById('cd-sec').textContent=pad(Math.floor(diff%60000/1000));
+    const CAT_CLS  = {technical:'et-t',cultural:'et-c',sports:'et-s',workshop:'et-w',gaming:'et-g'};
+    const CAT_ICON = {technical:'💻',cultural:'🎭',sports:'⚽',workshop:'🔧',gaming:'🎮'};
+    const fmtD  = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'TBD';
+    const fmtDT = d => d ? new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'TBD';
+
+    /* ─── Countdown ─── */
+    function startCD(target) {
+      const pad = n => String(n).padStart(2,'0');
+      const tick = () => {
+        const diff = new Date(target).getTime() - Date.now();
+        if(diff <= 0) { ['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent='00'; }); return; }
+        document.getElementById('cd-days').textContent = pad(Math.floor(diff/86400000));
+        document.getElementById('cd-hrs').textContent  = pad(Math.floor(diff%86400000/3600000));
+        document.getElementById('cd-min').textContent  = pad(Math.floor(diff%3600000/60000));
+        document.getElementById('cd-sec').textContent  = pad(Math.floor(diff%60000/1000));
       };
-      tick(); setInterval(tick,1000);
+      tick(); setInterval(tick, 1000);
     }
 
-    document.addEventListener('DOMContentLoaded', async ()=>{
-      // Process OAuth redirect first (Google sign-in lands here)
-      if (typeof handleOAuthCallback === 'function') {
-        await handleOAuthCallback();
+    /* ─── Tab switcher ─── */
+    let allRegs = [];
+    function switchTab(mode, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderEvents(mode);
+    }
+
+    function renderEvents(mode) {
+      const evDiv = document.getElementById('my-events');
+      if(!allRegs.length) {
+        evDiv.innerHTML = `<div class="empty"><span class="empty-icon">📅</span><h4>No events registered yet</h4><p>Explore upcoming events and secure your spot!</p><a href="events.html" class="empty-btn"><i data-lucide="search"></i>Browse Events</a></div>`;
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+        return;
       }
+      const sc = s => s==='confirmed'?'es-confirmed':s==='pending'?'es-pending':'es-attended';
+      evDiv.innerHTML = `<div class="ev-list">${allRegs.map(r => {
+        const ev = r.events||{}; const cat = ev.category||'technical';
+        return `<a href="event-detail.html?id=${r.event_id}" class="ev-item">
+          <div class="ev-thumb ${CAT_CLS[cat]||'et-t'}">${CAT_ICON[cat]||'🎯'}</div>
+          <div class="ev-info">
+            <div class="ev-name">${ev.title||'Event'}</div>
+            <div class="ev-meta"><span>📅 ${fmtD(ev.event_date)}</span><span>📍 ${ev.venue||'TBD'}</span></div>
+          </div>
+          <div class="ev-right">
+            <span class="ev-status ${sc(r.status||'confirmed')}">${r.status||'confirmed'}</span>
+            <span class="ev-arrow"><i data-lucide="chevron-right"></i></span>
+          </div>
+        </a>`;
+      }).join('')}</div>`;
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    /* ─── Main Init ─── */
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Handle OAuth redirect (Google sign-in lands here)
+      if(typeof handleOAuthCallback === 'function') await handleOAuthCallback();
 
       const user = await requireAuth('participant');
       if(!user) return;
 
       renderNavbar('dashboard');
       renderSidebar('participant','overview');
-      if(typeof initParticles==='function') initParticles('particles-canvas',12);
-      if(typeof lucide!=='undefined') lucide.createIcons();
+      if(typeof initParticles === 'function') initParticles('particles-canvas', 12);
+      if(typeof lucide !== 'undefined') lucide.createIcons();
 
-      // Banner
+      /* ── Populate hero ── */
       document.getElementById('time-greeting').textContent = getGreeting();
-      const first=(user.full_name||'Participant').split(' ')[0];
+      const first = (user.full_name||'Participant').split(' ')[0];
       document.getElementById('user-first-name').textContent = first;
-      if(user.college) document.getElementById('user-college').textContent = user.college+(user.department?' · '+user.department:'');
-      const roleEl=document.getElementById('user-role-label');
-      if(roleEl) roleEl.textContent=(user.role||'participant').charAt(0).toUpperCase()+(user.role||'participant').slice(1);
-      const av=document.getElementById('dash-avatar');
-      if(user.avatar_url){ av.innerHTML=`<img src="${user.avatar_url}" alt="Avatar">`; av.style.background='transparent'; }
-      else { av.textContent=ini(user.full_name); av.style.background=avBg(user.full_name); }
 
-      // Countdown  ← change this date to your real fest date!
+      const college = user.college ? user.college+(user.department?' · '+user.department:'') : 'AGRATHA 2K26';
+      document.getElementById('user-college').textContent = college;
+      document.getElementById('strip-college').textContent = college;
+      document.getElementById('strip-email').textContent = user.email || '—';
+
+      const roleEl = document.getElementById('user-role-label');
+      if(roleEl) roleEl.textContent = (user.role||'participant').charAt(0).toUpperCase()+(user.role||'participant').slice(1);
+
+      const av = document.getElementById('dash-avatar');
+      if(user.avatar_url) { av.innerHTML = `<img src="${user.avatar_url}" alt="Avatar">`; av.style.background = 'transparent'; }
+      else { av.textContent = ini(user.full_name); av.style.background = avBg(user.full_name); }
+
+      /* ── Countdown ── */
       startCD('2026-09-15T09:00:00');
 
-      // Stats
-      let evtC=0,teamC=0;
-      try{
-        const[r,t]=await Promise.all([
+      /* ── Stats ── */
+      let evtC=0, teamC=0;
+      try {
+        const [r,t] = await Promise.all([
           supabase.from('registrations').select('id',{count:'exact',head:true}).eq('user_id',user.id),
           supabase.from('team_members').select('id',{count:'exact',head:true}).eq('user_id',user.id),
         ]);
-        evtC=r.count||0; teamC=t.count||0;
-      }catch(e){}
-      const pts=user.points||0;
-      setTimeout(()=>{
-        countUp(document.getElementById('stat-events'),evtC,1200);
-        countUp(document.getElementById('stat-teams'),teamC,1200);
-        countUp(document.getElementById('stat-tickets'),evtC,1200);
-        countUp(document.getElementById('stat-points'),pts,1400);
-      },300);
+        evtC = r.count||0; teamC = t.count||0;
+      } catch(e){}
 
-      // Readiness
-      if(evtC>0){
-        const pct=Math.min(100,Math.round((evtC/5)*100));
-        const r=document.getElementById('xready'); if(r) r.style.display='block';
-        document.getElementById('xready-pct').textContent=pct+'%';
-        setTimeout(()=>{ const f=document.getElementById('xready-fill'); if(f) f.style.width=pct+'%'; },700);
+      const pts = user.points||0;
+
+      setTimeout(() => {
+        countUp(document.getElementById('stat-events'),  evtC, 1200);
+        countUp(document.getElementById('stat-teams'),   teamC, 1200);
+        countUp(document.getElementById('stat-tickets'), evtC, 1200);
+        countUp(document.getElementById('stat-points'),  pts,  1400);
+      }, 300);
+
+      /* ── Points bar ── */
+      const maxPts = 500;
+      document.getElementById('pts-val').textContent = pts;
+      setTimeout(() => {
+        const pf = document.getElementById('pts-fill');
+        if(pf) pf.style.width = Math.min(100, Math.round((pts/maxPts)*100)) + '%';
+      }, 600);
+
+      /* ── Readiness ── */
+      if(evtC > 0) {
+        const pct = Math.min(100, Math.round((evtC/5)*100));
+        const r = document.getElementById('readiness'); if(r) r.style.display = 'block';
+        document.getElementById('rdy-pct').textContent = pct+'%';
+        setTimeout(() => { const f=document.getElementById('rdy-fill'); if(f) f.style.width=pct+'%'; }, 700);
       }
 
-      // Events
-      const evDiv=document.getElementById('my-events');
-      try{
-        const{data:regs}=await supabase.from('registrations').select('*,events(*)').eq('user_id',user.id).limit(6);
-        if(!regs||!regs.length){
-          evDiv.innerHTML=`<div class="xempty"><span class="xempty-icon">📅</span><h4>No events registered yet</h4><p>Explore upcoming events and secure your spot!</p><a href="events.html" class="xempty-btn"><i data-lucide="search"></i>Browse Events</a></div>`;
+      /* ── Events ── */
+      const evDiv = document.getElementById('my-events');
+      try {
+        const { data: regs } = await supabase.from('registrations').select('*,events(*)').eq('user_id',user.id).limit(8);
+        allRegs = regs||[];
+        renderEvents('registered');
+      } catch(e) {
+        evDiv.innerHTML = `<div class="empty"><p>Could not load events.</p></div>`;
+      }
+
+      /* ── Announcements ── */
+      const annDiv = document.getElementById('recent-announcements');
+      try {
+        const { data: anns } = await supabase.from('announcements').select('*').order('created_at',{ascending:false}).limit(4);
+        if(!anns||!anns.length) {
+          annDiv.innerHTML = `<div class="empty"><span class="empty-icon">📢</span><h4>No announcements yet</h4><p>Check back soon!</p></div>`;
         } else {
-          const sc=s=>s==='confirmed'?'xs-confirmed':s==='pending'?'xs-pending':'xs-attended';
-          evDiv.innerHTML=`<div class="xev-list">${regs.map(r=>{
-            const ev=r.events||{}; const cat=ev.category||'technical';
-            return `<a href="event-detail.html?id=${r.event_id}" class="xev-item">
-              <div class="xev-thumb ${CAT_CLS[cat]||'eth-t'}">${CAT_ICON[cat]||'🎯'}</div>
-              <div class="xev-info">
-                <div class="xev-name">${ev.title||'Event'}</div>
-                <div class="xev-meta"><span>📅 ${fmtD(ev.event_date)}</span><span>📍 ${ev.venue||'TBD'}</span></div>
-              </div>
-              <span class="xev-status ${sc(r.status||'confirmed')}">${r.status||'confirmed'}</span>
-            </a>`;
+          annDiv.innerHTML = `<div class="ann-list">${anns.map(a => {
+            const p = a.priority||'normal';
+            const b = p==='urgent'
+              ? `<span class="ann-badge ab-urgent">🔴 Urgent</span>`
+              : p==='important'
+              ? `<span class="ann-badge ab-important">🟡 Important</span>`
+              : '';
+            return `<div class="ann-item ${p}">
+              <div class="ann-row"><div class="ann-ttl">${a.title||'Announcement'}</div>${b}</div>
+              <div class="ann-body">${a.content||''}</div>
+              <div class="ann-time">${fmtDT(a.created_at)}</div>
+            </div>`;
           }).join('')}</div>`;
         }
-      }catch(e){ evDiv.innerHTML=`<div class="xempty"><p>Could not load events.</p></div>`; }
+      } catch(e) {
+        annDiv.innerHTML = `<div class="empty"><p>Could not load.</p></div>`;
+      }
 
-      // Announcements
-      const annDiv=document.getElementById('recent-announcements');
-      try{
-        const{data:anns}=await supabase.from('announcements').select('*').order('created_at',{ascending:false}).limit(5);
-        if(!anns||!anns.length){
-          annDiv.innerHTML=`<div class="xempty"><span class="xempty-icon">📢</span><h4>No announcements yet</h4><p>Check back soon!</p></div>`;
-        } else {
-          annDiv.innerHTML=`<div class="xann-list">${anns.map(a=>{
-            const p=a.priority||'normal';
-            const b=p==='urgent'?`<span class="xann-badge xab-urgent">🔴 Urgent</span>`:p==='important'?`<span class="xann-badge xab-important">🟡 Important</span>`:'';
-            return `<div class="xann-item ${p}"><div class="xann-row"><div class="xann-ttl">${a.title||'Announcement'}</div>${b}</div><div class="xann-body">${a.content||''}</div><div class="xann-time">${fmtDT(a.created_at)}</div></div>`;
-          }).join('')}</div>`;
-        }
-      }catch(e){ annDiv.innerHTML=`<div class="xempty"><p>Could not load.</p></div>`; }
-
-      if(typeof lucide!=='undefined') lucide.createIcons();
+      if(typeof lucide !== 'undefined') lucide.createIcons();
     });
   </script>
 </body>
